@@ -1,0 +1,10 @@
+# ไฟล์ขยะของ Windows/Mac
+Thumbs.db
+.DS_Store
+
+# โฟลเดอร์รูปภาพที่อัปโหลด (เราจะไม่เก็บรูปทดสอบขึ้น Git)
+src/uploads/*
+!src/uploads/.gitkeep
+
+# ข้อมูล Database (ถ้าเผลอ Map ออกมาข้างนอก)
+mysql_data/

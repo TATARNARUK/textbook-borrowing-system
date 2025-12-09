@@ -1,0 +1,50 @@
+version: '3.8'
+
+services:
+  # 1. ส่วนของ Web Server (PHP + Apache)
+  web:
+    image: php:8.2-apache
+    container_name: lib_web
+    ports:
+      - "8099:80" 
+    volumes:
+      - ./src:/var/www/html # โฟลเดอร์ src ในเครื่องเรา คือหน้าเว็บ
+    networks:
+      - lib-network
+    # ติดตั้ง Extension ที่จำเป็นสำหรับเชื่อมต่อ MySQL และจัดการรูปภาพ
+    command: >
+      bash -c "docker-php-ext-install mysqli pdo pdo_mysql && docker-php-entrypoint apache2-foreground"
+
+  # 2. ส่วนของ Database (MySQL)
+  db:
+    image: mysql:8.0
+    container_name: lib_db
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpassword # รหัสผ่าน Root
+      MYSQL_DATABASE: library_db      # ชื่อฐานข้อมูล
+      MYSQL_USER: user
+      MYSQL_PASSWORD: password
+    volumes:
+      - db_data:/var/lib/mysql
+    networks:
+      - lib-network
+
+  # 3. ส่วนจัดการ Database (phpMyAdmin)
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin
+    container_name: lib_pma
+    links:
+      - db
+    ports:
+      - "8083:80" # เข้าจัดการ Database ผ่าน http://localhost:8081
+    environment:
+      PMA_HOST: db
+      MYSQL_ROOT_PASSWORD: rootpassword
+    networks:
+      - lib-network
+
+networks:
+  lib-network:
+
+volumes:
+  db_data:
