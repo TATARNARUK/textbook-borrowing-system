@@ -52,48 +52,100 @@ $user_role = $_SESSION['role']; // admin หรือ student
     <div class="container">
         
         <?php if($user_role == 'admin') { 
-            // Query ข้อมูลสรุป
+            // Query ข้อมูลตัวเลข
             $cnt_users = $pdo->query("SELECT COUNT(*) FROM users WHERE role='student'")->fetchColumn();
             $cnt_books = $pdo->query("SELECT COUNT(*) FROM book_items")->fetchColumn();
             $cnt_borrow = $pdo->query("SELECT COUNT(*) FROM book_items WHERE status='borrowed'")->fetchColumn();
-            
-            // นับหนังสือที่เกินกำหนด (Due date น้อยกว่าวันนี้ และยังไม่ได้คืน)
+            $cnt_available = $pdo->query("SELECT COUNT(*) FROM book_items WHERE status='available'")->fetchColumn();
             $cnt_overdue = $pdo->query("SELECT COUNT(*) FROM transactions WHERE status='borrowed' AND due_date < NOW()")->fetchColumn();
         ?>
-        <div class="row mb-4">
-            <div class="col-md-3">
-                <div class="card bg-primary text-white shadow-sm">
-                    <div class="card-body">
-                        <h3><?php echo $cnt_users; ?></h3>
-                        <p class="mb-0"><i class="fa-solid fa-users"></i> นักเรียนทั้งหมด</p>
+        <div class="row mb-5">
+            <div class="col-md-8">
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <div class="card p-3 border-start border-4 border-primary h-100">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <h6 class="text-muted text-uppercase mb-1">นักเรียนทั้งหมด</h6>
+                                    <h2 class="mb-0 fw-bold text-primary"><?php echo number_format($cnt_users); ?></h2>
+                                </div>
+                                <div class="fs-1 text-primary opacity-25"><i class="fa-solid fa-users"></i></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="card p-3 border-start border-4 border-success h-100">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <h6 class="text-muted text-uppercase mb-1">หนังสือทั้งหมด (เล่ม)</h6>
+                                    <h2 class="mb-0 fw-bold text-success"><?php echo number_format($cnt_books); ?></h2>
+                                </div>
+                                <div class="fs-1 text-success opacity-25"><i class="fa-solid fa-book"></i></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="card p-3 border-start border-4 border-warning h-100">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <h6 class="text-muted text-uppercase mb-1">กำลังถูกยืม</h6>
+                                    <h2 class="mb-0 fw-bold text-warning"><?php echo number_format($cnt_borrow); ?></h2>
+                                </div>
+                                <div class="fs-1 text-warning opacity-25"><i class="fa-solid fa-hand-holding-heart"></i></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="card p-3 border-start border-4 border-danger h-100">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <h6 class="text-muted text-uppercase mb-1">เกินกำหนดส่ง!</h6>
+                                    <h2 class="mb-0 fw-bold text-danger"><?php echo number_format($cnt_overdue); ?></h2>
+                                </div>
+                                <div class="fs-1 text-danger opacity-25"><i class="fa-solid fa-bell"></i></div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
-            <div class="col-md-3">
-                <div class="card bg-success text-white shadow-sm">
-                    <div class="card-body">
-                        <h3><?php echo $cnt_books; ?></h3>
-                        <p class="mb-0"><i class="fa-solid fa-book"></i> หนังสือในสต็อก (เล่ม)</p>
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-3">
-                <div class="card bg-warning text-dark shadow-sm">
-                    <div class="card-body">
-                        <h3><?php echo $cnt_borrow; ?></h3>
-                        <p class="mb-0"><i class="fa-solid fa-hand-holding"></i> กำลังถูกยืม</p>
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-3">
-                <div class="card bg-danger text-white shadow-sm">
-                    <div class="card-body">
-                        <h3><?php echo $cnt_overdue; ?></h3>
-                        <p class="mb-0"><i class="fa-solid fa-circle-exclamation"></i> เกินกำหนดคืน!</p>
+
+            <div class="col-md-4">
+                <div class="card h-100 shadow-sm">
+                    <div class="card-body text-center">
+                        <h6 class="text-muted mb-3">สถานะคลังหนังสือ</h6>
+                        <div style="height: 200px; position: relative;">
+                            <canvas id="stockChart"></canvas>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
+        <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+        <script>
+            // รอเว็บโหลดเสร็จค่อยวาดกราฟ
+            document.addEventListener("DOMContentLoaded", function() {
+                const ctx = document.getElementById('stockChart').getContext('2d');
+                new Chart(ctx, {
+                    type: 'doughnut', // กราฟวงกลมแบบโดนัท
+                    data: {
+                        labels: ['ว่างพร้อมยืม', 'ถูกยืมออกไป'],
+                        datasets: [{
+                            data: [<?php echo $cnt_available; ?>, <?php echo $cnt_borrow; ?>],
+                            backgroundColor: ['#198754', '#ffc107'], // สีเขียว, สีเหลือง
+                            borderWidth: 0,
+                            hoverOffset: 4
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: { position: 'bottom' }
+                        }
+                    }
+                });
+            });
+        </script>
         <?php } ?>
         <div class="d-flex justify-content-between align-items-center mb-4">
     </nav>
