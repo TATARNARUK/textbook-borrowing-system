@@ -62,7 +62,7 @@ if (isset($_POST['save_book'])) {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>เพิ่มหนังสือใหม่ - ระบบห้องสมุด</title>
-    <link rel="icon" type="image/png" href="images/LOGO-BNCC.png">
+    <link rel="icon" type="image/png" href="images/logo2.png">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;600&display=swap" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css" rel="stylesheet">
