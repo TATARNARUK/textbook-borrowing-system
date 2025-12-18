@@ -31,20 +31,42 @@ $transactions = $stmt->fetchAll();
 <head>
     <meta charset="UTF-8">
     <title>รายงานสรุปการยืม-คืน</title>
-    <link rel="icon" type="image/png" href="images/logo2.png">
+    <link rel="icon" type="image/png" href="images/books.png">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 
-    <style>
+<style>
         body { font-family: 'Sarabun', sans-serif; background-color: #f8f9fa; }
         
-        /* CSS พิเศษสำหรับตอนสั่ง Print (ซ่อนปุ่ม/เมนู) */
+        /* CSS สำหรับโหมดพิมพ์ (Print) */
         @media print {
-            .no-print { display: none !important; } /* ซ่อนสิ่งที่ไม่อยากให้พิมพ์ */
-            .card { border: none !important; box-shadow: none !important; }
-            body { background-color: white; }
-            .container { max-width: 100%; width: 100%; padding: 0; }
+            /* 1. ซ่อนเมนู, ปุ่มกด, และ Navbar */
+            .no-print, .navbar, nav, header, .btn { 
+                display: none !important; 
+            } 
+            
+            /* 2. ปรับหน้ากระดาษให้สะอาด (ลบวันที่/URL ที่หัวกระดาษ) */
+            @page { 
+                size: auto;   /* auto is the initial value */
+                margin: 0mm;  /* this affects the margin in the printer settings */
+            }
+
+            /* 3. จัดจัดหน้าให้สวยงาม */
+            body { 
+                background-color: white; 
+                margin: 20px; /* เว้นขอบกระดาษนิดหน่อย */
+            }
+            .container { 
+                max-width: 100% !important; 
+                width: 100% !important; 
+                padding: 0; 
+                margin: 0;
+            }
+            .card { 
+                border: none !important; 
+                box-shadow: none !important; 
+            }
         }
     </style>
 </head>

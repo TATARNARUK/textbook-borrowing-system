@@ -10,7 +10,7 @@ if (session_status() === PHP_SESSION_NONE) {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ระบบยืม-คืนหนังสือเรียนฟรี</title>
     
-    <link rel="icon" type="image/png" href="images/logo2.png">
+    <link rel="icon" type="image/png" href="images/books.png">
 
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdn.datatables.net/1.13.4/css/dataTables.bootstrap5.min.css" rel="stylesheet">
@@ -77,8 +77,9 @@ if (session_status() === PHP_SESSION_NONE) {
 <body>
     <nav class="navbar navbar-expand-lg navbar-light fixed-top mb-5">
         <div class="container">
-            <a class="navbar-brand" href="index.php">
-                <i class="fa-solid fa-book-open text-primary me-2"></i> BNCC Library
+            <a class="navbar-brand fw-bold text-primary d-flex align-items-center" href="index.php">
+                <img src="images/books.png" alt="Logo" width="35" height="35" class="me-2"> 
+                BNCC Library
             </a>
             
             <div class="d-flex align-items-center gap-3">

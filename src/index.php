@@ -19,7 +19,7 @@ $user_role = $_SESSION['role']; // admin หรือ student
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>รายการหนังสือ - ระบบยืมคืนหนังสือเรียนฟรี</title>
-    <link rel="icon" type="image/png" href="images/logo2.png">
+    <link rel="icon" type="image/png" href="images/books.png">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdn.datatables.net/1.13.4/css/dataTables.bootstrap5.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;600&display=swap" rel="stylesheet">
@@ -37,7 +37,7 @@ $user_role = $_SESSION['role']; // admin หรือ student
     <nav class="top-nav">
         <div class="container d-flex justify-content-between align-items-center">
             <div class="d-flex align-items-center gap-3">
-                <img src="images/logo2.png" height="80" alt="Logo"> <div>
+                <img src="images/books.png" height="40" alt="Logo"> <div>
                     <h5 class="m-0 fw-bold text-primary">TEXTBOOK BORROWING SYSTEM</h5>
                     <small class="text-muted">ระบบยืม-คืนหนังสือเรียนฟรี</small>
                 </div>
@@ -193,8 +193,21 @@ $user_role = $_SESSION['role']; // admin หรือ student
                             $countStmt = $pdo->prepare("SELECT COUNT(*) FROM book_items WHERE book_master_id = ? AND status = 'available'");
                             $countStmt->execute([$book['id']]);
                             $available = $countStmt->fetchColumn();
+                            // เช็ครูปภาพ (ถ้าไม่มีให้ใช้รูปแทน)
+                            $showImg = $book['cover_image'] ? "uploads/".$book['cover_image'] : "https://via.placeholder.com/150?text=No+Image";
+                            // เช็คสถานะ (ข้อความ)
+                            $stockStatus = ($available > 0) ? "ว่าง $available เล่ม" : "หมด";
                         ?>
-                        <tr>
+                        <tr style="cursor: pointer; transition: 0.2s;" 
+                            onmouseover="this.style.backgroundColor='#f1f3f5';" 
+                            onmouseout="this.style.backgroundColor='';"
+                            onclick="showBookModal(
+                                '<?php echo addslashes($book['title']); ?>', 
+                                '<?php echo addslashes($book['author']); ?>', 
+                                '<?php echo $book['isbn']; ?>', 
+                                '<?php echo $stockStatus; ?>', 
+                                '<?php echo $showImg; ?>'
+                            )">
                             <td>
                                 <?php if($book['cover_image']): ?>
                                     <img src="uploads/<?php echo $book['cover_image']; ?>" class="book-cover">
@@ -291,5 +304,45 @@ $user_role = $_SESSION['role']; // admin หรือ student
             Swal.fire('ล้มเหลว', 'หนังสือเล่มนี้หมดพอดี', 'error');
         }
     </script>
+    <div class="modal fade" id="bookModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content rounded-4 border-0 shadow-lg">
+            <div class="modal-header border-0">
+                <h5 class="modal-title fw-bold text-primary">รายละเอียดหนังสือ</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body text-center pb-4 px-4">
+                <img id="m_cover" src="" class="rounded shadow mb-3" style="max-height: 350px; max-width: 250%;">
+                <h4 id="m_title" class="fw-bold mb-2"></h4>
+                <p id="m_author" class="text-muted mb-3"></p>
+                
+                <div class="bg-light p-3 rounded-3 text-start d-inline-block w-100">
+                    <div><strong>ISBN:</strong> <span id="m_isbn"></span></div>
+                    <div><strong>คงเหลือ:</strong> <span id="m_stock"></span></div>
+                </div>
+            </div>
+            <div class="modal-footer border-0 justify-content-center">
+                <button type="button" class="btn btn-secondary rounded-pill px-4" data-bs-dismiss="modal">ปิดหน้าต่าง</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+<script>
+    function showBookModal(title, author, isbn, stock, image) {
+        // เอารับค่ามาใส่ใน Modal
+        document.getElementById('m_title').innerText = title;
+        document.getElementById('m_author').innerText = author;
+        document.getElementById('m_isbn').innerText = isbn;
+        document.getElementById('m_stock').innerText = stock;
+        document.getElementById('m_cover').src = image;
+
+        // สั่งเปิด Modal
+        var myModal = new bootstrap.Modal(document.getElementById('bookModal'));
+        myModal.show();
+    }
+</script>
 </body>
 </html>
