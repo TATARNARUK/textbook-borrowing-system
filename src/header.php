@@ -77,7 +77,7 @@ if (session_status() === PHP_SESSION_NONE) {
 <body>
     <nav class="navbar navbar-expand-lg navbar-light fixed-top mb-5">
         <div class="container">
-            <a class="navbar-brand fw-bold text-primary d-flex align-items-center" href="index.php">
+            <a class="navbar-brand fw-bold text-primary d-flex align-items-center" href="#">
                 <img src="images/books.png" alt="Logo" width="35" height="35" class="me-2"> 
                 BNCC Library
             </a>

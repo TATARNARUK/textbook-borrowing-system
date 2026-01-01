@@ -40,6 +40,7 @@ if (isset($_POST['student_id']) && isset($_POST['password'])) {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>เข้าสู่ระบบ - ระบบยืมหนังสือเรียน</title>
     <link rel="icon" type="image/png" href="images/books.png">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;600&display=swap" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css" rel="stylesheet">
@@ -56,6 +57,12 @@ if (isset($_POST['student_id']) && isset($_POST['password'])) {
             align-items: center;
             justify_content: center;
         }
+        /* ตกแต่ง Navbar ให้ดูพรีเมียม */
+    .navbar {
+        background: rgba(255, 255, 255, 0.95) !important;
+        backdrop-filter: blur(10px); /* ทำพื้นหลัง Nav เบลอนิดๆ จะสวยมาก */
+        border-bottom: 2px solid #0d6efd; /* เพิ่มเส้นสีน้ำเงินบางๆ ด้านล่าง */
+    }
 
         .login-card {
             background: rgba(255, 255, 255, 0.9);
@@ -105,13 +112,29 @@ if (isset($_POST['student_id']) && isset($_POST['password'])) {
 </head>
 
 <body>
+    <nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm fixed-top py-3">
+        <div class="container">
+            <a class="navbar-brand d-flex align-items-center gap-3" href="index.php">
+                <img src="images/books.png" height="40" alt="Logo">
+            <div class="d-none d-md-block text-start">
+                    <h5 class="m-0 fw-bold text-primary" style="font-family: 'Kanit', sans-serif;">
+                         TEXTBOOK BORROWING SYSTEM
+                    </h5>
+                    <small class="text-muted">ระบบยืม-คืนหนังสือเรียนฟรี</small>
+                </div>
+            </a>
 
-    <div class="topbar-bncc">
-        <div class="text-center">
-            <div class="topbar-bncc-title">TEXTBOOK BORROWING SYSTEM</div>
-            <div class="topbar-bncc-subtitle">ระบบยืม-คืนหนังสือเรียนฟรี</div>
+            <div class="ms-auto d-flex align-items-center gap-3">
+                <a href="manual.php" class="text-decoration-none text-dark fw-medium small">
+                    <i class="fas fa-book me-1"></i> คู่มือการใช้งานระบบ
+                </a>
+                <div class="vr mx-2 text-muted" style="height: 20px;"></div>
+                <a href="https://www.facebook.com/kittikun.nookeaw?locale=th_TH" target="_blank" class="btn btn-sm btn-outline-primary rounded-pill px-3 ms-2">
+                    <i class="fas fa-headset me-1"></i> ติดต่อเจ้าหน้าที่
+                </a>
+            </div>
         </div>
-    </div>
+    </nav>
 
     <div class="container d-flex justify-content-center">
         <div class="login-card">
