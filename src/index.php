@@ -53,8 +53,8 @@ $user_role = $_SESSION['role']; // admin หรือ student
 <body>
 
     <nav class="top-nav">
-        <div class="container d-flex justify-content-between align-items-center">
-            <div class="d-flex align-items-center gap-3">
+        <div class="container d-flex flex-column flex-md-row justify-content-between align-items-center gap-3">
+            <div class="d-flex align-items-center gap-4">
                 <img src="images/books.png" height="40" alt="Logo">
                 <div>
                     <h5 class="m-0 fw-bold text-primary">TEXTBOOK BORROWING SYSTEM</h5>
@@ -203,7 +203,7 @@ $user_role = $_SESSION['role']; // admin หรือ student
                         </div>
                     </div>
                 </div>
-                <div class="d-flex justify-content-between align-items-center mb-4">
+                <div class="d-flex flex-column flex-md-row justify-content-between align-items-center mb-4 gap-3">
                     <h3>📚 รายชื่อหนังสือเรียนทั้งหมด</h3>
 
                     <div>
@@ -225,6 +225,7 @@ $user_role = $_SESSION['role']; // admin หรือ student
 
                 <div class="card shadow-sm border-0 rounded-4">
                     <div class="card-body">
+                        <div class="table-responsive">
                         <table id="bookTable" class="table table-hover align-middle" style="width:100%">
                             <thead class="table-light">
                                 <tr>
@@ -307,6 +308,7 @@ $user_role = $_SESSION['role']; // admin หรือ student
                                 <?php } ?>
                             </tbody>
                         </table>
+                        </div>
                     </div>
                 </div>
             </div>

@@ -102,7 +102,7 @@ $transactions = $stmt->fetchAll();
         
         <div class="text-center mb-4">
             <h2 class="fw-bold">รายงานสรุปการยืม-คืนหนังสือเรียน</h2>
-            <p>วิทยาลัยพณิชยการบางนา (BNCC Textbook System)</p>
+            <p>แผนกเทคโนดลยีสารสนเทศ (IT Textbook System)</p>
             <p class="text-muted">ข้อมูลระหว่างวันที่: <?php echo date('d/m/Y', strtotime($start_date)); ?> ถึง <?php echo date('d/m/Y', strtotime($end_date)); ?></p>
         </div>
 

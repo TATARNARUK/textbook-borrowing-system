@@ -127,16 +127,17 @@ require_once 'config.php';
                             </div>
                             
                             <h5 class="fw-bold mt-3">2.1 ค้นหาหนังสือที่ต้องการ</h5>
-                            <p>ท่านสามารถพิมพ์ชื่อหนังสือ, รหัสวิชา หรือชื่อผู้แต่ง ในช่อง <strong>"ค้นหา"</strong> ด้านขวามือ ระบบจะแสดงผลทันที</p>
+                            <p>ท่านสามารถกดตรงปุ่มค้นหาและทำการพิมพ์ชื่อหนังสือ, รหัสวิชา หรือชื่อผู้แต่ง ในช่อง <strong>"ค้นหา"</strong> ด้านขวามือ ระบบจะแสดงผลทันที</p>
+                            
+                            <img src="images/index2.png" class="img-fluid rounded shadow border" alt="หน้า index">
                             
                             <h5 class="fw-bold mt-4">2.2 ดูรายละเอียดและกดขอยืม</h5>
                             <p>
-                                - คลิกที่ <strong>รูปปกหนังสือ</strong> หรือ <strong>พื้นที่ว่างในแถว</strong> เพื่อดูรายละเอียดเพิ่มเติม (Modal)<br>
+                                - คลิกที่ <strong>รูปปกหนังสือ</strong> หรือ <strong>รายละเอียด</strong> เพื่อดูรายละเอียดเพิ่มเติม (Modal)<br>
                                 - คลิกปุ่มสีเขียว <strong>"ยืมหนังสือ"</strong> เพื่อทำการยืม
                             </p>
 
-                            <img src="images/index.png" class="img-fluid rounded shadow border" alt="หน้า index">
-                            <img src="images/manual_borrow.png" class="img-fluid rounded shadow border" alt="หน้า Modal">
+                            <img src="images/manual_borrow1.png" class="img-fluid rounded shadow border" alt="หน้า Modal">
                         </div>
                     </div>
 
@@ -149,15 +150,12 @@ require_once 'config.php';
                             <p class="fs-5 text-muted">ตรวจสอบว่าเรายืมอะไรไปบ้าง และต้องคืนวันไหน?</p>
                             
                             <ul class="list-group list-group-flush mb-4">
-                                <li class="list-group-item"><i class="fa-solid fa-check text-success me-2"></i> กดที่เมนู <strong>"ประวัติการยืม"</strong> ด้านบน</li>
+                                <li class="list-group-item"><i class="fa-solid fa-check text-success me-2"></i> กดที่เมนู <strong>"ประวัติการยืม"</strong> ปุ่มสีฟ้าด้านขวา</li>
+                                <img src="images/index1.png" class="img-fluid rounded shadow border" alt="หน้า index">
                                 <li class="list-group-item"><i class="fa-solid fa-check text-success me-2"></i> ระบบจะแสดงรายการหนังสือทั้งหมด พร้อม <strong>"วันกำหนดส่ง"</strong></li>
                                 <li class="list-group-item"><i class="fa-solid fa-check text-success me-2"></i> หากเกินกำหนด จะมีแจ้งเตือนสีแดง</li>
+                                <img src="images/history.png" class="img-fluid rounded shadow border" alt="หน้า history">
                             </ul>
-
-                            <div class="screenshot-box">
-                                <i class="fa-solid fa-clock-rotate-left fa-3x mb-3"></i>
-                                <span>[พื้นที่สำหรับใส่รูปหน้า My History]</span>
-                                </div>
                         </div>
                     </div>
 
