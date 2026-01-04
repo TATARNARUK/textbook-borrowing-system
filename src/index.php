@@ -219,6 +219,9 @@ $user_role = $_SESSION['role']; // admin หรือ student
                             <a href="add_book.php" class="btn btn-success">
                                 <i class="fa-solid fa-plus"></i> เพิ่มหนังสือใหม่
                             </a>
+                            <a href="admin_users.php" class="btn btn-secondary text-white flex-fill flex-md-grow-0 shadow-sm py-2">
+                                <i class="fa-solid fa-users-gear"></i> จัดการผู้ใช้
+                            </a>
                         <?php } ?>
                     </div>
                 </div>
@@ -226,88 +229,88 @@ $user_role = $_SESSION['role']; // admin หรือ student
                 <div class="card shadow-sm border-0 rounded-4">
                     <div class="card-body">
                         <div class="table-responsive">
-                        <table id="bookTable" class="table table-hover align-middle" style="width:100%">
-                            <thead class="table-light">
-                                <tr>
-                                    <th width="10%">ปก</th>
-                                    <th width="15%">รหัสวิชา/ISBN</th>
-                                    <th width="30%">ชื่อหนังสือ</th>
-                                    <th width="15%">ผู้แต่ง</th>
-                                    <th width="10%">คงเหลือ</th>
-                                    <th width="20%">จัดการ</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <?php
-                                $stmt = $pdo->query("SELECT * FROM book_masters ORDER BY id DESC");
-                                $count = 0;  // <--- ✅ เพิ่มบรรทัดนี้ (เริ่มนับ 0)
+                            <table id="bookTable" class="table table-hover align-middle" style="width:100%">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th width="10%">ปก</th>
+                                        <th width="15%">รหัสวิชา/ISBN</th>
+                                        <th width="30%">ชื่อหนังสือ</th>
+                                        <th width="15%">ผู้แต่ง</th>
+                                        <th width="10%">คงเหลือ</th>
+                                        <th width="20%">จัดการ</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <?php
+                                    $stmt = $pdo->query("SELECT * FROM book_masters ORDER BY id DESC");
+                                    $count = 0;  // <--- ✅ เพิ่มบรรทัดนี้ (เริ่มนับ 0)
 
-                                while ($book = $stmt->fetch()) {
-                                    $count++; // <--- ✅ เพิ่มบรรทัดนี้ (นับเพิ่มทีละ 1)
+                                    while ($book = $stmt->fetch()) {
+                                        $count++; // <--- ✅ เพิ่มบรรทัดนี้ (นับเพิ่มทีละ 1)
 
-                                    // ... (โค้ดเดิมของคุณต่อจากนี้) ...
-                                    // เช็คจำนวนหนังสือที่ว่าง (คำนวณจาก table book_items)
-                                    $countStmt = $pdo->prepare("SELECT COUNT(*) FROM book_items WHERE book_master_id = ? AND status = 'available'");
-                                    $countStmt->execute([$book['id']]);
-                                    $available = $countStmt->fetchColumn();
-                                    // เช็ครูปภาพ (ถ้าไม่มีให้ใช้รูปแทน)
-                                    $showImg = $book['cover_image'] ? "uploads/" . $book['cover_image'] : "https://via.placeholder.com/150?text=No+Image";
-                                    // เช็คสถานะ (ข้อความ)
-                                    $stockStatus = ($available > 0) ? "ว่าง $available เล่ม" : "หมด";
-                                ?>
-                                    <tr style="cursor: pointer; transition: 0.2s;"
-                                        onmouseover="this.style.backgroundColor='#f1f3f5';"
-                                        onmouseout="this.style.backgroundColor='';"
-                                        onclick="showBookModal(
+                                        // ... (โค้ดเดิมของคุณต่อจากนี้) ...
+                                        // เช็คจำนวนหนังสือที่ว่าง (คำนวณจาก table book_items)
+                                        $countStmt = $pdo->prepare("SELECT COUNT(*) FROM book_items WHERE book_master_id = ? AND status = 'available'");
+                                        $countStmt->execute([$book['id']]);
+                                        $available = $countStmt->fetchColumn();
+                                        // เช็ครูปภาพ (ถ้าไม่มีให้ใช้รูปแทน)
+                                        $showImg = $book['cover_image'] ? "uploads/" . $book['cover_image'] : "https://via.placeholder.com/150?text=No+Image";
+                                        // เช็คสถานะ (ข้อความ)
+                                        $stockStatus = ($available > 0) ? "ว่าง $available เล่ม" : "หมด";
+                                    ?>
+                                        <tr style="cursor: pointer; transition: 0.2s;"
+                                            onmouseover="this.style.backgroundColor='#f1f3f5';"
+                                            onmouseout="this.style.backgroundColor='';"
+                                            onclick="showBookModal(
                                 '<?php echo addslashes($book['title']); ?>', 
                                 '<?php echo addslashes($book['author']); ?>', 
                                 '<?php echo $book['isbn']; ?>', 
                                 '<?php echo $stockStatus; ?>', 
                                 '<?php echo $showImg; ?>'
                             )">
-                                        <td>
-                                            <?php if ($book['cover_image']): ?>
-                                                <img src="uploads/<?php echo $book['cover_image']; ?>" class="book-cover">
-                                            <?php else: ?>
-                                                <img src="https://via.placeholder.com/80x120?text=No+Cover" class="book-cover">
-                                            <?php endif; ?>
-                                        </td>
-                                        <td><span class="badge bg-secondary"><?php echo $book['isbn']; ?></span></td>
-                                        <td class="fw-bold text-primary">
-                                            <?php echo $book['title']; ?>
-                                            <?php if ($count <= 5): ?>
-                                                <span class="badge bg-danger rounded-pill ms-2 small shadow-sm animate__animated animate__pulse animate__infinite">New!</span>
-                                            <?php endif; ?>
-                                        </td>
-                                        <td><?php echo $book['author']; ?></td>
-                                        <td>
-                                            <?php if ($available > 0): ?>
-                                                <span class="badge bg-success">ว่าง <?php echo $available; ?> เล่ม</span>
-                                            <?php else: ?>
-                                                <span class="badge bg-danger">หมด</span>
-                                            <?php endif; ?>
-                                        </td>
-                                        <td>
-                                            <?php if ($user_role == 'admin') { ?>
-                                                <a href="book_stock.php?id=<?php echo $book['id']; ?>" class="btn btn-sm btn-warning w-100 mb-1">
-                                                    <i class="fa-solid fa-layer-group"></i> จัดการสต็อก</a>
-                                            <?php } ?>
-                                            <a href="book_detail.php?id=<?php echo $book['id']; ?>" class="btn btn-sm btn-primary w-100 mb-1">
-                                                <i class="fa-solid fa-circle-info"></i> รายละเอียด
-                                            </a>
-                                            <?php if ($available > 0): ?>
-                                                <button onclick="event.stopPropagation(); confirmBorrow(<?php echo $book['id']; ?>, '<?php echo htmlspecialchars($book['title'], ENT_QUOTES); ?>')"
-                                                    class="btn btn-sm btn-outline-success w-100">
-                                                    ยืมหนังสือ
-                                                </button>
-                                            <?php else: ?>
-                                                <button class="btn btn-sm btn-secondary w-100" disabled>หนังสือหมด</button>
-                                            <?php endif; ?>
-                                        </td>
-                                    </tr>
-                                <?php } ?>
-                            </tbody>
-                        </table>
+                                            <td>
+                                                <?php if ($book['cover_image']): ?>
+                                                    <img src="uploads/<?php echo $book['cover_image']; ?>" class="book-cover">
+                                                <?php else: ?>
+                                                    <img src="https://via.placeholder.com/80x120?text=No+Cover" class="book-cover">
+                                                <?php endif; ?>
+                                            </td>
+                                            <td><span class="badge bg-secondary"><?php echo $book['isbn']; ?></span></td>
+                                            <td class="fw-bold text-primary">
+                                                <?php echo $book['title']; ?>
+                                                <?php if ($count <= 5): ?>
+                                                    <span class="badge bg-danger rounded-pill ms-2 small shadow-sm animate__animated animate__pulse animate__infinite">New!</span>
+                                                <?php endif; ?>
+                                            </td>
+                                            <td><?php echo $book['author']; ?></td>
+                                            <td>
+                                                <?php if ($available > 0): ?>
+                                                    <span class="badge bg-success">ว่าง <?php echo $available; ?> เล่ม</span>
+                                                <?php else: ?>
+                                                    <span class="badge bg-danger">หมด</span>
+                                                <?php endif; ?>
+                                            </td>
+                                            <td>
+                                                <?php if ($user_role == 'admin') { ?>
+                                                    <a href="book_stock.php?id=<?php echo $book['id']; ?>" class="btn btn-sm btn-warning w-100 mb-1">
+                                                        <i class="fa-solid fa-layer-group"></i> จัดการสต็อก</a>
+                                                <?php } ?>
+                                                <a href="book_detail.php?id=<?php echo $book['id']; ?>" class="btn btn-sm btn-primary w-100 mb-1">
+                                                    <i class="fa-solid fa-circle-info"></i> รายละเอียด
+                                                </a>
+                                                <?php if ($available > 0): ?>
+                                                    <button onclick="event.stopPropagation(); confirmBorrow(<?php echo $book['id']; ?>, '<?php echo htmlspecialchars($book['title'], ENT_QUOTES); ?>')"
+                                                        class="btn btn-sm btn-outline-success w-100">
+                                                        ยืมหนังสือ
+                                                    </button>
+                                                <?php else: ?>
+                                                    <button class="btn btn-sm btn-secondary w-100" disabled>หนังสือหมด</button>
+                                                <?php endif; ?>
+                                            </td>
+                                        </tr>
+                                    <?php } ?>
+                                </tbody>
+                            </table>
                         </div>
                     </div>
                 </div>

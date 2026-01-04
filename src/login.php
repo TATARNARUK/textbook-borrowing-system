@@ -44,71 +44,7 @@ if (isset($_POST['student_id']) && isset($_POST['password'])) {
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;600&display=swap" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css" rel="stylesheet">
-
-    <style>
-        body {
-            font-family: 'Prompt', sans-serif;
-            background-image: url('https://images.unsplash.com/photo-1524995997946-a1c2e315a42f?q=80&w=2070&auto=format&fit=crop');
-            /* รูป Background ชั่วคราว */
-            background-size: cover;
-            background-position: center;
-            height: 100vh;
-            display: flex;
-            align-items: center;
-            justify_content: center;
-        }
-        /* ตกแต่ง Navbar ให้ดูพรีเมียม */
-    .navbar {
-        background: rgba(255, 255, 255, 0.95) !important;
-        backdrop-filter: blur(10px); /* ทำพื้นหลัง Nav เบลอนิดๆ จะสวยมาก */
-        border-bottom: 2px solid #0d6efd; /* เพิ่มเส้นสีน้ำเงินบางๆ ด้านล่าง */
-    }
-
-        .login-card {
-            background: rgba(255, 255, 255, 0.9);
-            backdrop-filter: blur(10px);
-            border-radius: 15px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
-            padding: 40px;
-            width: 100%;
-            max-width: 400px;
-        }
-
-        .topbar-bncc {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            background: white;
-            padding: 15px 20px;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-
-            display: flex;
-            /* ต้องมีบรรทัดนี้ */
-            align-items: center;
-            /* จัดกึ่งกลางแนวตั้ง */
-            justify-content: center;
-            /* <--- เพิ่มบรรทัดนี้! เพื่อจัดกึ่งกลางแนวนอน */
-
-            gap: 15px;
-            z-index: 1000;
-        }
-
-        .topbar-bncc img {
-            height: 50px;
-        }
-
-        .topbar-bncc-title {
-            font-weight: bold;
-            font-size: 1.5rem;
-            line-height: 1.2;
-        }
-
-        .topbar-bncc-subtitle {
-            font-size: 1rem;
-            color: #666;
-        }
-    </style>
+    <link rel="stylesheet" href="style-login.css">
 </head>
 
 <body>
@@ -116,9 +52,9 @@ if (isset($_POST['student_id']) && isset($_POST['password'])) {
         <div class="container">
             <a class="navbar-brand d-flex align-items-center gap-3" href="index.php">
                 <img src="images/books.png" height="40" alt="Logo">
-            <div class="d-none d-md-block text-start">
+                <div class="d-none d-md-block text-start">
                     <h5 class="m-0 fw-bold text-primary" style="font-family: 'Kanit', sans-serif;">
-                         TEXTBOOK BORROWING SYSTEM
+                        TEXTBOOK BORROWING SYSTEM
                     </h5>
                     <small class="text-muted">ระบบยืม-คืนหนังสือเรียนฟรี</small>
                 </div>
@@ -151,8 +87,16 @@ if (isset($_POST['student_id']) && isset($_POST['password'])) {
                     <input type="password" name="password" class="form-control" placeholder="กรอกรหัสผ่าน" required>
                 </div>
 
-                <button type="submit" class="btn btn-primary w-100 mb-2">เข้าสู่ระบบ</button>
-                <a href="register.php" class="btn btn-outline-danger w-100">สมัครสมาชิก</a>
+                <button type="submit" class="btg w-100 mb-2">เข้าสู่ระบบ</button>
+                <button type="button" onclick="window.location.href='register.php'" class="btb w-100 mb-2">
+                    สมัครสมาชิก
+                </button>
+
+                <div class="text-center mt-3">
+                    <a href="forgot_password.php" class="text-decoration-none text-muted small" style="font-size: 0.85rem;">
+                        ลืมรหัสผ่าน?
+                    </a>
+                </div>
             </form>
         </div>
     </div>
