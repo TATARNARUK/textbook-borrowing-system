@@ -8,7 +8,9 @@ services:
     ports:
       - "8099:80" 
     volumes:
-      - ./src:/var/www/html # โฟลเดอร์ src ในเครื่องเรา คือหน้าเว็บ
+      - ./src:/var/www/html
+      - ./uploads:/var/www/html/uploads # โฟลเดอร์ src ในเครื่องเรา คือหน้าเว็บ
+      
     networks:
       - lib-network
     # ติดตั้ง Extension ที่จำเป็นสำหรับเชื่อมต่อ MySQL และจัดการรูปภาพ
