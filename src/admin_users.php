@@ -16,11 +16,11 @@ $msg_type = '';
 if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['reset_password'])) {
     $target_user_id = $_POST['user_id'];
     $new_password = $_POST['new_pass'];
-    
+
     if (!empty($new_password)) {
         // Hash รหัสผ่านใหม่
         $hashed_password = password_hash($new_password, PASSWORD_DEFAULT);
-        
+
         $stmt = $pdo->prepare("UPDATE users SET password = ? WHERE id = ?");
         if ($stmt->execute([$hashed_password, $target_user_id])) {
             $message = "เปลี่ยนรหัสผ่านเรียบร้อยแล้ว!";
@@ -35,6 +35,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['reset_password'])) {
 
 <!DOCTYPE html>
 <html lang="th">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -43,12 +44,23 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['reset_password'])) {
     <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link href="https://cdn.datatables.net/1.13.4/css/dataTables.bootstrap5.min.css" rel="stylesheet">
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
     <style>
-        body { font-family: 'Prompt', sans-serif; background-color: #f8f9fa; }
-        .top-nav { background: white; box-shadow: 0 2px 10px rgba(0,0,0,0.05); padding: 15px 0; margin-bottom: 30px; }
+        body {
+            font-family: 'Prompt', sans-serif;
+            background-color: #f8f9fa;
+        }
+
+        .top-nav {
+            background: white;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+            padding: 15px 0;
+            margin-bottom: 30px;
+        }
     </style>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </head>
+
 <body>
 
     <nav class="top-nav">
@@ -67,7 +79,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['reset_password'])) {
     </nav>
 
     <div class="container">
-        
+
         <?php if ($message): ?>
             <script>
                 Swal.fire({
@@ -84,6 +96,11 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['reset_password'])) {
                 <h5 class="m-0 fw-bold"><i class="fa-solid fa-users-gear text-primary me-2"></i> รายชื่อสมาชิกทั้งหมด</h5>
             </div>
             <div class="card-body">
+                <div class="mb-3">
+                    <a href="sync_students.php" class="btn btn-primary" onclick="return confirm('⚠️ ยืนยันการดึงข้อมูลจาก RMS?');">
+                        <i class="fa-solid fa-cloud-arrow-down"></i> ดึงข้อมูลนักเรียนจาก RMS
+                    </a>
+                </div>
                 <div class="table-responsive">
                     <table id="userTable" class="table table-hover align-middle">
                         <thead class="table-light">
@@ -100,24 +117,24 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['reset_password'])) {
                             $stmt = $pdo->query("SELECT * FROM users ORDER BY role ASC, id DESC");
                             while ($row = $stmt->fetch()) {
                             ?>
-                            <tr>
-                                <td><?php echo $row['student_id']; ?></td>
-                                <td><?php echo $row['fullname']; ?></td>
-                                <td><?php echo $row['phone'] ? $row['phone'] : '-'; ?></td>
-                                <td>
-                                    <?php if($row['role'] == 'admin'): ?>
-                                        <span class="badge bg-danger">ผู้ดูแลระบบ</span>
-                                    <?php else: ?>
-                                        <span class="badge bg-success">นักเรียน</span>
-                                    <?php endif; ?>
-                                </td>
-                                <td>
-                                    <button onclick="openResetModal(<?php echo $row['id']; ?>, '<?php echo $row['fullname']; ?>')" 
+                                <tr>
+                                    <td><?php echo $row['student_id']; ?></td>
+                                    <td><?php echo $row['fullname']; ?></td>
+                                    <td><?php echo $row['phone'] ? $row['phone'] : '-'; ?></td>
+                                    <td>
+                                        <?php if ($row['role'] == 'admin'): ?>
+                                            <span class="badge bg-danger">ผู้ดูแลระบบ</span>
+                                        <?php else: ?>
+                                            <span class="badge bg-success">นักเรียน</span>
+                                        <?php endif; ?>
+                                    </td>
+                                    <td>
+                                        <button onclick="openResetModal(<?php echo $row['id']; ?>, '<?php echo $row['fullname']; ?>')"
                                             class="btn btn-sm btn-warning text-dark shadow-sm">
-                                        <i class="fa-solid fa-key"></i> รีเซ็ตรหัส
-                                    </button>
-                                </td>
-                            </tr>
+                                            <i class="fa-solid fa-key"></i> รีเซ็ตรหัส
+                                        </button>
+                                    </td>
+                                </tr>
                             <?php } ?>
                         </tbody>
                     </table>
@@ -139,7 +156,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['reset_password'])) {
                     <div class="modal-body p-4">
                         <input type="hidden" name="reset_password" value="1">
                         <input type="hidden" name="user_id" id="modal_user_id">
-                        
+
                         <div class="alert alert-light border text-center mb-3">
                             กำลังเปลี่ยนรหัสผ่านให้: <br>
                             <strong id="modal_user_name" class="text-primary fs-5">...</strong>
@@ -167,7 +184,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['reset_password'])) {
     <script src="https://cdn.datatables.net/1.13.4/js/jquery.dataTables.min.js"></script>
     <script src="https://cdn.datatables.net/1.13.4/js/dataTables.bootstrap5.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    
+
     <script>
         $(document).ready(function() {
             $('#userTable').DataTable({
@@ -175,7 +192,12 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['reset_password'])) {
                     search: "ค้นหา:",
                     lengthMenu: "แสดง _MENU_ คน",
                     info: "แสดง _START_ ถึง _END_ จาก _TOTAL_ คน",
-                    paginate: { first: "หน้าแรก", last: "หน้าสุดท้าย", next: "ถัดไป", previous: "ก่อนหน้า" }
+                    paginate: {
+                        first: "หน้าแรก",
+                        last: "หน้าสุดท้าย",
+                        next: "ถัดไป",
+                        previous: "ก่อนหน้า"
+                    }
                 }
             });
         });
@@ -184,11 +206,12 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['reset_password'])) {
             // ส่งค่า ID และชื่อคน ไปใส่ใน Modal
             document.getElementById('modal_user_id').value = id;
             document.getElementById('modal_user_name').innerText = name;
-            
+
             // เปิด Modal
             var myModal = new bootstrap.Modal(document.getElementById('resetModal'));
             myModal.show();
         }
     </script>
 </body>
+
 </html>

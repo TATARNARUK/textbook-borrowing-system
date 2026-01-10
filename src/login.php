@@ -1,32 +1,35 @@
 <?php
 session_start();
-require_once 'config.php'; // เรียกใช้ไฟล์ config ที่เราทำไว้ใน Docker
+require_once 'config.php';
 
 // ตรวจสอบข้อมูลเมื่อมีการกดปุ่ม Login
 if (isset($_POST['student_id']) && isset($_POST['password'])) {
 
-    $student_id = $_POST['student_id'];
-    $password = $_POST['password']; // รับรหัสผ่าน (ถ้าจะให้ดีควรใช้ password_verify ในอนาคต)
+    $student_id = trim($_POST['student_id']); // ตัดช่องว่างหน้าหลังออกเผื่อพลาด
+    $password = $_POST['password'];
 
-    // 1. เช็คข้อมูลในตาราง users
-    // (เปรียบเทียบรหัสผ่านแบบ SHA1 ตามโค้ดเดิมของคุณ)
-    $stmt = $pdo->prepare("SELECT id, fullname, role FROM users WHERE student_id = :id AND password = :pass");
+    // 1. ดึงข้อมูล User ออกมาก่อน (ยังไม่เช็คพาสเวิร์ดที่ SQL)
+    // ✅ ต้อง SELECT password ออกมาด้วย เพื่อเอามาเช็คทีหลัง
+    $stmt = $pdo->prepare("SELECT id, fullname, role, password FROM users WHERE student_id = :id");
     $stmt->bindValue(':id', $student_id, PDO::PARAM_STR);
-    $stmt->bindValue(':pass', $password, PDO::PARAM_STR); // *ข้อควรระวัง: ในการใช้งานจริงควร Hash รหัสผ่าน
     $stmt->execute();
 
-    if ($stmt->rowCount() == 1) {
-        // 2. ถ้าเจอข้อมูล ให้สร้าง Session
-        $row = $stmt->fetch(PDO::FETCH_ASSOC);
-        $_SESSION['user_id'] = $row['id'];
-        $_SESSION['fullname'] = $row['fullname'];
-        $_SESSION['role'] = $row['role']; // เก็บว่าเป็น admin หรือ student
+    $user = $stmt->fetch(PDO::FETCH_ASSOC);
+
+    // 2. เช็คว่ามี User นี้ไหม? และ รหัสผ่านตรงกันไหม? (ด้วย password_verify)
+    if ($user && password_verify($password, $user['password'])) {
+
+        // ✅ รหัสถูกต้อง! สร้าง Session
+        $_SESSION['user_id'] = $user['id'];
+        $_SESSION['fullname'] = $user['fullname'];
+        $_SESSION['role'] = $user['role'];
+        $_SESSION['student_id'] = $student_id; // เก็บ student_id ไว้ใช้ด้วยเผื่อจำเป็น
 
         // ส่งไปหน้าแรก
         header('location: index.php');
         exit();
     } else {
-        // 3. ถ้าไม่เจอ (รหัสผิด)
+        // ❌ รหัสผิด หรือ หาชื่อไม่เจอ
         $error_msg = "รหัสนักเรียน หรือ รหัสผ่าน ไม่ถูกต้อง";
     }
 }
@@ -44,28 +47,48 @@ if (isset($_POST['student_id']) && isset($_POST['password'])) {
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;600&display=swap" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="style-login.css">
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
 </head>
 
-<body>
-    <nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm fixed-top py-3">
+<body><?php require_once 'loader.php'; ?><div id="particles-js"></div>
+    <div id="welcome-screen">
+        <div class="intro-content text-center">
+            
+            <div class="intro-icons mb-3">
+                <i class="fas fa-code"></i>
+                <i class="fas fa-user-graduate"></i>
+                <i class="fas fa-book"></i>
+            </div>
+
+            <h1 class="fade-in-text">Welcome To My Website</h1>
+            
+            <h2 class="gradient-text">Textbook Borrowing System</h2>
+            
+            <p class="text-white mt-2" style="min-height: 30px; font-size: 1.1rem;">
+    <span id="typewriter-text"></span><span class="cursor">|</span>
+</p>
+        </div>
+    </div>
+    <nav class="navbar navbar-expand-lg shadow-sm fixed-top py-3" data-aos="fade-down" data-aos-duration="2000">
         <div class="container">
             <a class="navbar-brand d-flex align-items-center gap-3" href="index.php">
                 <img src="images/books.png" height="40" alt="Logo">
-                <div class="d-none d-md-block text-start">
-                    <h5 class="m-0 fw-bold text-primary" style="font-family: 'Kanit', sans-serif;">
+                <div class="d-none d-md-block text-start" data-aos="fade-down" data-aos-duration="2000">
+                    <h5 class="m-0 fw-bold text-white" style="font-family: 'Kanit', sans-serif;">
                         TEXTBOOK BORROWING SYSTEM
                     </h5>
-                    <small class="text-muted">ระบบยืม-คืนหนังสือเรียนฟรี</small>
+                    <small class="text-white">ระบบยืม-คืนหนังสือเรียนฟรี</small>
                 </div>
             </a>
 
-            <div class="ms-auto d-flex align-items-center gap-3">
-                <a href="manual.php" class="text-decoration-none text-dark fw-medium small">
+            <div class="ms-auto d-flex align-items-center gap-3" data-aos="fade-down" data-aos-duration="2000">
+                <a href="manual.php" class="text-decoration-none text-white fw-medium small">
                     <i class="fas fa-book me-1"></i> คู่มือการใช้งานระบบ
                 </a>
-                <div class="vr mx-2 text-muted" style="height: 20px;"></div>
-                <a href="https://www.facebook.com/kittikun.nookeaw?locale=th_TH" target="_blank" class="btn btn-sm btn-outline-primary rounded-pill px-3 ms-2">
+                <div class="vr mx-2 text-white" style="height: 20px;"></div>
+                <a href="https://www.facebook.com/kittikun.nookeaw?locale=th_TH" target="_blank"
+                    class="btn btn-sm btn-outline-light rounded-pill px-3 ms-2">
                     <i class="fas fa-headset me-1"></i> ติดต่อเจ้าหน้าที่
                 </a>
             </div>
@@ -73,24 +96,21 @@ if (isset($_POST['student_id']) && isset($_POST['password'])) {
     </nav>
 
     <div class="container d-flex justify-content-center">
-        <div class="login-card">
-            <h3 class="text-center mb-4">เข้าสู่ระบบ</h3>
+        <div class="login-card" data-aos="fade-down" data-aos-duration="1200">
+            <h3 class="text-center mb-4 text-dark">เข้าสู่ระบบ</h3>
 
             <form action="" method="post">
                 <div class="mb-3">
-                    <label class="form-label">รหัสนักเรียน / ชื่อผู้ใช้</label>
+                    <label class="form-label text-dark">รหัสนักเรียน / ชื่อผู้ใช้</label>
                     <input type="text" name="student_id" class="form-control" placeholder="กรอกรหัสนักเรียน" required>
                 </div>
 
                 <div class="mb-3">
-                    <label class="form-label">รหัสผ่าน</label>
+                    <label class="form-label text-dark">รหัสผ่าน</label>
                     <input type="password" name="password" class="form-control" placeholder="กรอกรหัสผ่าน" required>
                 </div>
 
-                <button type="submit" class="btg w-100 mb-2">เข้าสู่ระบบ</button>
-                <button type="button" onclick="window.location.href='register.php'" class="btb w-100 mb-2">
-                    สมัครสมาชิก
-                </button>
+                <button type="submit" class="btg w-100 mb-2 rounded-pill">เข้าสู่ระบบ</button>
 
                 <div class="text-center mt-3">
                     <a href="forgot_password.php" class="text-decoration-none text-muted small" style="font-size: 0.85rem;">
@@ -113,6 +133,172 @@ if (isset($_POST['student_id']) && isset($_POST['password'])) {
         </script>
     <?php endif; ?>
 
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+
+    <script>
+        AOS.init({
+            duration: 1000, // ความเร็วในการขยับ (1000ms = 1 วินาที) ยิ่งเลขเยอะยิ่งช้าและนุ่ม
+            once: true // ให้เล่นแค่ครั้งเดียวตอนเลื่อนลงมา (ไม่ต้องเล่นซ้ำตอนเลื่อนขึ้น)
+        });
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/particles.js@2.0.0/particles.min.js"></script>
+    <script>
+        /* เรียกใช้ particles.js ที่กล่อง id="particles-js" */
+        particlesJS("particles-js", {
+            "particles": {
+                "number": {
+                    "value": 80,
+                    /* จำนวนดาว (ยิ่งเยอะยิ่งรก) ลองปรับดูที่ 50-100 */
+                    "density": {
+                        "enable": true,
+                        "value_area": 800
+                    }
+                },
+                "color": {
+                    "value": "#ffffff" /* สีของดาว (สีขาว) */
+                },
+                "shape": {
+                    "type": "circle",
+                    /* รูปร่าง (วงกลม) */
+                    "stroke": {
+                        "width": 0,
+                        "color": "#000000"
+                    },
+                    "polygon": {
+                        "nb_sides": 5
+                    }
+                },
+                "opacity": {
+                    "value": 0.5,
+                    /* ความจางของดาว (0.5 คือครึ่งๆ) */
+                    "random": true,
+                    /* ให้จางไม่เท่ากัน ดูมีมิติ */
+                    "anim": {
+                        "enable": false,
+                        "speed": 1,
+                        "opacity_min": 0.1,
+                        "sync": false
+                    }
+                },
+                "size": {
+                    "value": 3,
+                    /* ขนาดของดาว */
+                    "random": true,
+                    /* เล็กใหญ่ไม่เท่ากัน */
+                    "anim": {
+                        "enable": false,
+                        "speed": 40,
+                        "size_min": 0.1,
+                        "sync": false
+                    }
+                },
+                "line_linked": {
+                    "enable": true,
+                    /* ✅ ถ้าไม่อยากได้เส้นเชื่อม ให้แก้เป็น false */
+                    "distance": 150,
+                    /* ระยะห่างที่จะให้มีเส้นเชื่อม */
+                    "color": "#ffffff",
+                    /* สีของเส้น */
+                    "opacity": 0.4,
+                    /* ความจางของเส้น */
+                    "width": 1
+                },
+                "move": {
+                    "enable": true,
+                    /* สั่งให้ขยับ */
+                    "speed": 2,
+                    /* ความเร็วในการวิ่ง (ยิ่งเยอะยิ่งเร็ว) */
+                    "direction": "none",
+                    /* ทิศทาง (none คือมั่ว) */
+                    "random": false,
+                    "straight": false,
+                    "out_mode": "out",
+                    "bounce": false,
+                    "attract": {
+                        "enable": false,
+                        "rotateX": 600,
+                        "rotateY": 1200
+                    }
+                }
+            },
+            "interactivity": {
+                /* ส่วนนี้คือเวลาเอาเมาส์ไปโดน */
+                "detect_on": "canvas",
+                "events": {
+                    "onhover": {
+                        "enable": true,
+                        /* ถ้า true เวลาเอาเมาส์ไปชี้ ดาวจะวิ่งหนีหรือวิ่งเข้าหา */
+                        "mode": "grab" /* grab = มีเส้นดูดเข้าหาเมาส์, repulse = วิ่งหนี */
+                    },
+                    "onclick": {
+                        "enable": true,
+                        "mode": "push" /* คลิกแล้วมีดาวเพิ่ม */
+                    },
+                    "resize": true
+                },
+                "modes": {
+                    "grab": {
+                        "distance": 140,
+                        "line_linked": {
+                            "opacity": 1
+                        }
+                    },
+                    "bubble": {
+                        "distance": 400,
+                        "size": 40,
+                        "duration": 2,
+                        "opacity": 8,
+                        "speed": 3
+                    },
+                    "repulse": {
+                        "distance": 200,
+                        "duration": 0.4
+                    },
+                    "push": {
+                        "particles_nb": 4
+                    },
+                    "remove": {
+                        "particles_nb": 2
+                    }
+                }
+            },
+            "retina_detect": true
+        });
+    </script>
+    <script>
+    document.addEventListener("DOMContentLoaded", function() {
+        // เช็คว่าเคยเข้าเว็บมารึยัง?
+        if (sessionStorage.getItem('introShown')) {
+            // ถ้าเคยเข้าแล้ว ให้ซ่อนหน้านี้ทันที (ไม่ต้องเล่นซ้ำ)
+            document.getElementById('welcome-screen').style.display = 'none';
+        } else {
+            // ถ้ายังไม่เคยเข้า ให้บันทึกว่าเข้าแล้ว
+            sessionStorage.setItem('introShown', 'true');
+        }
+    });
+</script>
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        // ข้อความที่จะให้พิมพ์
+        const text = "ระบบยืม-คืนหนังสือเรียน";
+        
+        // หาตำแหน่งที่จะพิมพ์
+        const target = document.getElementById('typewriter-text');
+        
+        let index = 0;
+        
+        function type() {
+            if (index < text.length) {
+                target.innerHTML += text.charAt(index);
+                index++;
+                setTimeout(type, 70); // ความเร็วในการพิมพ์ (เลขน้อย = เร็ว)
+            }
+        }
+
+        // ✅ ตั้งเวลาเริ่มพิมพ์: รอ 3000ms (3.0 วินาที) ให้หัวข้อข้างบนขึ้นมาก่อน
+        setTimeout(type, 3000); 
+    });
+</script>
 </body>
 
 </html>

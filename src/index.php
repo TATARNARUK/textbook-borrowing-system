@@ -25,11 +25,25 @@ $user_role = $_SESSION['role']; // admin หรือ student
     <link href="https://cdn.datatables.net/1.13.4/css/dataTables.bootstrap5.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
     <style>
         body {
             font-family: 'Prompt', sans-serif;
-            background-color: #f8f9fa;
+            background-color: #000000ff;
+            margin: 0;
+        }
+
+        #particles-js {
+            position: fixed;
+            /* ให้มันลอยอยู่กับที่ ไม่ต้องเลื่อนตาม Scroll bar */
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            z-index: -1;
+            /* ✅ สำคัญมาก! สั่งให้ไปอยู่ข้างหลังสุด */
+            pointer-events: none;
+            /* สั่งให้เม้าส์คลิกทะลุผ่านไปได้ (เผื่อไว้ก่อน) */
         }
 
         .book-cover {
@@ -50,14 +64,14 @@ $user_role = $_SESSION['role']; // admin หรือ student
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </head>
 
-<body>
+<body><?php require_once 'loader.php'; ?><div id="particles-js"></div>
 
     <nav class="top-nav">
         <div class="container d-flex flex-column flex-md-row justify-content-between align-items-center gap-3">
             <div class="d-flex align-items-center gap-4">
                 <img src="images/books.png" height="40" alt="Logo">
                 <div>
-                    <h5 class="m-0 fw-bold text-primary">TEXTBOOK BORROWING SYSTEM</h5>
+                    <h5 class="m-0 fw-bold text-dark">TEXTBOOK BORROWING SYSTEM</h5>
                     <small class="text-muted">ระบบยืม-คืนหนังสือเรียนฟรี</small>
                 </div>
             </div>
@@ -179,14 +193,14 @@ $user_role = $_SESSION['role']; // admin หรือ student
 
             <div class="container">
                 <div class="card border-0 shadow-sm rounded-4 mb-5 overflow-hidden text-white"
-                    style="background: linear-gradient(135deg, #0d6efd 0%, #0dcaf0 100%);">
+                    style="background: linear-gradient(135deg, #000000ff 0%, #c2c2c2ff 100%);">
                     <div class="card-body p-5 position-relative">
                         <div class="row align-items-center position-relative" style="z-index: 2;">
                             <div class="col-lg-8">
                                 <h1 class="fw-bold mb-2">ยินดีต้อนรับสู่ห้องสมุด IT 📖</h1>
                                 <p class="fs-5 opacity-75 mb-4">แหล่งเรียนรู้ ยืม-คืนง่าย ได้ความรู้ฟรี!</p>
                                 <div class="d-flex gap-2">
-                                    <button onclick="focusSearch()" class="btn btn-light text-primary rounded-pill px-4 fw-bold shadow-sm">
+                                    <button onclick="focusSearch()" class="btn btn-light text-dark rounded-pill px-4 fw-bold shadow-sm">
                                         <i class="fa-solid fa-magnifying-glass"></i> ค้นหาหนังสือ
                                     </button>
                                     <a href="manual.php" class="btn btn-outline-light rounded-pill px-4">
@@ -203,23 +217,23 @@ $user_role = $_SESSION['role']; // admin หรือ student
                         </div>
                     </div>
                 </div>
-                <div class="d-flex flex-column flex-md-row justify-content-between align-items-center mb-4 gap-3">
+                <div class="d-flex flex-column flex-md-row text-white justify-content-between align-items-center mb-4 gap-3">
                     <h3>📚 รายชื่อหนังสือเรียนทั้งหมด</h3>
 
                     <div>
-                        <a href="my_history.php" class="btn btn-primary text-white ms-2">
+                        <a href="my_history.php" class="btn bg-white text-dark ms-2 flex-fill flex-md-grow-0 shadow-sm py-2">
                             <i class="fa-solid fa-file-pdf"></i> ประวัติการยืม
                         </a>
                         <?php if ($user_role == 'admin') { ?>
-                            <a href="report.php" class="btn btn-info text-white ms-2">
+                            <a href="report.php" class="btn bg-white text-dark ms-2 flex-fill flex-md-grow-0 shadow-sm py-2">
                                 <i class="fa-solid fa-file-pdf"></i> รายงานสรุป
                             </a>
                         <?php } ?>
                         <?php if ($user_role == 'admin') { ?>
-                            <a href="add_book.php" class="btn btn-success">
+                            <a href="add_book.php" class="btn bg-white text-dark flex-fill flex-md-grow-0 shadow-sm py-2">
                                 <i class="fa-solid fa-plus"></i> เพิ่มหนังสือใหม่
                             </a>
-                            <a href="admin_users.php" class="btn btn-secondary text-white flex-fill flex-md-grow-0 shadow-sm py-2">
+                            <a href="admin_users.php" class="btn bg-white text-dark flex-fill flex-md-grow-0 shadow-sm py-2">
                                 <i class="fa-solid fa-users-gear"></i> จัดการผู้ใช้
                             </a>
                         <?php } ?>
@@ -423,6 +437,115 @@ $user_role = $_SESSION['role']; // admin หรือ student
                     }, 500); // รอ 0.5 วินาทีให้เลื่อนถึงก่อนค่อยโฟกัส
                 }
             </script>
+            <script src="https://cdn.jsdelivr.net/npm/particles.js@2.0.0/particles.min.js"></script>
+<script>
+    /* เรียกใช้ particles.js ที่กล่อง id="particles-js" */
+    particlesJS("particles-js", {
+      "particles": {
+        "number": {
+          "value": 80, /* จำนวนดาว (ยิ่งเยอะยิ่งรก) ลองปรับดูที่ 50-100 */
+          "density": {
+            "enable": true,
+            "value_area": 800
+          }
+        },
+        "color": {
+          "value": "#ffffff" /* สีของดาว (สีขาว) */
+        },
+        "shape": {
+          "type": "circle", /* รูปร่าง (วงกลม) */
+          "stroke": {
+            "width": 0,
+            "color": "#000000"
+          },
+          "polygon": {
+            "nb_sides": 5
+          }
+        },
+        "opacity": {
+          "value": 0.5, /* ความจางของดาว (0.5 คือครึ่งๆ) */
+          "random": true, /* ให้จางไม่เท่ากัน ดูมีมิติ */
+          "anim": {
+            "enable": false,
+            "speed": 1,
+            "opacity_min": 0.1,
+            "sync": false
+          }
+        },
+        "size": {
+          "value": 3, /* ขนาดของดาว */
+          "random": true, /* เล็กใหญ่ไม่เท่ากัน */
+          "anim": {
+            "enable": false,
+            "speed": 40,
+            "size_min": 0.1,
+            "sync": false
+          }
+        },
+        "line_linked": {
+          "enable": true, /* ✅ ถ้าไม่อยากได้เส้นเชื่อม ให้แก้เป็น false */
+          "distance": 150, /* ระยะห่างที่จะให้มีเส้นเชื่อม */
+          "color": "#ffffff", /* สีของเส้น */
+          "opacity": 0.4, /* ความจางของเส้น */
+          "width": 1
+        },
+        "move": {
+          "enable": true, /* สั่งให้ขยับ */
+          "speed": 2, /* ความเร็วในการวิ่ง (ยิ่งเยอะยิ่งเร็ว) */
+          "direction": "none", /* ทิศทาง (none คือมั่ว) */
+          "random": false,
+          "straight": false,
+          "out_mode": "out",
+          "bounce": false,
+          "attract": {
+            "enable": false,
+            "rotateX": 600,
+            "rotateY": 1200
+          }
+        }
+      },
+      "interactivity": { /* ส่วนนี้คือเวลาเอาเมาส์ไปโดน */
+        "detect_on": "canvas",
+        "events": {
+          "onhover": {
+            "enable": true, /* ถ้า true เวลาเอาเมาส์ไปชี้ ดาวจะวิ่งหนีหรือวิ่งเข้าหา */
+            "mode": "grab" /* grab = มีเส้นดูดเข้าหาเมาส์, repulse = วิ่งหนี */
+          },
+          "onclick": {
+            "enable": true,
+            "mode": "push" /* คลิกแล้วมีดาวเพิ่ม */
+          },
+          "resize": true
+        },
+        "modes": {
+          "grab": {
+            "distance": 140,
+            "line_linked": {
+              "opacity": 1
+            }
+          },
+          "bubble": {
+            "distance": 400,
+            "size": 40,
+            "duration": 2,
+            "opacity": 8,
+            "speed": 3
+          },
+          "repulse": {
+            "distance": 200,
+            "duration": 0.4
+          },
+          "push": {
+            "particles_nb": 4
+          },
+          "remove": {
+            "particles_nb": 2
+          }
+        }
+      },
+      "retina_detect": true
+    });
+</script>
 </body>
 
 </html>

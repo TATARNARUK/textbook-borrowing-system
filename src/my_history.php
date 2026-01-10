@@ -36,7 +36,7 @@ if ($role == 'admin') {
         
         <h4 class="mb-0"><i class="fa-solid fa-clock-rotate-left"></i> ประวัติการยืม-คืนหนังสือ</h4>
         
-        <a href="index.php" class="btn btn-secondary btn-sm">
+        <a href="index.php" class="btn btn-dark btn-sm">
             <i class="fa-solid fa-arrow-left"></i> กลับหน้าหลัก
         </a>
         
