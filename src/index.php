@@ -57,69 +57,67 @@ $user_role = $_SESSION['role']; // admin หรือ student
         }
 
 
-    .navbar-brand-text {
-        font-size: 1.1rem;
-        font-weight: 700;
-        color: #fff;
-        letter-spacing: 1px;
-    }
+        .navbar-custom {
+            padding: 15px 0;
+            /* ✅ เปลี่ยนจาก Fixed เป็น Relative เพื่อไม่ให้ลอยตาม */
+            position: relative;
+            width: 100%;
+            z-index: 1000;
+        }
 
-    .navbar-brand-sub {
-        font-size: 0.75rem;
-        color: #dadada;
-        font-weight: 400;
-        display: block;
-        margin-top: -2px;
-    }
+        .navbar-brand-text {
+            font-family: 'Noto Sans Thai', sans-serif;
+            font-size: 1.3rem;
+            font-weight: 800;
+            color: #fff;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
 
-    /* จัดการเมนูลิงก์ */
-    .nav-item .nav-link {
-        color: #ffffff !important; /* สีเทาอ่อน */
-        font-size: 0.9rem;
-        font-weight: 500;
-        margin: 0 10px;
-        position: relative;
-        transition: color 0.3s;
-    }
+        .nav-item .nav-link {
+            color: #ccc !important;
+            font-size: 0.9rem;
+            font-weight: 500;
+            margin: 0 12px;
+            position: relative;
+            transition: all 0.3s;
+        }
 
-    .nav-item .nav-link:hover,
-    .nav-item .nav-link.active {
-        color: #fff !important; /* สีขาวตอนชี้ */
-    }
+        .nav-item .nav-link:hover,
+        .nav-item .nav-link.active {
+            color: #fff !important;
+        }
 
-    /* Effect เส้นขีดใต้ (Underline) ตามรูปตัวอย่าง */
-    .nav-item .nav-link::after {
-        content: '';
-        position: absolute;
-        width: 0;
-        height: 2px;
-        bottom: -5px; /* ระยะห่างจากตัวหนังสือ */
-        left: 50%;
-        background-color: #fff;
-        transition: width 0.3s ease, left 0.3s ease;
-        border-radius: 2px;
-    }
+        .nav-item .nav-link::after {
+            content: '';
+            position: absolute;
+            width: 0;
+            height: 2px;
+            bottom: -5px;
+            left: 50%;
+            background: linear-gradient(90deg, #fff, #aaa);
+            transition: width 0.3s ease, left 0.3s ease;
+        }
 
-    .nav-item .nav-link:hover::after {
-        width: 100%;
-        left: 0;
-    }
+        .nav-item .nav-link:hover::after {
+            width: 100%;
+            left: 0;
+        }
 
-    /* โปรไฟล์ขวาสุด */
-    .user-profile-box {
-        border-left: 1px solid rgb(255, 255, 255);
-        padding-left: 20px;
-    }
+        .user-profile-box {
+            border-left: 1px solid rgba(255, 255, 255, 0.2);
+            padding-left: 20px;
+        }
     </style>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </head>
 
 <body><?php require_once 'loader.php'; ?><div id="particles-js"></div>
 
-<nav class="navbar navbar-expand-lg fixed-top">
-    <div class="container">
+   <nav class="navbar navbar-expand-lg navbar-custom">
+    <div class="container-fluid px-lg-5">
         
-<a class="navbar-brand d-flex align-items-center" href="index.php">
+        <a class="navbar-brand d-flex align-items-center" href="index.php">
             <span class="navbar-brand-text">TEXTBOOK BORROWING SYSTEM</span>
         </a>
 
@@ -150,11 +148,15 @@ $user_role = $_SESSION['role']; // admin หรือ student
 
             <div class="d-flex align-items-center gap-3 ms-lg-4 user-profile-box mt-3 mt-lg-0">
                 <div class="text-end d-none d-lg-block">
-                    <span class="d-block text-white fw-bold" style="font-size: 0.9rem;"><?php echo $user_name; ?></span>
-                    <span class="d-block text-white" style="font-size: 0.75rem; text-transform: uppercase;"><?php echo ucfirst($user_role); ?></span>
+                    <span class="d-block text-white fw-bold" style="font-size: 0.9rem; letter-spacing: 0.5px;">
+                        <?php echo ($user_role == 'admin') ? 'ผู้ดูแลระบบสูงสุด' : $user_name; ?>
+                    </span>
+                    <span class="d-block text-white small text-uppercase" style="font-size: 0.7rem;">
+                        <?php echo ucfirst($user_role); ?>
+                    </span>
                 </div>
-                <a href="logout.php" class="btn btn-sm btn-outline-danger rounded-pill px-3">
-                    <i class="fa-solid fa-power-off"> ออกจากระบบ</i>
+                <a href="logout.php" class="btn btn-sm btn-outline-danger rounded-pill px-3 py-1 fw-bold">
+                    <i class="fa-solid fa-power-off me-1"></i> ออกจากระบบ
                 </a>
             </div>
         </div>
@@ -162,7 +164,7 @@ $user_role = $_SESSION['role']; // admin หรือ student
     </div>
 </nav>
 
-<div style="padding-top: 100px;"></div>
+    <div style="padding-top: 100px;"></div>
 
     <div class="container">
 
