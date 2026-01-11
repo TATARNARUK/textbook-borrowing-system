@@ -45,7 +45,9 @@ if (isset($_POST['student_id']) && isset($_POST['password'])) {
     <link rel="icon" type="image/png" href="images/books.png">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;600&display=swap" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Thai:wght@100..900&display=swap" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css" rel="stylesheet">
     <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
@@ -54,20 +56,20 @@ if (isset($_POST['student_id']) && isset($_POST['password'])) {
 <body><?php require_once 'loader.php'; ?><div id="particles-js"></div>
     <div id="welcome-screen">
         <div class="intro-content text-center">
-            
+
             <div class="intro-icons mb-3">
                 <i class="fas fa-code"></i>
                 <i class="fas fa-user-graduate"></i>
                 <i class="fas fa-book"></i>
             </div>
 
-            <h1 class="fade-in-text">Welcome To My Website</h1>
-            
+            <h1 class="fade-in-text">Welcome To Website</h1>
+
             <h2 class="gradient-text">Textbook Borrowing System</h2>
-            
+
             <p class="text-white mt-2" style="min-height: 30px; font-size: 1.1rem;">
-    <span id="typewriter-text"></span><span class="cursor">|</span>
-</p>
+                <span id="typewriter-text"></span><span class="cursor">|</span>
+            </p>
         </div>
     </div>
     <nav class="navbar navbar-expand-lg shadow-sm fixed-top py-3" data-aos="fade-down" data-aos-duration="2000">
@@ -75,7 +77,7 @@ if (isset($_POST['student_id']) && isset($_POST['password'])) {
             <a class="navbar-brand d-flex align-items-center gap-3" href="index.php">
                 <img src="images/books.png" height="40" alt="Logo">
                 <div class="d-none d-md-block text-start" data-aos="fade-down" data-aos-duration="2000">
-                    <h5 class="m-0 fw-bold text-white" style="font-family: 'Kanit', sans-serif;">
+                    <h5 class="m-0 fw-bold text-white" style="font-family: 'Noto Sans Thai', sans-serif;">
                         TEXTBOOK BORROWING SYSTEM
                     </h5>
                     <small class="text-white">ระบบยืม-คืนหนังสือเรียนฟรี</small>
@@ -88,7 +90,7 @@ if (isset($_POST['student_id']) && isset($_POST['password'])) {
                 </a>
                 <div class="vr mx-2 text-white" style="height: 20px;"></div>
                 <a href="https://www.facebook.com/kittikun.nookeaw?locale=th_TH" target="_blank"
-                    class="btn btn-sm btn-outline-light rounded-pill px-3 ms-2">
+                    class="btn btn-sm btn-outline-light rounded-pill px-3 ms-2 ">
                     <i class="fas fa-headset me-1"></i> ติดต่อเจ้าหน้าที่
                 </a>
             </div>
@@ -135,12 +137,6 @@ if (isset($_POST['student_id']) && isset($_POST['password'])) {
 
     <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
 
-    <script>
-        AOS.init({
-            duration: 1000, // ความเร็วในการขยับ (1000ms = 1 วินาที) ยิ่งเลขเยอะยิ่งช้าและนุ่ม
-            once: true // ให้เล่นแค่ครั้งเดียวตอนเลื่อนลงมา (ไม่ต้องเล่นซ้ำตอนเลื่อนขึ้น)
-        });
-    </script>
     <script src="https://cdn.jsdelivr.net/npm/particles.js@2.0.0/particles.min.js"></script>
     <script>
         /* เรียกใช้ particles.js ที่กล่อง id="particles-js" */
@@ -266,39 +262,58 @@ if (isset($_POST['student_id']) && isset($_POST['password'])) {
         });
     </script>
     <script>
-    document.addEventListener("DOMContentLoaded", function() {
-        // เช็คว่าเคยเข้าเว็บมารึยัง?
-        if (sessionStorage.getItem('introShown')) {
-            // ถ้าเคยเข้าแล้ว ให้ซ่อนหน้านี้ทันที (ไม่ต้องเล่นซ้ำ)
-            document.getElementById('welcome-screen').style.display = 'none';
-        } else {
-            // ถ้ายังไม่เคยเข้า ให้บันทึกว่าเข้าแล้ว
-            sessionStorage.setItem('introShown', 'true');
-        }
-    });
-</script>
-<script>
-    document.addEventListener("DOMContentLoaded", function() {
-        // ข้อความที่จะให้พิมพ์
-        const text = "ระบบยืม-คืนหนังสือเรียน";
-        
-        // หาตำแหน่งที่จะพิมพ์
-        const target = document.getElementById('typewriter-text');
-        
-        let index = 0;
-        
-        function type() {
-            if (index < text.length) {
-                target.innerHTML += text.charAt(index);
-                index++;
-                setTimeout(type, 70); // ความเร็วในการพิมพ์ (เลขน้อย = เร็ว)
-            }
-        }
+        document.addEventListener("DOMContentLoaded", function() {
 
-        // ✅ ตั้งเวลาเริ่มพิมพ์: รอ 3000ms (3.0 วินาที) ให้หัวข้อข้างบนขึ้นมาก่อน
-        setTimeout(type, 3000); 
-    });
-</script>
+            // ตัวละคร
+            const welcomeScreen = document.getElementById('welcome-screen');
+            const typewriterText = document.getElementById('typewriter-text');
+
+            // ⚙️ ตั้งค่า AOS ตรงนี้แทน (รวมศูนย์ไว้ที่นี่)
+            function startAOS() {
+                AOS.init({
+                    duration: 1000, // ความเร็ว
+                    once: true, // เล่นครั้งเดียว
+                    easing: 'ease-out-cubic'
+                });
+            }
+
+            // --- เช็คว่าเคยเข้าเว็บมารึยัง? ---
+            if (sessionStorage.getItem('introShown')) {
+
+                // 🟢 กรณี: เคยเข้าแล้ว (กด Refresh)
+                // 1. ซ่อนฉากดำทันที
+                if (welcomeScreen) welcomeScreen.style.display = 'none';
+
+                // 2. สั่ง AOS ทำงานทันที (ไม่ต้องรอ)
+                startAOS();
+
+            } else {
+
+                // 🔴 กรณี: เพิ่งเข้าครั้งแรก (New User)
+                sessionStorage.setItem('introShown', 'true');
+
+                // 1. เริ่มเอฟเฟกต์พิมพ์ดีด
+                const textToType = "ระบบยืม-คืนหนังสือเรียน";
+                let charIndex = 0;
+
+                function type() {
+                    if (charIndex < textToType.length) {
+                        typewriterText.innerHTML += textToType.charAt(charIndex);
+                        charIndex++;
+                        setTimeout(type, 80);
+                    }
+                }
+                // เริ่มพิมพ์ตอนวินาทีที่ 2.5
+                setTimeout(type, 2500);
+
+                // 2. ⏰ รอให้ฉากดำเล่นจบก่อน... แล้วค่อยปลุก AOS ตื่น!
+                // (ตั้งเวลา 6500 ให้ตรงกับ animation-delay ใน CSS เป๊ะๆ)
+                setTimeout(function() {
+                    startAOS(); // 👈 สั่งเริ่มตรงนี้! การ์ดถึงจะเด้งตอนเห็นภาพ
+                }, 6500);
+            }
+        });
+    </script>
 </body>
 
 </html>
