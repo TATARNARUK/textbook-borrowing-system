@@ -98,6 +98,7 @@ $user_role = $_SESSION['role']; // admin หรือ student
             background: linear-gradient(90deg, #fff, #aaa);
             transition: width 0.3s ease, left 0.3s ease;
         }
+        
 
         .nav-item .nav-link:hover::after {
             width: 100%;
@@ -114,55 +115,60 @@ $user_role = $_SESSION['role']; // admin หรือ student
 
 <body><?php require_once 'loader.php'; ?><div id="particles-js"></div>
 
-   <nav class="navbar navbar-expand-lg navbar-custom">
-    <div class="container-fluid px-lg-5">
-        
-        <a class="navbar-brand d-flex align-items-center" href="index.php">
-            <span class="navbar-brand-text">TEXTBOOK BORROWING SYSTEM</span>
-        </a>
-
-        <button class="navbar-toggler border-0 shadow-none" type="button" data-bs-toggle="collapse" data-bs-target="#navbarContent">
-            <i class="fa-solid fa-bars text-white fs-3"></i>
-        </button>
-
-        <div class="collapse navbar-collapse" id="navbarContent">
-            <ul class="navbar-nav ms-auto mb-2 mb-lg-0 align-items-center">
-                
-                <li class="nav-item">
-                    <a class="nav-link" href="my_history.php">ประวัติการยืม</a>
-                </li>
-
-                <?php if ($user_role == 'admin') { ?>
-                    <li class="nav-item">
-                        <a class="nav-link" href="report.php">รายงานสรุป</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="add_book.php">เพิ่มหนังสือ</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="admin_users.php">จัดการผู้ใช้</a>
-                    </li>
-                <?php } ?>
-
-            </ul>
-
-            <div class="d-flex align-items-center gap-3 ms-lg-4 user-profile-box mt-3 mt-lg-0">
-                <div class="text-end d-none d-lg-block">
-                    <span class="d-block text-white fw-bold" style="font-size: 0.9rem; letter-spacing: 0.5px;">
-                        <?php echo ($user_role == 'admin') ? 'ผู้ดูแลระบบสูงสุด' : $user_name; ?>
-                    </span>
-                    <span class="d-block text-white small text-uppercase" style="font-size: 0.7rem;">
-                        <?php echo ucfirst($user_role); ?>
-                    </span>
+    <nav class="navbar navbar-expand-lg navbar-custom">
+        <div class="container-fluid px-lg-5">
+            <a class="navbar-brand d-flex align-items-center gap-3" href="index.php">
+                <img src="images/books.png" height="40" alt="Logo">
+                <div class="d-none d-md-block text-start">
+                    <h5 class="m-0 fw-bold text-white" style="font-family: 'Noto Sans Thai', sans-serif;">
+                        TEXTBOOK BORROWING SYSTEM
+                    </h5>
+                    <small class="text-white">ระบบยืม-คืนหนังสือเรียนฟรี</small>
                 </div>
-                <a href="logout.php" class="btn btn-sm btn-outline-danger rounded-pill px-3 py-1 fw-bold">
-                    <i class="fa-solid fa-power-off me-1"></i> ออกจากระบบ
-                </a>
-            </div>
-        </div>
+            </a>
 
-    </div>
-</nav>
+            <button class="navbar-toggler border-0 shadow-none" type="button" data-bs-toggle="collapse" data-bs-target="#navbarContent">
+                <i class="fa-solid fa-bars text-white fs-3"></i>
+            </button>
+
+            <div class="collapse navbar-collapse" id="navbarContent">
+                <ul class="navbar-nav ms-auto mb-2 mb-lg-0 align-items-center">
+
+                    <li class="nav-item">
+                        <a class="nav-link" href="my_history.php">ประวัติการยืม</a>
+                    </li>
+
+                    <?php if ($user_role == 'admin') { ?>
+                        <li class="nav-item">
+                            <a class="nav-link" href="report.php">รายงานสรุป</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="add_book.php">เพิ่มหนังสือ</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="admin_users.php">จัดการผู้ใช้</a>
+                        </li>
+                    <?php } ?>
+
+                </ul>
+
+                <div class="d-flex align-items-center gap-3 ms-lg-4 user-profile-box mt-3 mt-lg-0">
+                    <div class="text-end d-none d-lg-block">
+                        <span class="d-block text-white fw-bold" style="font-size: 0.9rem; letter-spacing: 0.5px;">
+                            <?php echo ($user_role == 'admin') ? 'ผู้ดูแลระบบสูงสุด' : $user_name; ?>
+                        </span>
+                        <span class="d-block text-white small text-uppercase" style="font-size: 0.7rem;">
+                            <?php echo ucfirst($user_role); ?>
+                        </span>
+                    </div>
+                    <a href="logout.php" class="btn btn-sm btn-outline-danger rounded-pill px-3 py-1 fw-bold">
+                        <i class="fa-solid fa-power-off me-1"></i> ออกจากระบบ
+                    </a>
+                </div>
+            </div>
+
+        </div>
+    </nav>
 
     <div style="padding-top: 100px;"></div>
 
