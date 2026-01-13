@@ -31,8 +31,15 @@ $user_role = $_SESSION['role']; // admin หรือ student
     <style>
         body {
             font-family: 'Noto Sans Thai', sans-serif;
-            background-color: #000000ff;
+            background-color: #f0f4f8;
+            /* พื้นหลังสีเทาอมฟ้าอ่อน */
+            background-image: radial-gradient(#dbeafe 1px, transparent 1px);
+            /* ลายจุดจางๆ */
+            background-size: 20px 20px;
             margin: 0;
+            min-height: 100vh;
+            color: #333;
+            overflow-x: hidden;
         }
 
         #particles-js {
@@ -58,6 +65,7 @@ $user_role = $_SESSION['role']; // admin หรือ student
 
 
         .navbar-custom {
+            background: rgba(255, 255, 255, 0.9) !important;
             padding: 15px 0;
             /* ✅ เปลี่ยนจาก Fixed เป็น Relative เพื่อไม่ให้ลอยตาม */
             position: relative;
@@ -75,7 +83,7 @@ $user_role = $_SESSION['role']; // admin หรือ student
         }
 
         .nav-item .nav-link {
-            color: #ccc !important;
+            color: #000000 !important;
             font-size: 0.9rem;
             font-weight: 500;
             margin: 0 12px;
@@ -85,7 +93,7 @@ $user_role = $_SESSION['role']; // admin หรือ student
 
         .nav-item .nav-link:hover,
         .nav-item .nav-link.active {
-            color: #fff !important;
+            color: #000000 !important;
         }
 
         .nav-item .nav-link::after {
@@ -95,10 +103,10 @@ $user_role = $_SESSION['role']; // admin หรือ student
             height: 2px;
             bottom: -5px;
             left: 50%;
-            background: linear-gradient(90deg, #fff, #aaa);
+            background: linear-gradient(90deg, #000000, #000000);
             transition: width 0.3s ease, left 0.3s ease;
         }
-        
+
 
         .nav-item .nav-link:hover::after {
             width: 100%;
@@ -106,7 +114,7 @@ $user_role = $_SESSION['role']; // admin หรือ student
         }
 
         .user-profile-box {
-            border-left: 1px solid rgba(255, 255, 255, 0.2);
+            border-left: 1px solid rgb(0, 0, 0);
             padding-left: 20px;
         }
     </style>
@@ -116,14 +124,14 @@ $user_role = $_SESSION['role']; // admin หรือ student
 <body><?php require_once 'loader.php'; ?><div id="particles-js"></div>
 
     <nav class="navbar navbar-expand-lg navbar-custom">
-        <div class="container-fluid px-lg-5">
+        <div class="container">
             <a class="navbar-brand d-flex align-items-center gap-3" href="index.php">
                 <img src="images/books.png" height="40" alt="Logo">
                 <div class="d-none d-md-block text-start">
-                    <h5 class="m-0 fw-bold text-white" style="font-family: 'Noto Sans Thai', sans-serif;">
+                    <h5 class="m-0 fw-bold text-primary" style="font-family: 'Noto Sans Thai', sans-serif;">
                         TEXTBOOK BORROWING SYSTEM
                     </h5>
-                    <small class="text-white">ระบบยืม-คืนหนังสือเรียนฟรี</small>
+                    <small class="text-dark">ระบบยืม-คืนหนังสือเรียนฟรี</small>
                 </div>
             </a>
 
@@ -154,10 +162,10 @@ $user_role = $_SESSION['role']; // admin หรือ student
 
                 <div class="d-flex align-items-center gap-3 ms-lg-4 user-profile-box mt-3 mt-lg-0">
                     <div class="text-end d-none d-lg-block">
-                        <span class="d-block text-white fw-bold" style="font-size: 0.9rem; letter-spacing: 0.5px;">
+                        <span class="d-block text-dark fw-bold" style="font-size: 0.9rem; letter-spacing: 0.5px;">
                             <?php echo ($user_role == 'admin') ? 'ผู้ดูแลระบบสูงสุด' : $user_name; ?>
                         </span>
-                        <span class="d-block text-white small text-uppercase" style="font-size: 0.7rem;">
+                        <span class="d-block text-dark small text-uppercase" style="font-size: 0.7rem;">
                             <?php echo ucfirst($user_role); ?>
                         </span>
                     </div>
@@ -277,7 +285,7 @@ $user_role = $_SESSION['role']; // admin หรือ student
 
             <div class="container">
                 <div class="card border-0 shadow-sm rounded-4 mb-5 overflow-hidden text-white"
-                    style="background: linear-gradient(135deg, #000000ff 0%, #c2c2c2ff 100%);">
+                    style="background: linear-gradient(135deg, #003cff 0%, rgb(255, 255, 255) 100%);">
                     <div class="card-body p-5 position-relative">
                         <div class="row align-items-center position-relative" style="z-index: 2;">
                             <div class="col-lg-8">
@@ -301,7 +309,7 @@ $user_role = $_SESSION['role']; // admin หรือ student
                         </div>
                     </div>
                 </div>
-                <div class="d-flex flex-column flex-md-row text-white justify-content-between align-items-center mb-4 gap-3">
+                <div class="d-flex flex-column flex-md-row text-dark justify-content-between align-items-center mb-4 gap-3">
                     <h3>📚 รายชื่อหนังสือเรียนทั้งหมด</h3>
                 </div>
 
@@ -504,98 +512,60 @@ $user_role = $_SESSION['role']; // admin หรือ student
             </script>
             <script src="https://cdn.jsdelivr.net/npm/particles.js@2.0.0/particles.min.js"></script>
             <script>
-                /* เรียกใช้ particles.js ที่กล่อง id="particles-js" */
+                /* --- ตั้งค่า Particles สีฟ้า/เทา สำหรับพื้นขาว --- */
                 particlesJS("particles-js", {
                     "particles": {
                         "number": {
-                            "value": 80,
-                            /* จำนวนดาว (ยิ่งเยอะยิ่งรก) ลองปรับดูที่ 50-100 */
+                            "value": 60,
                             "density": {
                                 "enable": true,
                                 "value_area": 800
                             }
                         },
                         "color": {
-                            "value": "#ffffff" /* สีของดาว (สีขาว) */
+                            "value": "#0d6efd"
                         },
+                        /* เปลี่ยนดาวเป็นสีฟ้า */
                         "shape": {
-                            "type": "circle",
-                            /* รูปร่าง (วงกลม) */
-                            "stroke": {
-                                "width": 0,
-                                "color": "#000000"
-                            },
-                            "polygon": {
-                                "nb_sides": 5
-                            }
+                            "type": "circle"
                         },
                         "opacity": {
                             "value": 0.5,
-                            /* ความจางของดาว (0.5 คือครึ่งๆ) */
-                            "random": true,
-                            /* ให้จางไม่เท่ากัน ดูมีมิติ */
-                            "anim": {
-                                "enable": false,
-                                "speed": 1,
-                                "opacity_min": 0.1,
-                                "sync": false
-                            }
+                            "random": true
                         },
                         "size": {
                             "value": 3,
-                            /* ขนาดของดาว */
-                            "random": true,
-                            /* เล็กใหญ่ไม่เท่ากัน */
-                            "anim": {
-                                "enable": false,
-                                "speed": 40,
-                                "size_min": 0.1,
-                                "sync": false
-                            }
+                            "random": true
                         },
                         "line_linked": {
                             "enable": true,
-                            /* ✅ ถ้าไม่อยากได้เส้นเชื่อม ให้แก้เป็น false */
                             "distance": 150,
-                            /* ระยะห่างที่จะให้มีเส้นเชื่อม */
-                            "color": "#ffffff",
-                            /* สีของเส้น */
-                            "opacity": 0.4,
-                            /* ความจางของเส้น */
+                            "color": "#0d6efd",
+                            /* เปลี่ยนเส้นเชื่อมเป็นสีฟ้า */
+                            "opacity": 0.2,
                             "width": 1
                         },
                         "move": {
                             "enable": true,
-                            /* สั่งให้ขยับ */
                             "speed": 2,
-                            /* ความเร็วในการวิ่ง (ยิ่งเยอะยิ่งเร็ว) */
                             "direction": "none",
-                            /* ทิศทาง (none คือมั่ว) */
                             "random": false,
                             "straight": false,
                             "out_mode": "out",
-                            "bounce": false,
-                            "attract": {
-                                "enable": false,
-                                "rotateX": 600,
-                                "rotateY": 1200
-                            }
+                            "bounce": false
                         }
                     },
                     "interactivity": {
-                        /* ส่วนนี้คือเวลาเอาเมาส์ไปโดน */
                         "detect_on": "canvas",
                         "events": {
                             "onhover": {
                                 "enable": true,
-                                /* ถ้า true เวลาเอาเมาส์ไปชี้ ดาวจะวิ่งหนีหรือวิ่งเข้าหา */
-                                "mode": "grab" /* grab = มีเส้นดูดเข้าหาเมาส์, repulse = วิ่งหนี */
+                                "mode": "grab"
                             },
                             "onclick": {
                                 "enable": true,
-                                "mode": "push" /* คลิกแล้วมีดาวเพิ่ม */
-                            },
-                            "resize": true
+                                "mode": "push"
+                            }
                         },
                         "modes": {
                             "grab": {
@@ -603,23 +573,6 @@ $user_role = $_SESSION['role']; // admin หรือ student
                                 "line_linked": {
                                     "opacity": 1
                                 }
-                            },
-                            "bubble": {
-                                "distance": 400,
-                                "size": 40,
-                                "duration": 2,
-                                "opacity": 8,
-                                "speed": 3
-                            },
-                            "repulse": {
-                                "distance": 200,
-                                "duration": 0.4
-                            },
-                            "push": {
-                                "particles_nb": 4
-                            },
-                            "remove": {
-                                "particles_nb": 2
                             }
                         }
                     },

@@ -1,15 +1,14 @@
        @import url('https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;600&display=swap');
 
        body {
-        font-family: 'Noto Sans Thai', sans-serif;
-         background-color: #000000;
-         margin: 0;
-         background-size: cover;
-         background-position: center;
+         font-family: 'Noto Sans Thai', sans-serif;
+         background-color: #f0f4f8;
+         /* พื้นหลังสีเทาอมฟ้าอ่อนสบายตา */
+         background-image: radial-gradient(#dbeafe 1px, transparent 1px);
+         /* ลายจุดจางๆ */
+         background-size: 20px 20px;
          height: 100vh;
-         display: flex;
-         align-items: center;
-         justify-content: center;
+         overflow: hidden;
        }
 
        #particles-js {
@@ -35,6 +34,15 @@
          width: 100%;
          max-width: 400px;
        }
+               .navbar-custom {
+            background: rgba(255, 255, 255, 0.9) !important;
+            padding: 15px 0;
+            /* ✅ เปลี่ยนจาก Fixed เป็น Relative เพื่อไม่ให้ลอยตาม */
+            position: relative;
+            width: 100%;
+            z-index: 1000;
+        }
+
 
        .topbar-bncc {
          position: fixed;
@@ -72,10 +80,10 @@
        }
 
        .btg {
-         color: rgb(0, 0, 0);
+         color: #0b5ed7;
          text-transform: uppercase;
          text-decoration: none;
-         border: 2px solid rgb(0, 0, 0);
+         border: 2px solid #0b5ed7;
          padding: 10px 20px;
          font-size: 17px;
          cursor: pointer;
@@ -98,7 +106,7 @@
          top: 0;
          left: -40px;
          transform: skewX(45deg);
-         background-color: rgb(0, 0, 0);
+         background-color: #0b5ed7;
          z-index: -1;
          transition: all 1s;
        }
@@ -138,97 +146,143 @@
        .input:focus {
          color: #05060fc2;
        }
-#welcome-screen {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100vh; /* เต็มความสูงจอ */
-    background-color: #000000; /* สีพื้นหลังดำด้าน (แบบ GitHub Dark Mode) */
-    z-index: 9999; 
-    
-    /* ✅ สูตรจัดกึ่งกลางเป๊ะๆ */
-    display: flex;
-    justify-content: center; /* กึ่งกลางแนวนอน */
-    align-items: center;     /* กึ่งกลางแนวตั้ง */
-    flex-direction: column;  /* เรียงลงมาเป็นแนวตั้ง */
-    
-    /* อนิเมชั่นปิดฉาก */
-    animation: fadeOutScreen 1s ease-in-out forwards;
-    animation-delay: 5.5s; /* โชว์นาน 4.5 วิ แล้วค่อยหายไป */
-    pointer-events: none;
-}
 
-/* ไอคอนด้านบน */
-.intro-icons i {
-    font-size: 1.5rem;
-    color: #ffffff; /* สีม่วง */
-    margin: 0 10px;
-    opacity: 0;
-    transform: translateY(20px);
-    animation: popUpIcon 0.8s cubic-bezier(0.68, -0.55, 0.27, 1.55) forwards;
-}
-/* ให้ไอคอนเด้งขึ้นมาทีละตัว */
-.intro-icons i:nth-child(1) { animation-delay: 0.5s; }
-.intro-icons i:nth-child(2) { animation-delay: 0.7s; }
-.intro-icons i:nth-child(3) { animation-delay: 0.9s; }
+       #welcome-screen {
+         position: fixed;
+         top: 0;
+         left: 0;
+         width: 100%;
+         height: 100vh;
+         /* เต็มความสูงจอ */
+         background-color: #ffffff;
+         /* สีพื้นหลังดำด้าน (แบบ GitHub Dark Mode) */
+         z-index: 9999;
 
-/* ข้อความทั่วไป (Welcome To) */
-.fade-in-text {
-    font-family: 'Prompt', sans-serif;
-    color: #fff;
-    font-weight: 300;
-    font-size: 2rem;
-    margin: 0;
-    opacity: 0;
-    animation: textFadeIn 1s ease-out forwards;
-    animation-delay: 1.2s;
-}
+         /* ✅ สูตรจัดกึ่งกลางเป๊ะๆ */
+         display: flex;
+         justify-content: center;
+         /* กึ่งกลางแนวนอน */
+         align-items: center;
+         /* กึ่งกลางแนวตั้ง */
+         flex-direction: column;
+         /* เรียงลงมาเป็นแนวตั้ง */
 
-/* ✅ ข้อความพระเอก (ชื่อระบบไล่สี) */
-.gradient-text {
-    font-family: 'Prompt', sans-serif;
-    font-weight: 700;
-    font-size: 3.5rem; /* ตัวใหญ่สะใจ */
-    text-transform: uppercase;
-    margin: 10px 0;
-    opacity: 0;
-    
-    /* สูตรไล่สีตัวหนังสือ */
-    background: linear-gradient(90deg, #ffffff 0%, #000000 100%);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-    
-    animation: textFadeIn 1s ease-out forwards;
-    animation-delay: 1.8s; /* มาทีหลังสุด */
-}
-/* เส้นเคอร์เซอร์กระพริบ */
-.cursor {
-    display: inline-block;
-    vertical-align: bottom;
-    width: 2px;
-    height: 1.2em;
-    background-color: #fff;
-    animation: blinkCursor 0.7s infinite;
-    margin-left: 2px;
-}
+         /* อนิเมชั่นปิดฉาก */
+         animation: fadeOutScreen 1s ease-in-out forwards;
+         animation-delay: 5.5s;
+         /* โชว์นาน 4.5 วิ แล้วค่อยหายไป */
+         pointer-events: none;
+       }
 
-@keyframes blinkCursor {
-    0%, 100% { opacity: 1; }
-    50% { opacity: 0; }
-}
+       /* ไอคอนด้านบน */
+       .intro-icons i {
+         font-size: 1.5rem;
+         color: #0b5ed7;
+         margin: 0 10px;
+         opacity: 0;
+         transform: translateY(20px);
+         animation: popUpIcon 0.8s cubic-bezier(0.68, -0.55, 0.27, 1.55) forwards;
+       }
 
-.delay-2 { animation-delay: 3.5s; font-size: 1rem; }
+       /* ให้ไอคอนเด้งขึ้นมาทีละตัว */
+       .intro-icons i:nth-child(1) {
+         animation-delay: 0.5s;
+       }
 
-/* Keyframes (คิวการขยับ) */
-@keyframes popUpIcon {
-    100% { opacity: 1; transform: translateY(0); }
-}
-@keyframes textFadeIn {
-    0% { opacity: 0; transform: translateY(20px); filter: blur(5px); }
-    100% { opacity: 1; transform: translateY(0); filter: blur(0); }
-}
-@keyframes fadeOutScreen {
-    to { opacity: 0; visibility: hidden; }
-}
+       .intro-icons i:nth-child(2) {
+         animation-delay: 0.7s;
+       }
+
+       .intro-icons i:nth-child(3) {
+         animation-delay: 0.9s;
+       }
+
+       /* ข้อความทั่วไป (Welcome To) */
+       .fade-in-text {
+         font-family: 'Prompt', sans-serif;
+         color: #0b5ed7;
+         font-weight: 300;
+         font-size: 2rem;
+         margin: 0;
+         opacity: 0;
+         animation: textFadeIn 1s ease-out forwards;
+         animation-delay: 1.2s;
+       }
+
+       /* ✅ ข้อความพระเอก (ชื่อระบบไล่สี) */
+       .gradient-text {
+         font-family: 'Prompt', sans-serif;
+         font-weight: 700;
+         font-size: 3.5rem;
+         /* ตัวใหญ่สะใจ */
+         text-transform: uppercase;
+         margin: 10px 0;
+         opacity: 0;
+
+         /* สูตรไล่สีตัวหนังสือ */
+         background: linear-gradient(90deg, #1158c2 0%, #0b5ed7 100%);
+         -webkit-background-clip: text;
+         -webkit-text-fill-color: transparent;
+         background-clip: text;
+
+         animation: textFadeIn 1s ease-out forwards;
+         animation-delay: 1.8s;
+         /* มาทีหลังสุด */
+       }
+
+       /* เส้นเคอร์เซอร์กระพริบ */
+       .cursor {
+         display: inline-block;
+         vertical-align: bottom;
+         width: 2px;
+         height: 1.2em;
+         background-color: #0b5ed7;
+         animation: blinkCursor 0.7s infinite;
+         margin-left: 2px;
+       }
+
+       @keyframes blinkCursor {
+
+         0%,
+         100% {
+           opacity: 1;
+         }
+
+         50% {
+           opacity: 0;
+         }
+       }
+
+       .delay-2 {
+         animation-delay: 3.5s;
+         font-size: 1rem;
+       }
+
+       /* Keyframes (คิวการขยับ) */
+       @keyframes popUpIcon {
+         100% {
+           opacity: 1;
+           transform: translateY(0);
+         }
+       }
+
+       @keyframes textFadeIn {
+         0% {
+           opacity: 0;
+           transform: translateY(20px);
+           filter: blur(5px);
+         }
+
+         100% {
+           opacity: 1;
+           transform: translateY(0);
+           filter: blur(0);
+         }
+       }
+
+       @keyframes fadeOutScreen {
+         to {
+           opacity: 0;
+           visibility: hidden;
+         }
+       }

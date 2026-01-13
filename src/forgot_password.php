@@ -55,15 +55,27 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
     <style>
         body {
-            font-family: 'Prompt', sans-serif;
-            background-image: url('https://images.unsplash.com/photo-1524995997946-a1c2e315a42f?q=80&w=2070&auto=format&fit=crop');
-            /* รูป Background ชั่วคราว */
-            background-size: cover;
-            background-position: center;
+            font-family: 'Noto Sans Thai', sans-serif;
+            background-color: #f0f4f8;
+            /* พื้นหลังสีเทาอมฟ้าอ่อนสบายตา */
+            background-image: radial-gradient(#dbeafe 1px, transparent 1px);
+            /* ลายจุดจางๆ */
+            background-size: 20px 20px;
             height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
+            overflow: hidden;
+        }
+
+        #particles-js {
+            position: fixed;
+            /* ให้มันลอยอยู่กับที่ ไม่ต้องเลื่อนตาม Scroll bar */
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            z-index: -1;
+            /* ✅ สำคัญมาก! สั่งให้ไปอยู่ข้างหลังสุด */
+            pointer-events: none;
+            /* สั่งให้เม้าส์คลิกทะลุผ่านไปได้ (เผื่อไว้ก่อน) */
         }
 
         /* ตกแต่ง Navbar ให้ดูพรีเมียม */
@@ -123,6 +135,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 </head>
 
 <body>
+    </div> <?php require_once 'loader.php'; ?> <div id="particles-js"></div>
     <div class="container d-flex align-items-center justify-content-center" style="min-height: 100vh;">
         <div class="card card-reset p-5 text-center shadow-lg border-0" style="max-width: 500px;">
 
@@ -152,6 +165,76 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
         </div>
     </div>
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/particles.js@2.0.0/particles.min.js"></script>
+    <script>
+        /* --- ตั้งค่า Particles สีฟ้า/เทา สำหรับพื้นขาว --- */
+        particlesJS("particles-js", {
+            "particles": {
+                "number": {
+                    "value": 60,
+                    "density": {
+                        "enable": true,
+                        "value_area": 800
+                    }
+                },
+                "color": {
+                    "value": "#0d6efd"
+                },
+                /* เปลี่ยนดาวเป็นสีฟ้า */
+                "shape": {
+                    "type": "circle"
+                },
+                "opacity": {
+                    "value": 0.5,
+                    "random": true
+                },
+                "size": {
+                    "value": 3,
+                    "random": true
+                },
+                "line_linked": {
+                    "enable": true,
+                    "distance": 150,
+                    "color": "#0d6efd",
+                    /* เปลี่ยนเส้นเชื่อมเป็นสีฟ้า */
+                    "opacity": 0.2,
+                    "width": 1
+                },
+                "move": {
+                    "enable": true,
+                    "speed": 2,
+                    "direction": "none",
+                    "random": false,
+                    "straight": false,
+                    "out_mode": "out",
+                    "bounce": false
+                }
+            },
+            "interactivity": {
+                "detect_on": "canvas",
+                "events": {
+                    "onhover": {
+                        "enable": true,
+                        "mode": "grab"
+                    },
+                    "onclick": {
+                        "enable": true,
+                        "mode": "push"
+                    }
+                },
+                "modes": {
+                    "grab": {
+                        "distance": 140,
+                        "line_linked": {
+                            "opacity": 1
+                        }
+                    }
+                }
+            },
+            "retina_detect": true
+        });
+    </script>
 </body>
 
 </html>
