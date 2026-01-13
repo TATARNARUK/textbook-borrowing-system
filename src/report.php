@@ -32,106 +32,110 @@ $transactions = $stmt->fetchAll();
     <title>รายงานสรุปการยืม-คืน</title>
     <link rel="icon" type="image/png" href="images/books.png">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Thai:wght@300;400;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Thai:wght@300;400;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
 
     <style>
-        /* --- 🌑 SCREEN MODE (Dark Luxury) --- */
+        /* --- 🎨 White & Blue Theme CSS --- */
         body {
             font-family: 'Noto Sans Thai', sans-serif;
-            background-color: #000000;
-            color: #e0e0e0;
+            background-color: #f0f4f8; /* พื้นหลังสีเทาอมฟ้าอ่อน */
+            background-image: radial-gradient(#dbeafe 1px, transparent 1px); /* ลายจุดจางๆ */
+            background-size: 20px 20px;
+            color: #333;
             overflow-x: hidden;
         }
 
        #particles-js {
-         position: fixed;
-         /* ให้มันลอยอยู่กับที่ ไม่ต้องเลื่อนตาม Scroll bar */
-         width: 100%;
-         height: 100%;
-         top: 0;
-         left: 0;
-         z-index: -1;
-         /* ✅ สำคัญมาก! สั่งให้ไปอยู่ข้างหลังสุด */
-         pointer-events: none;
-         /* สั่งให้เม้าส์คลิกทะลุผ่านไปได้ (เผื่อไว้ก่อน) */
+         position: fixed; width: 100%; height: 100%; top: 0; left: 0; z-index: -1; pointer-events: none;
        }
 
-        /* Glass Panel */
+        /* White Card Panel */
         .glass-panel {
-            background: rgba(15, 15, 15, 0.85);
-            backdrop-filter: blur(20px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 0px; /* เหลี่ยมเท่ๆ */
-            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+            background: #ffffff;
+            border: none;
+            border-radius: 20px;
+            box-shadow: 0 10px 40px rgba(13, 110, 253, 0.1);
             padding: 30px;
             margin-bottom: 30px;
+            position: relative;
+            z-index: 1;
         }
 
-        /* Inputs (Dark) */
+        /* Inputs (Light Theme) */
         .form-control {
-            background-color: #111;
-            border: 1px solid #333;
-            color: #fff;
-            border-radius: 4px;
+            background-color: #f8f9fa;
+            border: 1px solid #dee2e6;
+            color: #333;
+            border-radius: 10px;
+            padding: 10px;
         }
         .form-control:focus {
-            background-color: #000;
-            border-color: #fff;
-            color: #fff;
-            box-shadow: none;
-        }
-        /* Custom Date Picker Icon fix */
-        ::-webkit-calendar-picker-indicator {
-            filter: invert(1);
+            background-color: #fff;
+            border-color: #0d6efd;
+            box-shadow: 0 0 0 4px rgba(13, 110, 253, 0.1);
         }
 
         /* Buttons */
-        .btn-monochrome {
-            background: #fff; color: #000; border: 1px solid #fff;
-            font-weight: 600; border-radius: 4px; padding: 7px 20px;
+        .btn-custom-primary {
+            background: linear-gradient(45deg, #0d6efd, #0dcaf0);
+            color: #fff;
+            border: none;
+            font-weight: 600; border-radius: 10px; padding: 10px 20px;
             transition: all 0.3s;
+            box-shadow: 0 4px 6px rgba(13, 110, 253, 0.2);
         }
-        .btn-monochrome:hover {
-            background: #000; color: #fff;
+        .btn-custom-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(13, 110, 253, 0.3);
+            color: #fff;
         }
-        .btn-outline-white {
-            background: transparent; color: #aaa; border: 1px solid #333;
-            border-radius: 4px;
+        
+        .btn-outline-custom {
+            background: transparent; color: #0d6efd; border: 1px solid #0d6efd;
+            border-radius: 10px; font-weight: 600;
         }
-        .btn-outline-white:hover {
-            border-color: #fff; color: #fff;
+        .btn-outline-custom:hover {
+            background: #0d6efd; color: #fff;
         }
 
-        /* Modern Table */
+        /* Modern Table (Light Theme) */
         .table-custom {
             width: 100%; border-collapse: separate; border-spacing: 0 10px;
         }
         .table-custom thead th {
-            color: #666; font-size: 0.9rem; /* ปรับขนาดให้พอดีภาษาไทย */
-            letter-spacing: 0.5px; border: none; padding-bottom: 15px;
+            background-color: #e7f1ff; /* หัวตารางสีฟ้าอ่อน */
+            color: #0d6efd;
+            font-size: 0.9rem;
+            font-weight: 700;
+            letter-spacing: 0.5px; border: none; padding: 15px;
         }
+        .table-custom thead th:first-child { border-top-left-radius: 10px; border-bottom-left-radius: 10px; }
+        .table-custom thead th:last-child { border-top-right-radius: 10px; border-bottom-right-radius: 10px; }
+
         .table-custom tbody tr {
-            background-color: rgba(255, 255, 255, 0.03);
+            background-color: #fff;
             transition: all 0.2s;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.02);
         }
         .table-custom tbody tr:hover {
-            background-color: rgba(255, 255, 255, 0.08);
-            transform: scale(1.01);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(13, 110, 253, 0.1);
         }
         .table-custom td {
-            border: none; padding: 15px; vertical-align: middle; color: #ccc;
+            border: 1px solid #f0f0f0; border-width: 1px 0;
+            padding: 15px; vertical-align: middle; color: #555;
         }
-        .table-custom td:first-child { border-top-left-radius: 6px; border-bottom-left-radius: 6px; }
-        .table-custom td:last-child { border-top-right-radius: 6px; border-bottom-right-radius: 6px; }
+        .table-custom td:first-child { border-left: 1px solid #f0f0f0; border-top-left-radius: 10px; border-bottom-left-radius: 10px; }
+        .table-custom td:last-child { border-right: 1px solid #f0f0f0; border-top-right-radius: 10px; border-bottom-right-radius: 10px; }
 
         /* Status Badges */
         .status-pill {
-            padding: 4px 12px; border-radius: 50px; font-size: 0.8rem; font-weight: 500;
+            padding: 4px 12px; border-radius: 50px; font-size: 0.8rem; font-weight: 600;
         }
-        .st-borrow { background: rgba(255, 193, 7, 0.1); color: #ffc107; border: 1px solid rgba(255, 193, 7, 0.3); }
-        .st-return { background: rgba(25, 135, 84, 0.1); color: #198754; border: 1px solid rgba(25, 135, 84, 0.3); }
+        .st-borrow { background: #fff3cd; color: #856404; border: 1px solid #ffeeba; }
+        .st-return { background: #d1e7dd; color: #0f5132; border: 1px solid #badbcc; }
 
 
         /* --- 🖨️ PRINT MODE (Clean White) --- */
@@ -142,14 +146,13 @@ $transactions = $stmt->fetchAll();
             .glass-panel {
                 background: none !important; border: none !important;
                 box-shadow: none !important; padding: 0 !important; margin: 0 !important;
-                backdrop-filter: none !important;
             }
 
             .table-custom { border-collapse: collapse !important; border-spacing: 0 !important; }
             .table-custom th, .table-custom td {
                 border: 1px solid #000 !important; color: #000 !important; padding: 8px !important;
             }
-            .table-custom tbody tr { background: none !important; }
+            .table-custom tbody tr { background: none !important; box-shadow: none !important; }
             
             /* Hide Badges Background for print clarity */
             .status-pill { border: none !important; color: #000 !important; padding: 0 !important; }
@@ -169,16 +172,16 @@ $transactions = $stmt->fetchAll();
         
         <div class="d-flex justify-content-between align-items-center mb-4 no-print" data-aos="fade-down">
             <div>
-                <h3 class="text-white fw-light mb-0" style="letter-spacing: 1px;">
-                    <i class="fa-solid fa-file-invoice me-2 text-secondary"></i>รายงานสรุป
+                <h3 class="text-primary fw-bold mb-0" style="letter-spacing: 1px;">
+                    <i class="fa-solid fa-file-invoice me-2"></i>รายงานสรุป
                 </h3>
                 <small class="text-secondary">ระบบรายงานข้อมูลการยืม-คืนหนังสือ</small>
             </div>
             <div>
-                <a href="index.php" class="btn btn-outline-white me-2">
+                <a href="index.php" class="btn btn-outline-custom me-2">
                     <i class="fa-solid fa-arrow-left"></i> กลับหน้าหลัก
                 </a>
-                <button onclick="window.print()" class="btn btn-monochrome">
+                <button onclick="window.print()" class="btn btn-custom-primary">
                     <i class="fa-solid fa-print me-2"></i> พิมพ์รายงาน
                 </button>
             </div>
@@ -187,15 +190,15 @@ $transactions = $stmt->fetchAll();
         <div class="glass-panel no-print" data-aos="fade-up">
             <form method="get" class="row g-3 align-items-end">
                 <div class="col-md-4">
-                    <label class="text-white small mb-2">ตั้งแต่วันที่</label>
+                    <label class="text-secondary fw-bold small mb-2">ตั้งแต่วันที่</label>
                     <input type="date" name="start_date" class="form-control" value="<?php echo $start_date; ?>">
                 </div>
                 <div class="col-md-4">
-                    <label class="text-white small mb-2">ถึงวันที่</label>
+                    <label class="text-secondary fw-bold small mb-2">ถึงวันที่</label>
                     <input type="date" name="end_date" class="form-control" value="<?php echo $end_date; ?>">
                 </div>
                 <div class="col-md-4">
-                    <button type="submit" class="btn btn-monochrome w-100">
+                    <button type="submit" class="btn btn-custom-primary w-100">
                         <i class="fa-solid fa-magnifying-glass me-2"></i> ค้นหาข้อมูล
                     </button>
                 </div>
@@ -214,13 +217,13 @@ $transactions = $stmt->fetchAll();
                 <table class="table-custom">
                     <thead>
                         <tr>
-                            <th width="5%" class="text-center text-white">#</th>
-                            <th width="15%" class="text-white">วันที่ยืม</th>
-                            <th width="15%" class="text-white">รหัสนักเรียน</th>
-                            <th width="20%" class="text-white">ชื่อ-สกุล</th>
-                            <th width="25%" class="text-white">ชื่อหนังสือ</th>
-                            <th width="10%" class="text-center text-white">สถานะ</th>
-                            <th width="10%" class="text-center text-white">วันที่คืน</th>
+                            <th width="5%" class="text-center">#</th>
+                            <th width="15%">วันที่ยืม</th>
+                            <th width="15%">รหัสนักเรียน</th>
+                            <th width="20%">ชื่อ-สกุล</th>
+                            <th width="25%">ชื่อหนังสือ</th>
+                            <th width="10%" class="text-center">สถานะ</th>
+                            <th width="10%" class="text-center">วันที่คืน</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -229,15 +232,15 @@ $transactions = $stmt->fetchAll();
                                 $is_borrowed = $row['status'] == 'borrowed';
                             ?>
                             <tr>
-                                <td class="text-center text-white"><?php echo $i++; ?></td>
+                                <td class="text-center"><?php echo $i++; ?></td>
                                 <td>
-                                    <span class="text-white"><?php echo date('d/m/Y', strtotime($row['borrow_date'])); ?></span>
+                                    <span class="text-dark"><?php echo date('d/m/Y', strtotime($row['borrow_date'])); ?></span>
                                 </td>
-                                <td><span class="text-white font-monospace"><?php echo $row['student_id']; ?></span></td>
-                                <td class="text-white"><?php echo $row['fullname']; ?></td>
+                                <td><span class="text-secondary font-monospace"><?php echo $row['student_id']; ?></span></td>
+                                <td class="text-dark fw-bold"><?php echo $row['fullname']; ?></td>
                                 <td>
-                                    <div class="text-white"><?php echo $row['title']; ?></div>
-                                    <small class="text-white" style="font-size: 0.8rem;">รหัสเล่ม: <?php echo $row['book_code']; ?></small>
+                                    <div class="text-primary fw-bold"><?php echo $row['title']; ?></div>
+                                    <small class="text-muted" style="font-size: 0.8rem;">รหัสเล่ม: <?php echo $row['book_code']; ?></small>
                                 </td>
                                 <td class="text-center">
                                     <?php if($is_borrowed): ?>
@@ -254,7 +257,9 @@ $transactions = $stmt->fetchAll();
                         <?php else: ?>
                             <tr>
                                 <td colspan="7" class="text-center py-5 text-secondary">
-                                    <i class="fa-solid fa-box-open fs-1 mb-3 opacity-25"></i><br>
+                                    <div class="opacity-50 mb-3">
+                                        <i class="fa-solid fa-folder-open fs-1"></i>
+                                    </div>
                                     ไม่พบข้อมูลในช่วงเวลานี้
                                 </td>
                             </tr>
@@ -284,139 +289,19 @@ $transactions = $stmt->fetchAll();
     <script>
         AOS.init({ duration: 800, once: true });
         
+        // Particles สีฟ้า (Blue)
         particlesJS("particles-js", {
             "particles": {
-                "number": { "value": 40 },
-                "color": { "value": "#ffffff" },
+                "number": { "value": 60, "density": { "enable": true, "value_area": 800 } },
+                "color": { "value": "#0d6efd" }, /* สีฟ้า */
                 "shape": { "type": "circle" },
-                "opacity": { "value": 0.2, "random": true },
-                "size": { "value": 2, "random": true },
-                "line_linked": { "enable": true, "distance": 150, "color": "#ffffff", "opacity": 0.1, "width": 1 },
-                "move": { "enable": true, "speed": 0.5 }
+                "opacity": { "value": 0.5, "random": true },
+                "size": { "value": 3, "random": true },
+                "line_linked": { "enable": true, "distance": 150, "color": "#0d6efd", "opacity": 0.2, "width": 1 },
+                "move": { "enable": true, "speed": 2 }
             },
-            "interactivity": { "detect_on": "canvas", "events": { "onhover": { "enable": false } } }
-        });
-    </script>
-     <script>
-        /* เรียกใช้ particles.js ที่กล่อง id="particles-js" */
-        particlesJS("particles-js", {
-            "particles": {
-                "number": {
-                    "value": 80,
-                    /* จำนวนดาว (ยิ่งเยอะยิ่งรก) ลองปรับดูที่ 50-100 */
-                    "density": {
-                        "enable": true,
-                        "value_area": 800
-                    }
-                },
-                "color": {
-                    "value": "#ffffff" /* สีของดาว (สีขาว) */
-                },
-                "shape": {
-                    "type": "circle",
-                    /* รูปร่าง (วงกลม) */
-                    "stroke": {
-                        "width": 0,
-                        "color": "#000000"
-                    },
-                    "polygon": {
-                        "nb_sides": 5
-                    }
-                },
-                "opacity": {
-                    "value": 0.5,
-                    /* ความจางของดาว (0.5 คือครึ่งๆ) */
-                    "random": true,
-                    /* ให้จางไม่เท่ากัน ดูมีมิติ */
-                    "anim": {
-                        "enable": false,
-                        "speed": 1,
-                        "opacity_min": 0.1,
-                        "sync": false
-                    }
-                },
-                "size": {
-                    "value": 3,
-                    /* ขนาดของดาว */
-                    "random": true,
-                    /* เล็กใหญ่ไม่เท่ากัน */
-                    "anim": {
-                        "enable": false,
-                        "speed": 40,
-                        "size_min": 0.1,
-                        "sync": false
-                    }
-                },
-                "line_linked": {
-                    "enable": true,
-                    /* ✅ ถ้าไม่อยากได้เส้นเชื่อม ให้แก้เป็น false */
-                    "distance": 150,
-                    /* ระยะห่างที่จะให้มีเส้นเชื่อม */
-                    "color": "#ffffff",
-                    /* สีของเส้น */
-                    "opacity": 0.4,
-                    /* ความจางของเส้น */
-                    "width": 1
-                },
-                "move": {
-                    "enable": true,
-                    /* สั่งให้ขยับ */
-                    "speed": 2,
-                    /* ความเร็วในการวิ่ง (ยิ่งเยอะยิ่งเร็ว) */
-                    "direction": "none",
-                    /* ทิศทาง (none คือมั่ว) */
-                    "random": false,
-                    "straight": false,
-                    "out_mode": "out",
-                    "bounce": false,
-                    "attract": {
-                        "enable": false,
-                        "rotateX": 600,
-                        "rotateY": 1200
-                    }
-                }
-            },
-            "interactivity": {
-                /* ส่วนนี้คือเวลาเอาเมาส์ไปโดน */
-                "detect_on": "canvas",
-                "events": {
-                    "onhover": {
-                        "enable": true,
-                        /* ถ้า true เวลาเอาเมาส์ไปชี้ ดาวจะวิ่งหนีหรือวิ่งเข้าหา */
-                        "mode": "grab" /* grab = มีเส้นดูดเข้าหาเมาส์, repulse = วิ่งหนี */
-                    },
-                    "onclick": {
-                        "enable": true,
-                        "mode": "push" /* คลิกแล้วมีดาวเพิ่ม */
-                    },
-                    "resize": true
-                },
-                "modes": {
-                    "grab": {
-                        "distance": 140,
-                        "line_linked": {
-                            "opacity": 1
-                        }
-                    },
-                    "bubble": {
-                        "distance": 400,
-                        "size": 40,
-                        "duration": 2,
-                        "opacity": 8,
-                        "speed": 3
-                    },
-                    "repulse": {
-                        "distance": 200,
-                        "duration": 0.4
-                    },
-                    "push": {
-                        "particles_nb": 4
-                    },
-                    "remove": {
-                        "particles_nb": 2
-                    }
-                }
-            },
+            "interactivity": { "detect_on": "canvas", "events": { "onhover": { "enable": true, "mode": "grab" }, "resize": true },
+            "modes": { "grab": { "distance": 140, "line_linked": { "opacity": 1 } } } },
             "retina_detect": true
         });
     </script>

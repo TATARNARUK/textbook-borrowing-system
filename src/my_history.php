@@ -37,123 +37,121 @@ if ($role == 'admin') {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ประวัติการยืม-คืนหนังสือ</title>
+    <link rel="icon" type="image/png" href="images/books.png">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Thai:wght@100..900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Thai:wght@300;400;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
     <style>
+        /* --- 🎨 White & Blue Theme CSS --- */
         body {
             font-family: 'Noto Sans Thai', sans-serif;
-            background-color: #000000;
-            color: #e0e0e0;
+            background-color: #f0f4f8; /* พื้นหลังสีเทาอมฟ้าอ่อน */
+            background-image: radial-gradient(#dbeafe 1px, transparent 1px); /* ลายจุดจางๆ */
+            background-size: 20px 20px;
+            color: #333;
             overflow-x: hidden;
         }
 
        #particles-js {
-         position: fixed;
-         /* ให้มันลอยอยู่กับที่ ไม่ต้องเลื่อนตาม Scroll bar */
-         width: 100%;
-         height: 100%;
-         top: 0;
-         left: 0;
-         z-index: -1;
-         /* ✅ สำคัญมาก! สั่งให้ไปอยู่ข้างหลังสุด */
-         pointer-events: none;
-         /* สั่งให้เม้าส์คลิกทะลุผ่านไปได้ (เผื่อไว้ก่อน) */
+         position: fixed; width: 100%; height: 100%; top: 0; left: 0; z-index: -1; pointer-events: none;
        }
 
-        /* --- Glass Card --- */
+        /* --- White Card --- */
         .glass-card {
-            background: rgba(15, 15, 15, 0.85);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 0px;
-            box-shadow: 0 30px 60px rgba(0, 0, 0, 0.8);
+            background: #ffffff;
+            border: none;
+            border-radius: 20px;
+            box-shadow: 0 10px 40px rgba(13, 110, 253, 0.1); /* เงาสีฟ้าจางๆ */
+            position: relative;
+            z-index: 1;
         }
 
-        /* --- Table Styling --- */
+        /* --- Table Styling (Light Theme) --- */
         .table-custom {
             width: 100%;
             border-collapse: separate;
-            border-spacing: 0 10px; /* เว้นระยะห่างระหว่างแถว */
+            border-spacing: 0 10px;
         }
         
         .table-custom thead th {
-            color: #777;
-            font-size: 0.8rem;
+            background-color: #e7f1ff; /* หัวตารางสีฟ้าอ่อน */
+            color: #0d6efd; /* ตัวหนังสือสีฟ้า */
+            font-size: 0.85rem;
             text-transform: uppercase;
             letter-spacing: 1px;
             border: none;
-            padding-bottom: 15px;
-            font-weight: 600;
+            padding: 15px;
+            font-weight: 700;
         }
+        /* ทำมุมโค้งให้หัวตาราง */
+        .table-custom thead th:first-child { border-top-left-radius: 10px; border-bottom-left-radius: 10px; }
+        .table-custom thead th:last-child { border-top-right-radius: 10px; border-bottom-right-radius: 10px; }
 
         .table-custom tbody tr {
-            background-color: rgba(255, 255, 255, 0.03);
+            background-color: #fff;
             transition: all 0.3s ease;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.02);
         }
 
         .table-custom tbody tr:hover {
-            background-color: rgba(255, 255, 255, 0.08);
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(13, 110, 253, 0.1);
+            background-color: #f8f9fa;
         }
 
         .table-custom td {
-            border: none;
+            border: 1px solid #f0f0f0;
+            border-width: 1px 0;
             padding: 15px;
             vertical-align: middle;
-            color: #ccc;
+            color: #555;
         }
 
-        /* หัวท้ายมนๆ ของแต่ละแถว */
-        .table-custom tbody tr td:first-child { border-top-left-radius: 8px; border-bottom-left-radius: 8px; }
-        .table-custom tbody tr td:last-child { border-top-right-radius: 8px; border-bottom-right-radius: 8px; }
+        .table-custom tbody tr td:first-child { border-left: 1px solid #f0f0f0; border-top-left-radius: 10px; border-bottom-left-radius: 10px; }
+        .table-custom tbody tr td:last-child { border-right: 1px solid #f0f0f0; border-top-right-radius: 10px; border-bottom-right-radius: 10px; }
 
         /* --- Images --- */
         .book-thumb {
-            width: 50px;
-            height: 70px;
-            object-fit: cover;
-            border-radius: 4px;
-            box-shadow: 0 4px 8px rgba(0,0,0,0.5);
+            width: 50px; height: 70px; object-fit: cover;
+            border-radius: 6px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
         }
 
-        /* --- Status Badges (Minimal) --- */
+        /* --- Status Badges --- */
         .status-badge {
-            padding: 5px 12px;
+            padding: 6px 12px;
             border-radius: 50px;
             font-size: 0.75rem;
             font-weight: 600;
-            letter-spacing: 0.5px;
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
+            display: inline-flex; align-items: center; gap: 6px;
         }
-        .status-borrowed { background: rgba(255, 193, 7, 0.15); color: #ffc107; border: 1px solid rgba(255, 193, 7, 0.3); }
-        .status-returned { background: rgba(25, 135, 84, 0.15); color: #198754; border: 1px solid rgba(25, 135, 84, 0.3); }
-        .status-overdue  { background: rgba(220, 53, 69, 0.15); color: #dc3545; border: 1px solid rgba(220, 53, 69, 0.3); }
+        .status-borrowed { background-color: #fff3cd; color: #856404; border: 1px solid #ffeeba; }
+        .status-returned { background-color: #d1e7dd; color: #0f5132; border: 1px solid #badbcc; }
+        .status-overdue  { background-color: #f8d7da; color: #842029; border: 1px solid #f5c2c7; }
 
-        .dot { width: 6px; height: 6px; border-radius: 50%; background-color: currentColor; }
+        .dot { width: 8px; height: 8px; border-radius: 50%; background-color: currentColor; }
 
         /* --- Buttons --- */
-        .btn-outline-white {
-            color: #fff; border: 1px solid rgba(255,255,255,0.3);
+        .btn-outline-custom {
+            color: #0d6efd; border: 1px solid #0d6efd;
             background: transparent;
             transition: all 0.3s;
         }
-        .btn-outline-white:hover { border-color: #fff; background: rgba(255,255,255,0.1); }
+        .btn-outline-custom:hover { background: #0d6efd; color: #fff; }
 
         .btn-action {
-            background: #fff; color: #000;
+            background: linear-gradient(45deg, #0d6efd, #0dcaf0);
+            color: #fff;
             border: none; font-weight: 600;
-            padding: 6px 15px; border-radius: 4px;
+            padding: 6px 15px; border-radius: 50px;
             font-size: 0.85rem;
             transition: all 0.3s;
+            box-shadow: 0 4px 6px rgba(13, 110, 253, 0.2);
         }
         .btn-action:hover {
-            background: #ccc; transform: scale(1.05);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(13, 110, 253, 0.3);
         }
     </style>
 </head>
@@ -161,19 +159,20 @@ if ($role == 'admin') {
 <body>
     <?php require_once 'loader.php'; ?>
     <div id="particles-js"></div>
+    
     <div class="container py-5">
         
         <div class="glass-card p-4 p-md-5" data-aos="fade-up" data-aos-duration="1000">
             
-            <div class="d-flex justify-content-between align-items-center mb-5 pb-3" style="border-bottom: 1px solid rgba(255,255,255,0.1);">
+            <div class="d-flex justify-content-between align-items-center mb-4 pb-3" style="border-bottom: 2px solid #f0f4f8;">
                 <div>
-                    <h3 class="fw-light text-white mb-0" style="letter-spacing: 1px;">
-                        <i class="fa-solid fa-clock-rotate-left me-2 text-secondary"></i>HISTORY
+                    <h3 class="fw-bold text-primary mb-0">
+                        <i class="fa-solid fa-clock-rotate-left me-2"></i>HISTORY
                     </h3>
-                    <small class="text-white">ประวัติการยืมและคืนหนังสือทั้งหมด</small>
+                    <small class="text-muted">ประวัติการยืมและคืนหนังสือทั้งหมด</small>
                 </div>
-                <a href="index.php" class="btn btn-outline-white btn-sm rounded-0 px-4">
-                    <i class="fa-solid fa-arrow-left me-2"></i> กลับหน้าหลัก
+                <a href="index.php" class="btn btn-outline-custom btn-sm rounded-pill px-4 fw-bold">
+                    <i class="fa-solid fa-arrow-left me-1"></i> กลับหน้าหลัก
                 </a>
             </div>
 
@@ -181,19 +180,18 @@ if ($role == 'admin') {
                 <table class="table-custom">
                     <thead>
                         <tr>
-                            <th width="80" class="text-white">ปกหนังสือ</th>
-                            <th class="text-white">ชื่อหนังสือ</th>
-                            <th class="text-white">รหัสหนังสือ</th>
-                            <?php if($role == 'admin') echo "<th class='text-white'>ชื่อผู้ยืม</th>"; ?>
-                            <th class="text-white">วันที่ยืม</th>
-                            <th class="text-white">วันที่คืน</th>
-                            <th class="text-white">สถานะ</th>
-                            <th class="text-white">ACTION</th>
+                            <th width="80">ปกหนังสือ</th>
+                            <th>ชื่อหนังสือ</th>
+                            <th>รหัสหนังสือ</th>
+                            <?php if($role == 'admin') echo "<th>ชื่อผู้ยืม</th>"; ?>
+                            <th>วันที่ยืม</th>
+                            <th>วันที่คืน</th>
+                            <th>สถานะ</th>
+                            <th>ACTION</th>
                         </tr>
                     </thead>
                     <tbody> 
                         <?php 
-                        // เช็คว่ามีข้อมูลไหม
                         if ($stmt->rowCount() == 0) {
                             echo '<tr><td colspan="8" class="text-center py-5 text-muted">ไม่พบประวัติการยืม-คืน</td></tr>';
                         }
@@ -206,22 +204,22 @@ if ($role == 'admin') {
                                 <?php if($row['cover_image']): ?>
                                     <img src="uploads/<?php echo $row['cover_image']; ?>" class="book-thumb" alt="Cover">
                                 <?php else: ?>
-                                    <img src="https://via.placeholder.com/50x70/111/555?text=No+Img" class="book-thumb" alt="No Image">
+                                    <img src="https://via.placeholder.com/50x70/eee/999?text=No+Img" class="book-thumb" alt="No Image">
                                 <?php endif; ?>
                             </td>
                             <td>
-                                <div class="fw-bold text-white"><?php echo $row['title']; ?></div>
+                                <div class="fw-bold text-dark"><?php echo $row['title']; ?></div>
                             </td>
                             <td>
-                                <span class="badge bg-secondary bg-opacity-25 text-light border border-secondary border-opacity-25 fw-normal">
+                                <span class="badge bg-light text-secondary border fw-normal">
                                     <?php echo $row['book_code']; ?>
                                 </span>
                             </td>
                             
                             <?php if($role == 'admin'): ?>
                                 <td>
-                                    <div class="d-flex align-items-center">
-                                        <div class="avatar bg-dark rounded-circle text-white d-flex justify-content-center align-items-center me-2" style="width:30px; height:30px; font-size: 0.8rem;">
+                                    <div class="d-flex align-items-center text-secondary">
+                                        <div class="avatar bg-primary bg-opacity-10 text-primary rounded-circle d-flex justify-content-center align-items-center me-2" style="width:30px; height:30px; font-size: 0.8rem;">
                                             <i class="fa-solid fa-user"></i>
                                         </div>
                                         <?php echo $row['fullname']; ?>
@@ -229,10 +227,10 @@ if ($role == 'admin') {
                                 </td>
                             <?php endif; ?>
                             
-                            <td><?php echo date('d/m/Y', strtotime($row['borrow_date'])); ?></td>
+                            <td class="text-secondary"><?php echo date('d/m/Y', strtotime($row['borrow_date'])); ?></td>
                             
                             <td>
-                                <span class="<?php echo $is_overdue ? 'text-danger fw-bold' : ''; ?>">
+                                <span class="<?php echo $is_overdue ? 'text-danger fw-bold' : 'text-secondary'; ?>">
                                     <?php echo date('d/m/Y', strtotime($row['due_date'])); ?>
                                 </span>
                             </td>
@@ -247,7 +245,7 @@ if ($role == 'admin') {
                                 <?php else: ?>
                                     <div class="d-flex flex-column">
                                         <span class="status-badge status-returned mb-1"><span class="dot"></span> คืนแล้ว</span>
-                                        <small style="font-size: 0.7rem; color: #555;">
+                                        <small style="font-size: 0.7rem; color: #888;">
                                             <?php echo date('d/m/y', strtotime($row['return_date'])); ?>
                                         </small>
                                     </div>
@@ -261,7 +259,7 @@ if ($role == 'admin') {
                                         รับหนังสือคืน
                                     </button>
                                 <?php else: ?>
-                                    <span class="text-secondary opacity-25">-</span>
+                                    <span class="text-muted opacity-25">-</span>
                                 <?php endif; ?>
                             </td>
                         </tr>
@@ -280,32 +278,32 @@ if ($role == 'admin') {
     <script>
         AOS.init({ duration: 800, once: true });
 
+        // ✅ ตั้งค่า Particles สีฟ้า
         particlesJS("particles-js", {
             "particles": {
                 "number": { "value": 60, "density": { "enable": true, "value_area": 800 } },
-                "color": { "value": "#ffffff" },
-                "shape": { "type": "circle", "stroke": { "width": 0, "color": "#000000" } },
-                "opacity": { "value": 0.3, "random": true },
-                "size": { "value": 2, "random": true },
-                "line_linked": { "enable": true, "distance": 150, "color": "#ffffff", "opacity": 0.15, "width": 1 },
-                "move": { "enable": true, "speed": 0.5 }
+                "color": { "value": "#0d6efd" }, /* สีฟ้า */
+                "shape": { "type": "circle" },
+                "opacity": { "value": 0.5, "random": true },
+                "size": { "value": 3, "random": true },
+                "line_linked": { "enable": true, "distance": 150, "color": "#0d6efd", "opacity": 0.2, "width": 1 },
+                "move": { "enable": true, "speed": 2 }
             },
-            "interactivity": { "detect_on": "canvas", "events": { "onhover": { "enable": true, "mode": "grab" }, "resize": true } }
+            "interactivity": { "detect_on": "canvas", "events": { "onhover": { "enable": true, "mode": "grab" }, "resize": true } },
+            "retina_detect": true
         });
 
-        // Dark Theme Alert
+        // ✅ ฟังก์ชันแจ้งเตือน (ปรับเป็น Theme ขาว)
         function confirmReturn(transId, itemId) {
             Swal.fire({
-                title: 'CONFIRM RETURN',
-                text: "ยืนยันการรับคืนหนังสือ?",
-                icon: 'warning',
+                title: 'ยืนยันการคืน?',
+                text: "คุณต้องการบันทึกการรับคืนหนังสือใช่หรือไม่",
+                icon: 'question',
                 showCancelButton: true,
-                background: '#000',
-                color: '#fff',
-                confirmButtonColor: '#fff',
-                cancelButtonColor: '#333',
-                confirmButtonText: '<span style="color:#000; font-weight:bold;">YES, RETURN</span>',
-                cancelButtonText: 'CANCEL'
+                confirmButtonColor: '#0d6efd',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'ใช่, รับคืน',
+                cancelButtonText: 'ยกเลิก'
             }).then((result) => {
                 if (result.isConfirmed) {
                     window.location.href = `return_save.php?trans_id=${transId}&item_id=${itemId}`;
@@ -316,138 +314,13 @@ if ($role == 'admin') {
         const urlParams = new URLSearchParams(window.location.search);
         if (urlParams.get('status') === 'returned') {
             Swal.fire({
-                title: 'COMPLETED',
+                title: 'สำเร็จ!',
                 text: 'บันทึกการคืนเรียบร้อยแล้ว',
                 icon: 'success',
-                background: '#000',
-                color: '#fff',
-                confirmButtonColor: '#fff',
-                confirmButtonText: '<span style="color:#000; font-weight:bold;">OK</span>'
+                confirmButtonColor: '#0d6efd',
+                confirmButtonText: 'ตกลง'
             }).then(() => window.history.replaceState(null, null, window.location.pathname));
         }
-    </script>
-        <script>
-        /* เรียกใช้ particles.js ที่กล่อง id="particles-js" */
-        particlesJS("particles-js", {
-            "particles": {
-                "number": {
-                    "value": 80,
-                    /* จำนวนดาว (ยิ่งเยอะยิ่งรก) ลองปรับดูที่ 50-100 */
-                    "density": {
-                        "enable": true,
-                        "value_area": 800
-                    }
-                },
-                "color": {
-                    "value": "#ffffff" /* สีของดาว (สีขาว) */
-                },
-                "shape": {
-                    "type": "circle",
-                    /* รูปร่าง (วงกลม) */
-                    "stroke": {
-                        "width": 0,
-                        "color": "#000000"
-                    },
-                    "polygon": {
-                        "nb_sides": 5
-                    }
-                },
-                "opacity": {
-                    "value": 0.5,
-                    /* ความจางของดาว (0.5 คือครึ่งๆ) */
-                    "random": true,
-                    /* ให้จางไม่เท่ากัน ดูมีมิติ */
-                    "anim": {
-                        "enable": false,
-                        "speed": 1,
-                        "opacity_min": 0.1,
-                        "sync": false
-                    }
-                },
-                "size": {
-                    "value": 3,
-                    /* ขนาดของดาว */
-                    "random": true,
-                    /* เล็กใหญ่ไม่เท่ากัน */
-                    "anim": {
-                        "enable": false,
-                        "speed": 40,
-                        "size_min": 0.1,
-                        "sync": false
-                    }
-                },
-                "line_linked": {
-                    "enable": true,
-                    /* ✅ ถ้าไม่อยากได้เส้นเชื่อม ให้แก้เป็น false */
-                    "distance": 150,
-                    /* ระยะห่างที่จะให้มีเส้นเชื่อม */
-                    "color": "#ffffff",
-                    /* สีของเส้น */
-                    "opacity": 0.4,
-                    /* ความจางของเส้น */
-                    "width": 1
-                },
-                "move": {
-                    "enable": true,
-                    /* สั่งให้ขยับ */
-                    "speed": 2,
-                    /* ความเร็วในการวิ่ง (ยิ่งเยอะยิ่งเร็ว) */
-                    "direction": "none",
-                    /* ทิศทาง (none คือมั่ว) */
-                    "random": false,
-                    "straight": false,
-                    "out_mode": "out",
-                    "bounce": false,
-                    "attract": {
-                        "enable": false,
-                        "rotateX": 600,
-                        "rotateY": 1200
-                    }
-                }
-            },
-            "interactivity": {
-                /* ส่วนนี้คือเวลาเอาเมาส์ไปโดน */
-                "detect_on": "canvas",
-                "events": {
-                    "onhover": {
-                        "enable": true,
-                        /* ถ้า true เวลาเอาเมาส์ไปชี้ ดาวจะวิ่งหนีหรือวิ่งเข้าหา */
-                        "mode": "grab" /* grab = มีเส้นดูดเข้าหาเมาส์, repulse = วิ่งหนี */
-                    },
-                    "onclick": {
-                        "enable": true,
-                        "mode": "push" /* คลิกแล้วมีดาวเพิ่ม */
-                    },
-                    "resize": true
-                },
-                "modes": {
-                    "grab": {
-                        "distance": 140,
-                        "line_linked": {
-                            "opacity": 1
-                        }
-                    },
-                    "bubble": {
-                        "distance": 400,
-                        "size": 40,
-                        "duration": 2,
-                        "opacity": 8,
-                        "speed": 3
-                    },
-                    "repulse": {
-                        "distance": 200,
-                        "duration": 0.4
-                    },
-                    "push": {
-                        "particles_nb": 4
-                    },
-                    "remove": {
-                        "particles_nb": 2
-                    }
-                }
-            },
-            "retina_detect": true
-        });
     </script>
 </body>
 </html>

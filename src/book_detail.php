@@ -16,7 +16,7 @@ $stmt->execute([$id]);
 $book = $stmt->fetch();
 
 if (!$book) {
-    echo "<div class='container mt-5 text-white'><h3>ไม่พบข้อมูลหนังสือ</h3></div>";
+    echo "<div class='container mt-5 text-center'><h3>ไม่พบข้อมูลหนังสือ</h3><a href='index.php' class='btn btn-primary'>กลับหน้าหลัก</a></div>";
     exit();
 }
 
@@ -47,50 +47,53 @@ $available_items = $stock['available'] ?? 0;
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Thai:wght@100..900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Thai:wght@300;400;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
 
     <style>
-        /* --- Monochrome Base --- */
+        /* --- 🎨 White & Blue Theme CSS --- */
         body {
             font-family: 'Noto Sans Thai', sans-serif;
-            background-color: #000000;
-            color: #e0e0e0;
+            background-color: #f0f4f8;
+            /* พื้นหลังสีเทาอมฟ้าอ่อน */
+            background-image: radial-gradient(#dbeafe 1px, transparent 1px);
+            /* ลายจุดจางๆ */
+            background-size: 20px 20px;
+            color: #333;
             overflow-x: hidden;
         }
 
         #particles-js {
             position: fixed;
-            /* ให้มันลอยอยู่กับที่ ไม่ต้องเลื่อนตาม Scroll bar */
             width: 100%;
             height: 100%;
             top: 0;
             left: 0;
             z-index: -1;
-            /* ✅ สำคัญมาก! สั่งให้ไปอยู่ข้างหลังสุด */
             pointer-events: none;
-            /* สั่งให้เม้าส์คลิกทะลุผ่านไปได้ (เผื่อไว้ก่อน) */
         }
 
-        /* --- Glass Card --- */
+        /* --- White Card --- */
         .glass-card {
-            background: rgba(15, 15, 15, 0.85);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 0px;
-            /* เหลี่ยมเท่ๆ */
-            box-shadow: 0 30px 60px rgba(0, 0, 0, 0.8);
+            background: #ffffff;
+            border: none;
+            border-radius: 20px;
+            box-shadow: 0 10px 40px rgba(13, 110, 253, 0.15);
+            position: relative;
+            z-index: 1;
         }
 
         /* --- Image Styling --- */
         .book-cover-container {
             position: relative;
             overflow: hidden;
-            border-radius: 4px;
-            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.5);
+            border-radius: 10px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
             transition: transform 0.3s ease;
+            background: #fff;
+            padding: 5px;
+            border: 1px solid #dee2e6;
         }
 
         .book-cover-container:hover {
@@ -101,114 +104,119 @@ $available_items = $stock['available'] ?? 0;
             width: 100%;
             height: auto;
             object-fit: cover;
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
         }
 
         /* --- Typography --- */
         .text-label {
-            color: #777;
-            font-size: 0.85rem;
+            color: #6c757d;
+            font-size: 0.8rem;
             text-transform: uppercase;
             letter-spacing: 1px;
             margin-bottom: 2px;
+            font-weight: 600;
         }
 
         .text-value {
-            color: #fff;
+            color: #0d6efd;
             font-size: 1.1rem;
-            font-weight: 500;
+            font-weight: 600;
         }
 
         .price-tag {
-            font-size: 2rem;
-            font-weight: 700;
-            color: #fff;
+            font-size: 2.2rem;
+            font-weight: 800;
+            color: #0d6efd;
             letter-spacing: -1px;
+            line-height: 1;
         }
 
         .isbn-badge {
-            background: rgba(255, 255, 255, 0.1);
-            color: #aaa;
-            padding: 4px 10px;
-            font-size: 0.8rem;
-            letter-spacing: 1px;
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            background-color: #e7f1ff;
+            color: #0d6efd;
+            padding: 5px 12px;
+            font-size: 0.85rem;
+            letter-spacing: 0.5px;
+            border-radius: 50px;
+            font-weight: 600;
+            display: inline-block;
         }
 
-        /* --- Spec Grid --- */
+        /* --- Spec Grid (Light Theme) --- */
         .spec-box {
-            background: rgba(255, 255, 255, 0.03);
-            border: 1px solid rgba(255, 255, 255, 0.05);
+            background: #fff;
+            border: 1px solid #dee2e6;
             padding: 15px;
             text-align: center;
             transition: all 0.3s;
         }
 
+        /* จัดการเส้นขอบตารางให้สวยงาม */
         .spec-box:hover {
-            background: rgba(255, 255, 255, 0.06);
-            border-color: rgba(255, 255, 255, 0.2);
+            background-color: #f8f9fa;
+            border-color: #0d6efd;
+            z-index: 2;
+            position: relative;
         }
 
         /* --- Buttons --- */
-        .btn-monochrome {
-            background-color: #ffffff;
-            color: #000000;
-            border: 1px solid #ffffff;
-            font-weight: 700;
-            letter-spacing: 1px;
+        .btn-custom-primary {
+            background: linear-gradient(45deg, #0d6efd, #0dcaf0);
+            color: #fff;
+            border: none;
+            font-weight: 600;
+            border-radius: 10px;
             padding: 12px 30px;
-            border-radius: 0;
             transition: all 0.3s;
+            box-shadow: 0 4px 6px rgba(13, 110, 253, 0.2);
         }
 
-        .btn-monochrome:hover {
-            background-color: #000000;
-            color: #ffffff;
+        .btn-custom-primary:hover {
             transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(255, 255, 255, 0.1);
+            box-shadow: 0 6px 12px rgba(13, 110, 253, 0.3);
+            color: #fff;
         }
 
-        .btn-monochrome:disabled {
-            background-color: #333;
-            border-color: #333;
-            color: #666;
+        .btn-custom-primary:disabled {
+            background: #6c757d;
+            box-shadow: none;
             cursor: not-allowed;
             transform: none;
-            box-shadow: none;
         }
 
-        .btn-outline-monochrome {
+        .btn-outline-custom {
             background: transparent;
-            color: #fff;
-            border: 1px solid rgba(255, 255, 255, 0.3);
+            color: #6c757d;
+            border: 1px solid #dee2e6;
+            border-radius: 10px;
+            font-weight: 600;
             padding: 12px 20px;
-            border-radius: 0;
             transition: all 0.3s;
         }
 
-        .btn-outline-monochrome:hover {
-            border-color: #fff;
-            background: rgba(255, 255, 255, 0.05);
+        .btn-outline-custom:hover {
+            color: #0d6efd;
+            border-color: #0d6efd;
+            background: #fff;
         }
 
         /* --- Status Indicator --- */
         .status-dot {
             height: 10px;
             width: 10px;
-            background-color: #333;
             border-radius: 50%;
             display: inline-block;
-            margin-right: 8px;
+            margin-right: 6px;
         }
 
         .status-dot.active {
-            background-color: #00ff88;
-            box-shadow: 0 0 10px #00ff88;
+            background-color: #198754;
+            box-shadow: 0 0 5px #198754;
         }
 
         .status-dot.inactive {
-            background-color: #ff3333;
-            box-shadow: 0 0 10px #ff3333;
+            background-color: #dc3545;
+            box-shadow: 0 0 5px #dc3545;
         }
     </style>
 </head>
@@ -216,6 +224,7 @@ $available_items = $stock['available'] ?? 0;
 <body>
     <?php require_once 'loader.php'; ?>
     <div id="particles-js"></div>
+
     <div class="container py-5">
         <div class="row justify-content-center">
             <div class="col-lg-10">
@@ -228,29 +237,29 @@ $available_items = $stock['available'] ?? 0;
                                 <?php if ($book['cover_image']): ?>
                                     <img src="uploads/<?php echo $book['cover_image']; ?>" class="book-cover" alt="Cover">
                                 <?php else: ?>
-                                    <img src="https://via.placeholder.com/400x600/111/555?text=No+Cover" class="book-cover" alt="No Cover">
+                                    <img src="https://via.placeholder.com/400x600/eee/999?text=No+Cover" class="book-cover" alt="No Cover">
                                 <?php endif; ?>
                             </div>
 
-                            <div class="mt-4 text-center p-3" style="border: 1px solid rgb(255, 255, 255); background: rgba(0,0,0,0.3);">
+                            <div class="mt-4 text-center p-3 rounded-3 bg-light border border-secondary-subtle">
                                 <div class="d-flex justify-content-between align-items-center mb-2">
-                                    <span class="text-label" style="font-size: 0.7rem;">STATUS</span>
+                                    <span class="text-label" style="font-size: 0.75rem;">STOCK STATUS</span>
                                     <div>
                                         <?php if ($available_items > 0): ?>
-                                            <span class="status-dot active"></span> <span class="text-white small">พร้อมยืม</span>
+                                            <span class="status-dot active"></span> <span class="text-success fw-bold small">พร้อมยืม</span>
                                         <?php else: ?>
-                                            <span class="status-dot inactive"></span> <span class="text-white small">หมดชั่วคราว</span>
+                                            <span class="status-dot inactive"></span> <span class="text-danger fw-bold small">หมดชั่วคราว</span>
                                         <?php endif; ?>
                                     </div>
                                 </div>
-                                <div class="progress" style="height: 4px; background: #333;">
+                                <div class="progress" style="height: 6px; background-color: #e9ecef;">
                                     <?php
                                     $percent = ($total_items > 0) ? ($available_items / $total_items) * 100 : 0;
-                                    $color = ($available_items > 0) ? '#fff' : '#333';
+                                    $color = ($available_items > 0) ? 'bg-success' : 'bg-secondary';
                                     ?>
-                                    <div class="progress-bar" role="progressbar" style="width: <?php echo $percent; ?>%; background-color: <?php echo $color; ?>;"></div>
+                                    <div class="progress-bar <?php echo $color; ?>" role="progressbar" style="width: <?php echo $percent; ?>%;"></div>
                                 </div>
-                                <div class="d-flex justify-content-between mt-2 small text-white">
+                                <div class="d-flex justify-content-between mt-2 small text-secondary fw-bold">
                                     <span>ว่าง: <?php echo $available_items; ?></span>
                                     <span>ทั้งหมด: <?php echo $total_items; ?></span>
                                 </div>
@@ -259,14 +268,14 @@ $available_items = $stock['available'] ?? 0;
 
                         <div class="col-md-8">
 
-                            <div class="mb-4 border-bottom border-secondary pb-4">
+                            <div class="mb-4 border-bottom pb-4">
                                 <div class="d-flex justify-content-between align-items-start">
                                     <div>
-                                        <span class="isbn-badge mb-2 d-inline-block">ISBN: <?php echo $book['isbn']; ?></span>
-                                        <h1 class="fw-bold text-white mb-2" style="letter-spacing: -0.5px;"><?php echo $book['title']; ?></h1>
-                                        <div class="d-flex gap-3 text-white small">
-                                            <span><i class="fa-regular fa-user me-1"></i> <?php echo $book['author']; ?></span>
-                                            <span><i class="fa-regular fa-building me-1"></i> <?php echo $book['publisher']; ?></span>
+                                        <span class="isbn-badge mb-2">ISBN: <?php echo $book['isbn']; ?></span>
+                                        <h1 class="fw-bold text-dark mb-2"><?php echo $book['title']; ?></h1>
+                                        <div class="d-flex gap-3 text-secondary small">
+                                            <span><i class="fa-regular fa-user me-1 text-primary"></i> <?php echo $book['author']; ?></span>
+                                            <span><i class="fa-regular fa-building me-1 text-primary"></i> <?php echo $book['publisher']; ?></span>
                                         </div>
                                     </div>
                                     <div class="text-end">
@@ -277,38 +286,38 @@ $available_items = $stock['available'] ?? 0;
                             </div>
 
                             <div class="mb-5">
-                                <div class="text-white mb-3"><i class="fa-solid fa-layer-group me-2"></i>SPECIFICATIONS</div>
+                                <div class="text-secondary fw-bold mb-3 small"><i class="fa-solid fa-layer-group me-2"></i>SPECIFICATIONS</div>
                                 <div class="row g-0">
                                     <div class="col-6 col-md-3">
-                                        <div class="spec-box">
-                                            <div class="text-label" style="font-size: 0.7rem;">จำนวนหน้า</div>
-                                            <div class="text-white"><?php echo !empty($book['page_count']) ? $book['page_count'] : '-'; ?></div>
+                                        <div class="spec-box rounded-start-2">
+                                            <div class="text-label">จำนวนหน้า</div>
+                                            <div class="text-value"><?php echo !empty($book['page_count']) ? $book['page_count'] : '-'; ?></div>
                                         </div>
                                     </div>
                                     <div class="col-6 col-md-3">
                                         <div class="spec-box" style="border-left: 0;">
-                                            <div class="text-label" style="font-size: 0.7rem;">รูปแบบกระดาษ</div>
-                                            <div class="text-white"><?php echo !empty($book['paper_type']) ? $book['paper_type'] : '-'; ?></div>
+                                            <div class="text-label">รูปแบบกระดาษ</div>
+                                            <div class="text-dark fw-bold"><?php echo !empty($book['paper_type']) ? $book['paper_type'] : '-'; ?></div>
                                         </div>
                                     </div>
                                     <div class="col-6 col-md-3">
                                         <div class="spec-box" style="border-left: 0;">
-                                            <div class="text-label" style="font-size: 0.7rem;">ประเภทการพิมพ์</div>
-                                            <div class="text-white"><?php echo !empty($book['print_type']) ? $book['print_type'] : '-'; ?></div>
+                                            <div class="text-label">ประเภทการพิมพ์</div>
+                                            <div class="text-dark fw-bold"><?php echo !empty($book['print_type']) ? $book['print_type'] : '-'; ?></div>
                                         </div>
                                     </div>
                                     <div class="col-6 col-md-3">
-                                        <div class="spec-box" style="border-left: 0;">
-                                            <div class="text-label" style="font-size: 0.7rem;">ขนาดหนังสือ</div>
-                                            <div class="text-white"><?php echo !empty($book['book_size']) ? $book['book_size'] : '-'; ?></div>
+                                        <div class="spec-box rounded-end-2" style="border-left: 0;">
+                                            <div class="text-label">ขนาดหนังสือ</div>
+                                            <div class="text-dark fw-bold"><?php echo !empty($book['book_size']) ? $book['book_size'] : '-'; ?></div>
                                         </div>
                                     </div>
                                 </div>
                                 <div class="row g-0 mt-2">
                                     <div class="col-12">
-                                        <div class="spec-box d-flex justify-content-between">
+                                        <div class="spec-box d-flex justify-content-between rounded-2">
                                             <span class="text-label">APPROVAL NO.</span>
-                                            <span class="text-white"><?php echo !empty($book['approval_no']) ? $book['approval_no'] : '-'; ?> (ลำดับที่ <?php echo !empty($book['approval_order']) ? $book['approval_order'] : '-'; ?>)</span>
+                                            <span class="text-dark fw-bold"><?php echo !empty($book['approval_no']) ? $book['approval_no'] : '-'; ?> (ลำดับที่ <?php echo !empty($book['approval_order']) ? $book['approval_order'] : '-'; ?>)</span>
                                         </div>
                                     </div>
                                 </div>
@@ -317,22 +326,23 @@ $available_items = $stock['available'] ?? 0;
                             <div class="d-flex flex-wrap gap-3 mt-auto">
                                 <?php if ($available_items > 0): ?>
                                     <button onclick="confirmBorrowDetail(<?php echo $book['id']; ?>, '<?php echo htmlspecialchars($book['title']); ?>')"
-                                        class="btn btn-monochrome flex-grow-1">
-                                        <i class="fa-solid fa-book-open me-2"></i> ยิมหนังสือ
+                                        class="btn btn-custom-primary flex-grow-1 shadow-sm">
+                                        <i class="fa-solid fa-book-open me-2"></i> ยืมหนังสือ
                                     </button>
                                 <?php else: ?>
-                                    <button class="btn btn-monochrome flex-grow-1" disabled>
-                                        <i class="fa-solid fa-lock me-2"></i> OUT OF STOCK
+                                    <button class="btn btn-secondary flex-grow-1" disabled>
+                                        <i class="fa-solid fa-lock me-2"></i> หนังสือหมด (Out of Stock)
                                     </button>
                                 <?php endif; ?>
 
-                                <a href="index.php" class="btn btn-outline-monochrome">
+                                <a href="index.php" class="btn btn-outline-custom">
                                     <i class="fa-solid fa-arrow-left"></i>
                                 </a>
 
                                 <?php if (isset($_SESSION['role']) && $_SESSION['role'] == 'admin'): ?>
-                                    <a href="edit_book.php?id=<?php echo $book['id']; ?>" class="btn btn-outline-monochrome text-warning border-warning">
-                                        <i class="fa-solid fa-pen"></i>
+                                    <a href="edit_book.php?id=<?php echo $book['id']; ?>"
+                                        class="btn btn-outline-warning border-warning text-warning d-flex align-items-center justify-content-center gap-2">
+                                        <i class="fa-solid fa-pen"></i> <span>แก้ไข</span>
                                     </a>
                                 <?php endif; ?>
                             </div>
@@ -354,7 +364,7 @@ $available_items = $stock['available'] ?? 0;
             once: true
         });
 
-        /* Particles Config (White Dots) */
+        /* Particles Config (Blue Dots) */
         particlesJS("particles-js", {
             "particles": {
                 "number": {
@@ -365,33 +375,30 @@ $available_items = $stock['available'] ?? 0;
                     }
                 },
                 "color": {
-                    "value": "#ffffff"
+                    "value": "#0d6efd"
                 },
+                /* สีฟ้า */
                 "shape": {
-                    "type": "circle",
-                    "stroke": {
-                        "width": 0,
-                        "color": "#000000"
-                    }
+                    "type": "circle"
                 },
                 "opacity": {
-                    "value": 0.3,
+                    "value": 0.5,
                     "random": true
                 },
                 "size": {
-                    "value": 2,
+                    "value": 3,
                     "random": true
                 },
                 "line_linked": {
                     "enable": true,
                     "distance": 150,
-                    "color": "#ffffff",
-                    "opacity": 0.15,
+                    "color": "#0d6efd",
+                    "opacity": 0.2,
                     "width": 1
                 },
                 "move": {
                     "enable": true,
-                    "speed": 0.5
+                    "speed": 2
                 }
             },
             "interactivity": {
@@ -400,155 +407,29 @@ $available_items = $stock['available'] ?? 0;
                     "onhover": {
                         "enable": true,
                         "mode": "grab"
-                    },
-                    "resize": true
+                    }
                 }
-            }
+            },
+            "retina_detect": true
         });
 
-        /* Dark Theme SweetAlert */
+        /* SweetAlert (Default Light Theme) */
         function confirmBorrowDetail(id, title) {
             Swal.fire({
-                title: 'CONFIRM BORROW',
+                title: 'ยืนยันการยืม?',
                 text: "ต้องการยืมหนังสือ: " + title,
                 icon: 'question',
                 showCancelButton: true,
-                background: '#000',
-                color: '#fff',
-                iconColor: '#fff',
-                confirmButtonColor: '#fff',
-                cancelButtonColor: '#333',
-                confirmButtonText: '<span style="color:#000; font-weight:bold;">YES, BORROW</span>',
-                cancelButtonText: 'CANCEL'
+                confirmButtonColor: '#0d6efd',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'ใช่, ขอยืมเลย',
+                cancelButtonText: 'ยกเลิก'
             }).then((result) => {
                 if (result.isConfirmed) {
                     window.location.href = 'borrow_save.php?id=' + id;
                 }
             })
         }
-    </script>
-    <script>
-        /* เรียกใช้ particles.js ที่กล่อง id="particles-js" */
-        particlesJS("particles-js", {
-            "particles": {
-                "number": {
-                    "value": 80,
-                    /* จำนวนดาว (ยิ่งเยอะยิ่งรก) ลองปรับดูที่ 50-100 */
-                    "density": {
-                        "enable": true,
-                        "value_area": 800
-                    }
-                },
-                "color": {
-                    "value": "#ffffff" /* สีของดาว (สีขาว) */
-                },
-                "shape": {
-                    "type": "circle",
-                    /* รูปร่าง (วงกลม) */
-                    "stroke": {
-                        "width": 0,
-                        "color": "#000000"
-                    },
-                    "polygon": {
-                        "nb_sides": 5
-                    }
-                },
-                "opacity": {
-                    "value": 0.5,
-                    /* ความจางของดาว (0.5 คือครึ่งๆ) */
-                    "random": true,
-                    /* ให้จางไม่เท่ากัน ดูมีมิติ */
-                    "anim": {
-                        "enable": false,
-                        "speed": 1,
-                        "opacity_min": 0.1,
-                        "sync": false
-                    }
-                },
-                "size": {
-                    "value": 3,
-                    /* ขนาดของดาว */
-                    "random": true,
-                    /* เล็กใหญ่ไม่เท่ากัน */
-                    "anim": {
-                        "enable": false,
-                        "speed": 40,
-                        "size_min": 0.1,
-                        "sync": false
-                    }
-                },
-                "line_linked": {
-                    "enable": true,
-                    /* ✅ ถ้าไม่อยากได้เส้นเชื่อม ให้แก้เป็น false */
-                    "distance": 150,
-                    /* ระยะห่างที่จะให้มีเส้นเชื่อม */
-                    "color": "#ffffff",
-                    /* สีของเส้น */
-                    "opacity": 0.4,
-                    /* ความจางของเส้น */
-                    "width": 1
-                },
-                "move": {
-                    "enable": true,
-                    /* สั่งให้ขยับ */
-                    "speed": 2,
-                    /* ความเร็วในการวิ่ง (ยิ่งเยอะยิ่งเร็ว) */
-                    "direction": "none",
-                    /* ทิศทาง (none คือมั่ว) */
-                    "random": false,
-                    "straight": false,
-                    "out_mode": "out",
-                    "bounce": false,
-                    "attract": {
-                        "enable": false,
-                        "rotateX": 600,
-                        "rotateY": 1200
-                    }
-                }
-            },
-            "interactivity": {
-                /* ส่วนนี้คือเวลาเอาเมาส์ไปโดน */
-                "detect_on": "canvas",
-                "events": {
-                    "onhover": {
-                        "enable": true,
-                        /* ถ้า true เวลาเอาเมาส์ไปชี้ ดาวจะวิ่งหนีหรือวิ่งเข้าหา */
-                        "mode": "grab" /* grab = มีเส้นดูดเข้าหาเมาส์, repulse = วิ่งหนี */
-                    },
-                    "onclick": {
-                        "enable": true,
-                        "mode": "push" /* คลิกแล้วมีดาวเพิ่ม */
-                    },
-                    "resize": true
-                },
-                "modes": {
-                    "grab": {
-                        "distance": 140,
-                        "line_linked": {
-                            "opacity": 1
-                        }
-                    },
-                    "bubble": {
-                        "distance": 400,
-                        "size": 40,
-                        "duration": 2,
-                        "opacity": 8,
-                        "speed": 3
-                    },
-                    "repulse": {
-                        "distance": 200,
-                        "duration": 0.4
-                    },
-                    "push": {
-                        "particles_nb": 4
-                    },
-                    "remove": {
-                        "particles_nb": 2
-                    }
-                }
-            },
-            "retina_detect": true
-        });
     </script>
 </body>
 

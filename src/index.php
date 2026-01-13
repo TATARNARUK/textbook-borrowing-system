@@ -61,6 +61,7 @@ $user_role = $_SESSION['role']; // admin หรือ student
             object-fit: cover;
             border-radius: 5px;
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease; /* เพิ่ม Transition รูป */
         }
 
 
@@ -117,13 +118,50 @@ $user_role = $_SESSION['role']; // admin หรือ student
             border-left: 1px solid rgb(0, 0, 0);
             padding-left: 20px;
         }
+
+        /* --- 🔥 ส่วนที่เพิ่ม Animation เข้าไปใหม่ 🔥 --- */
+        
+        /* 1. ไอคอนลอยขึ้นลง */
+        @keyframes float {
+            0% { transform: translateY(0px); }
+            50% { transform: translateY(-15px); }
+            100% { transform: translateY(0px); }
+        }
+        .floating-icon {
+            animation: float 4s ease-in-out infinite;
+        }
+
+        /* 2. การ์ดสถิติเด้งดึ๋งเมื่อชี้ */
+        .stat-card-hover {
+            transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+        }
+        .stat-card-hover:hover {
+            transform: translateY(-5px); /* ลอยขึ้น */
+            box-shadow: 0 15px 30px rgba(0,0,0,0.1) !important; /* เงาชัดขึ้น */
+        }
+
+        /* 3. แถวตารางขยายเมื่อชี้ */
+        #bookTable tbody tr {
+            transition: all 0.2s ease-in-out;
+        }
+        #bookTable tbody tr:hover {
+            transform: scale(1.01); /* ขยาย */
+            background-color: #ffffff;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.08); /* มีเงา */
+            z-index: 10;
+            position: relative;
+        }
+        #bookTable tbody tr:hover .book-cover {
+            transform: scale(1.05); /* รูปขยายด้วย */
+        }
+
     </style>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </head>
 
 <body><?php require_once 'loader.php'; ?><div id="particles-js"></div>
 
-    <nav class="navbar navbar-expand-lg navbar-custom">
+    <nav class="navbar navbar-expand-lg navbar-custom fixed-top py-3" data-aos="fade-down" data-aos-duration="1500">
         <div class="container">
             <a class="navbar-brand d-flex align-items-center gap-3" href="index.php">
                 <img src="images/books.png" height="40" alt="Logo">
@@ -190,11 +228,10 @@ $user_role = $_SESSION['role']; // admin หรือ student
             $cnt_available = $pdo->query("SELECT COUNT(*) FROM book_items WHERE status='available'")->fetchColumn();
             $cnt_overdue = $pdo->query("SELECT COUNT(*) FROM transactions WHERE status='borrowed' AND due_date < NOW()")->fetchColumn();
         ?>
-            <div class="row mb-5">
-                <div class="col-md-8">
+            <div class="row mb-5" data-aos="fade-up"> <div class="col-md-8">
                     <div class="row g-3">
                         <div class="col-md-6">
-                            <div class="card p-3 border-start border-4 border-primary h-100">
+                            <div class="card stat-card-hover p-3 border-start border-4 border-primary h-100">
                                 <div class="d-flex justify-content-between align-items-center">
                                     <div>
                                         <h6 class="text-muted text-uppercase mb-1">นักเรียนทั้งหมด</h6>
@@ -205,7 +242,7 @@ $user_role = $_SESSION['role']; // admin หรือ student
                             </div>
                         </div>
                         <div class="col-md-6">
-                            <div class="card p-3 border-start border-4 border-success h-100">
+                            <div class="card stat-card-hover p-3 border-start border-4 border-success h-100">
                                 <div class="d-flex justify-content-between align-items-center">
                                     <div>
                                         <h6 class="text-muted text-uppercase mb-1">หนังสือทั้งหมด (เล่ม)</h6>
@@ -216,7 +253,7 @@ $user_role = $_SESSION['role']; // admin หรือ student
                             </div>
                         </div>
                         <div class="col-md-6">
-                            <div class="card p-3 border-start border-4 border-warning h-100">
+                            <div class="card stat-card-hover p-3 border-start border-4 border-warning h-100">
                                 <div class="d-flex justify-content-between align-items-center">
                                     <div>
                                         <h6 class="text-muted text-uppercase mb-1">กำลังถูกยืม</h6>
@@ -227,7 +264,7 @@ $user_role = $_SESSION['role']; // admin หรือ student
                             </div>
                         </div>
                         <div class="col-md-6">
-                            <div class="card p-3 border-start border-4 border-danger h-100">
+                            <div class="card stat-card-hover p-3 border-start border-4 border-danger h-100">
                                 <div class="d-flex justify-content-between align-items-center">
                                     <div>
                                         <h6 class="text-muted text-uppercase mb-1">เกินกำหนดส่ง!</h6>
@@ -241,7 +278,7 @@ $user_role = $_SESSION['role']; // admin หรือ student
                 </div>
 
                 <div class="col-md-4">
-                    <div class="card h-100 shadow-sm">
+                    <div class="card h-100 shadow-sm stat-card-hover">
                         <div class="card-body text-center">
                             <h6 class="text-muted mb-3">สถานะคลังหนังสือ</h6>
                             <div style="height: 200px; position: relative;">
@@ -285,7 +322,8 @@ $user_role = $_SESSION['role']; // admin หรือ student
 
             <div class="container">
                 <div class="card border-0 shadow-sm rounded-4 mb-5 overflow-hidden text-white"
-                    style="background: linear-gradient(135deg, #003cff 0%, rgb(255, 255, 255) 100%);">
+                    style="background: linear-gradient(135deg, #003cff 0%, rgb(255, 255, 255) 100%);"
+                    data-aos="fade-up" data-aos-delay="100">
                     <div class="card-body p-5 position-relative">
                         <div class="row align-items-center position-relative" style="z-index: 2;">
                             <div class="col-lg-8">
@@ -301,7 +339,7 @@ $user_role = $_SESSION['role']; // admin หรือ student
                                 </div>
                             </div>
                             <div class="col-lg-4 d-none d-lg-block text-center">
-                                <i class="fa-solid fa-book-open-reader fa-10x opacity-50 text-white"></i>
+                                <i class="fa-solid fa-book-open-reader fa-10x opacity-50 text-white floating-icon"></i>
                             </div>
                         </div>
                         <div class="position-absolute top-0 end-0 opacity-10">
@@ -313,7 +351,7 @@ $user_role = $_SESSION['role']; // admin หรือ student
                     <h3>📚 รายชื่อหนังสือเรียนทั้งหมด</h3>
                 </div>
 
-                <div class="card shadow-sm border-0 rounded-4">
+                <div class="card shadow-sm border-0 rounded-4" data-aos="fade-up" data-aos-delay="200">
                     <div class="card-body">
                         <div class="table-responsive">
                             <table id="bookTable" class="table table-hover align-middle" style="width:100%">
@@ -345,9 +383,7 @@ $user_role = $_SESSION['role']; // admin หรือ student
                                         // เช็คสถานะ (ข้อความ)
                                         $stockStatus = ($available > 0) ? "ว่าง $available เล่ม" : "หมด";
                                     ?>
-                                        <tr style="cursor: pointer; transition: 0.2s;"
-                                            onmouseover="this.style.backgroundColor='#f1f3f5';"
-                                            onmouseout="this.style.backgroundColor='';"
+                                        <tr style="cursor: pointer;"
                                             onclick="showBookModal(
                                 '<?php echo addslashes($book['title']); ?>', 
                                 '<?php echo addslashes($book['author']); ?>', 
@@ -483,8 +519,12 @@ $user_role = $_SESSION['role']; // admin หรือ student
             </div>
 
             <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+            <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
 
             <script>
+                // เริ่มต้น AOS (Animation On Scroll)
+                AOS.init({ duration: 800, once: true });
+
                 function showBookModal(title, author, isbn, stock, image) {
                     // เอารับค่ามาใส่ใน Modal
                     document.getElementById('m_title').innerText = title;

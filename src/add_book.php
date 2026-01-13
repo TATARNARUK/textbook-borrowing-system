@@ -2,7 +2,7 @@
 session_start();
 require_once 'config.php';
 
-// เช็คสิทธิ์
+// เช็คสิทธิ์ (เปิดคอมเมนต์เมื่อใช้งานจริง)
 if (!isset($_SESSION['user_id']) /* || $_SESSION['role'] !== 'admin' */) {
     // header("Location: login.php"); exit();
 }
@@ -58,224 +58,129 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Thai:wght@100..900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Thai:wght@300;400;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
 
     <style>
-        /* --- Monochrome Theme Setup --- */
+        /* --- 🎨 White & Blue Theme CSS --- */
         body {
             font-family: 'Noto Sans Thai', sans-serif;
-            background-color: #000000;
-            color: #e0e0e0;
+            background-color: #f0f4f8; /* พื้นหลังสีเทาอมฟ้าอ่อน */
+            background-image: radial-gradient(#dbeafe 1px, transparent 1px); /* ลายจุดจางๆ */
+            background-size: 20px 20px;
+            color: #333;
             overflow-x: hidden;
         }
 
         #particles-js {
-            position: fixed;
-            /* ให้มันลอยอยู่กับที่ ไม่ต้องเลื่อนตาม Scroll bar */
-            width: 100%;
-            height: 100%;
-            top: 0;
-            left: 0;
-            z-index: -1;
-            /* ✅ สำคัญมาก! สั่งให้ไปอยู่ข้างหลังสุด */
-            pointer-events: none;
-            /* สั่งให้เม้าส์คลิกทะลุผ่านไปได้ (เผื่อไว้ก่อน) */
+            position: fixed; width: 100%; height: 100%; top: 0; left: 0; z-index: -1; pointer-events: none;
         }
 
-        /* --- Glass Card --- */
+        /* --- White Card --- */
         .glass-card {
-            background: rgba(10, 10, 10, 0.85);
-            /* เพิ่มความทึบนิดนึงเพื่อให้ฟอร์มเด่น */
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            border: 1px solid rgba(255, 255, 255, 0.15);
-            border-radius: 0px;
-            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+            background: #ffffff;
+            border: none;
+            border-radius: 20px;
+            box-shadow: 0 10px 40px rgba(13, 110, 253, 0.1);
+            position: relative;
+            z-index: 1;
         }
 
-        /* --- Inputs Styling --- */
-        .form-control,
-        .form-select {
-            background-color: #111 !important;
-            border: 1px solid #333;
-            color: #fff !important;
-            border-radius: 4px;
+        /* --- Inputs Styling (Light Mode) --- */
+        .form-control, .form-select {
+            background-color: #f8f9fa !important;
+            border: 1px solid #dee2e6;
+            color: #333 !important;
+            border-radius: 10px;
             padding: 12px 15px;
-            font-weight: 300;
-            /* ป้องกันพื้นหลังเปลี่ยนสี */
-            background-clip: padding-box;
+            font-weight: 400;
         }
 
-
-
-        /* --- Monochrome Theme Setup --- */
-        body {
-            font-family: 'Noto Sans Thai', sans-serif;
-            background-color: #000000;
-            color: #e0e0e0;
-            overflow-x: hidden;
+        .form-control:focus, .form-select:focus {
+            background-color: #fff !important;
+            border-color: #0d6efd;
+            box-shadow: 0 0 0 4px rgba(13, 110, 253, 0.1);
+            color: #333 !important;
         }
 
-        /* --- Glass Card --- */
-        .glass-card {
-            background: rgba(10, 10, 10, 0.85);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            border: 1px solid rgba(255, 255, 255, 0.15);
-            border-radius: 0px;
-            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+        .form-floating > label {
+            color: #6c757d;
         }
-
-        /* 🔥 ไม้ตายแก้ช่องขาว (Autofill Override) 🔥 */
-        /* ใช้ box-shadow สีดำ ถมทับพื้นหลังสีขาวที่ browser ยัดเยียดมา */
-        input:-webkit-autofill,
-        input:-webkit-autofill:hover,
-        input:-webkit-autofill:focus,
-        input:-webkit-autofill:active,
-        textarea:-webkit-autofill,
-        textarea:-webkit-autofill:hover,
-        textarea:-webkit-autofill:focus,
-        select:-webkit-autofill,
-        select:-webkit-autofill:hover,
-        select:-webkit-autofill:focus {
-            -webkit-box-shadow: 0 0 0 1000px #111 inset !important;
-            /* ถมดำทับ */
-            -webkit-text-fill-color: #fff !important;
-            /* ตัวหนังสือขาว */
-            transition: background-color 5000s ease-in-out 0s;
-            /* หลอก browser ว่ายังไม่ได้เปลี่ยนสี */
-            caret-color: #fff;
-            /* สี cursor */
-            border: 1px solid #555 !important;
-            /* บังคับขอบสีเทา */
-        }
-
-        /* จัดการ Input ทั่วไป */
-        .form-control,
-        .form-select {
-            background-color: #111 !important;
-            border: 1px solid #333;
-            color: #fff !important;
-            border-radius: 4px;
-            padding: 12px 15px;
-            font-weight: 300;
-            background-clip: padding-box;
-        }
-
-        .form-control:focus,
-        .form-select:focus {
-            background-color: #000 !important;
-            border-color: #ffffff;
-            box-shadow: 0 0 0 0.2rem rgba(255, 255, 255, 0.1);
-            color: #fff;
-        }
-
-        .form-control::placeholder {
-            color: #555;
-        }
-
-        .form-select {
-            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%23ffffff' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='m2 5 6 6 6-6'/%3e%3c/svg%3e");
-        }
-
-        .form-select option {
-            background-color: #000;
-            color: #fff;
-        }
-
-        /* --- Floating Labels Settings --- */
-
-        /* 🔥🔥🔥 [จุดที่เพิ่ม] แก้ก้อนสีขาวบังตัวหนังสือ 🔥🔥🔥 */
-        /* Bootstrap สร้างฉากหลังให้ Label เราต้องสั่งลบออก */
-        .form-floating>label::after {
+        
+        .form-floating > .form-control:focus ~ label,
+        .form-floating > .form-control:not(:placeholder-shown) ~ label {
+            color: #0d6efd;
             background-color: transparent !important;
-        }
-
-        .form-floating>label {
-            color: #666;
-            z-index: 10;
-        }
-
-        /* ตอน Label ลอยขึ้นไป */
-        .form-floating>.form-control:focus~label,
-        .form-floating>.form-control:not(:placeholder-shown)~label {
-            color: #ffffff;
             font-weight: 600;
-            background-color: transparent !important;
         }
-
-        /* แก้บั๊ก Label มีพื้นหลังบังเส้นขอบกรณี Autofill ทำงาน */
+        
+        /* แก้ปัญหา Background ขาวทับ Label */
         .form-floating>.form-control:-webkit-autofill~label {
             background-color: transparent !important;
         }
 
-        /* --- Custom Upload Zone --- */
+        /* --- Upload Zone --- */
         .upload-zone {
-            border: 1px dashed #555;
-            background-color: rgba(255, 255, 255, 0.02);
-            border-radius: 4px;
+            border: 2px dashed #dee2e6;
+            background-color: #f8f9fa;
+            border-radius: 10px;
             padding: 20px;
             text-align: center;
             cursor: pointer;
             transition: all 0.3s;
             position: relative;
+            height: 100%;
+            min-height: 150px;
         }
 
         .upload-zone:hover {
-            border-color: #fff;
-            background-color: rgba(255, 255, 255, 0.05);
+            border-color: #0d6efd;
+            background-color: #e7f1ff;
         }
 
         .upload-zone input[type="file"] {
-            position: absolute;
-            width: 100%;
-            height: 100%;
-            top: 0;
-            left: 0;
-            opacity: 0;
-            cursor: pointer;
+            position: absolute; width: 100%; height: 100%; top: 0; left: 0; opacity: 0; cursor: pointer;
         }
 
         /* --- Typography & Elements --- */
         .section-title {
-            font-size: 0.85rem;
+            font-size: 0.9rem;
             text-transform: uppercase;
-            letter-spacing: 3px;
-            color: #888;
+            letter-spacing: 1px;
+            color: #0d6efd;
+            font-weight: 700;
             margin-bottom: 25px;
-            border-left: 2px solid #fff;
+            border-left: 4px solid #0d6efd;
             padding-left: 12px;
+            background-color: #e7f1ff;
+            padding-top: 5px;
+            padding-bottom: 5px;
+            border-radius: 0 5px 5px 0;
         }
 
         /* --- Buttons --- */
-        .btn-monochrome {
-            background-color: #ffffff;
-            color: #000000;
-            border: 1px solid #ffffff;
-            font-weight: 700;
-            letter-spacing: 1px;
-            transition: all 0.3s;
-        }
-
-        .btn-monochrome:hover {
-            background-color: #000000;
-            color: #ffffff;
-            border-color: #ffffff;
-        }
-
-        .btn-outline-monochrome {
-            background-color: transparent;
-            color: #888;
-            border: 1px solid #555;
-            transition: all 0.3s;
-        }
-
-        .btn-outline-monochrome:hover {
+        .btn-custom-primary {
+            background: linear-gradient(45deg, #0d6efd, #0dcaf0);
             color: #fff;
-            border-color: #fff;
-            background-color: transparent;
+            border: none;
+            font-weight: 600; border-radius: 10px; padding: 12px 20px;
+            transition: all 0.3s;
+            box-shadow: 0 4px 6px rgba(13, 110, 253, 0.2);
+        }
+        .btn-custom-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(13, 110, 253, 0.3);
+            color: #fff;
+        }
+
+        .btn-outline-custom {
+            background: transparent; color: #6c757d; border: 1px solid #dee2e6;
+            border-radius: 10px; font-weight: 600;
+            transition: all 0.3s;
+        }
+        .btn-outline-custom:hover {
+            color: #0d6efd; border-color: #0d6efd; background: #fff;
         }
     </style>
 </head>
@@ -290,48 +195,51 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
                 <div class="glass-card p-4 p-md-5" data-aos="fade-up" data-aos-duration="1000">
 
-                    <div class="d-flex align-items-center justify-content-between mb-5 border-bottom border-secondary pb-3">
-                        <h3 class="fw-light mb-0 text-white" style="letter-spacing: 1px;">
-                            <i class="fa-solid fa-plus me-2 text-secondary"></i>เพิ่มหนังสือใหม่
+                    <div class="d-flex align-items-center justify-content-between mb-5 border-bottom pb-3">
+                        <h3 class="fw-bold mb-0 text-dark">
+                            <span class="text-primary bg-primary bg-opacity-10 rounded-circle p-2 me-2 d-inline-flex justify-content-center align-items-center" style="width: 45px; height: 45px;">
+                                <i class="fa-solid fa-plus fs-5"></i>
+                            </span>
+                            เพิ่มหนังสือใหม่
                         </h3>
-                        <a href="index.php" class="btn btn-outline-monochrome btn-sm rounded-0 px-3">
-                            กลับหน้าหลัก
+                        <a href="index.php" class="btn btn-outline-custom btn-sm px-3">
+                            <i class="fa-solid fa-arrow-left me-1"></i> กลับหน้าหลัก
                         </a>
                     </div>
 
                     <form action="" method="POST" enctype="multipart/form-data">
 
-                        <div class="section-title text-white">ข้อมูลทั่วไป</div>
+                        <div class="section-title">ข้อมูลทั่วไป</div>
 
                         <div class="row g-3 mb-4">
                             <div class="col-md-6">
                                 <div class="form-floating">
                                     <input type="text" class="form-control" id="isbn" name="isbn" placeholder="ISBN" required autocomplete="off">
-                                    <label for="isbn" class="text-white">รหัสวิชา / ISBN</label>
+                                    <label for="isbn">รหัสวิชา / ISBN</label>
                                 </div>
                             </div>
                             <div class="col-md-6">
                                 <div class="form-floating">
                                     <input type="text" class="form-control" id="title" name="title" placeholder="ชื่อหนังสือ" required autocomplete="off">
-                                    <label for="title" class="text-white">ชื่อหนังสือ / ชื่อวิชา</label>
+                                    <label for="title">ชื่อหนังสือ / ชื่อวิชา</label>
                                 </div>
                             </div>
                             <div class="col-md-6">
                                 <div class="form-floating">
                                     <input type="text" class="form-control" id="author" name="author" placeholder="ผู้แต่ง" autocomplete="off">
-                                    <label for="author" class="text-white">ชื่อผู้แต่ง</label>
+                                    <label for="author">ชื่อผู้แต่ง</label>
                                 </div>
                             </div>
                             <div class="col-md-6">
                                 <div class="form-floating">
                                     <input type="text" class="form-control" id="publisher" name="publisher" placeholder="สำนักพิมพ์" autocomplete="off">
-                                    <label for="publisher" class="text-white">สำนักพิมพ์</label>
+                                    <label for="publisher">สำนักพิมพ์</label>
                                 </div>
                             </div>
                             <div class="col-md-6">
                                 <div class="form-floating">
                                     <input type="number" step="0.01" class="form-control" id="price" name="price" placeholder="ราคา" autocomplete="off">
-                                    <label for="price" class="text-white">ราคาหน้าปก (บาท)</label>
+                                    <label for="price">ราคาหน้าปก (บาท)</label>
                                 </div>
                             </div>
 
@@ -339,32 +247,35 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                                 <div class="upload-zone h-100 d-flex flex-column justify-content-center">
                                     <input type="file" name="cover_img" id="cover_img" accept="image/*" onchange="previewFile()">
                                     <div id="upload-label">
-                                        <i class="fa-regular fa-image fs-4 text-secondary mb-2"></i><br>
-                                        <small class="text-white" style="font-weight: 300;">อัปโหลดรูปหน้าปก</small>
+                                        <div class="mb-2">
+                                            <i class="fa-regular fa-image fs-1 text-primary bg-primary bg-opacity-10 rounded-circle p-3"></i>
+                                        </div>
+                                        <span class="fw-bold text-dark">อัปโหลดรูปหน้าปก</span><br>
+                                        <small class="text-muted">คลิกเพื่อเลือกไฟล์รูปภาพ</small>
                                     </div>
                                 </div>
                             </div>
                         </div>
 
-                        <div class="section-title mt-5 text-white">รายละเอียดหนังสือและอนุมัติ</div>
+                        <div class="section-title mt-5">รายละเอียดและอนุมัติ</div>
 
                         <div class="row g-3 mb-4">
                             <div class="col-md-6">
                                 <div class="form-floating">
                                     <input type="text" class="form-control" id="approval_no" name="approval_no" placeholder="ครั้งที่อนุมัติ" autocomplete="off">
-                                    <label for="approval_no" class="text-white">ครั้งที่อนุมัติ</label>
+                                    <label for="approval_no">ครั้งที่อนุมัติ</label>
                                 </div>
                             </div>
                             <div class="col-md-6">
                                 <div class="form-floating">
                                     <input type="number" class="form-control" id="approval_order" name="approval_order" placeholder="ลำดับ" autocomplete="off">
-                                    <label for="approval_order" class="text-white">ลำดับที่อนุมัติ</label>
+                                    <label for="approval_order">ลำดับที่อนุมัติ</label>
                                 </div>
                             </div>
                             <div class="col-6 col-md-3">
                                 <div class="form-floating">
                                     <input type="number" class="form-control" id="page_count" name="page_count" placeholder="หน้า" autocomplete="off">
-                                    <label for="page_count" class="text-white">จำนวนหน้า</label>
+                                    <label for="page_count">จำนวนหน้า</label>
                                 </div>
                             </div>
                             <div class="col-6 col-md-3">
@@ -376,7 +287,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                                         <option value="อาร์ต">อาร์ต</option>
                                         <option value="บรู๊ฟ">บรู๊ฟ</option>
                                     </select>
-                                    <label for="paper_type" class="text-white">กระดาษ</label>
+                                    <label for="paper_type">กระดาษ</label>
                                 </div>
                             </div>
                             <div class="col-6 col-md-3">
@@ -387,7 +298,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                                         <option value="2 สี">2 สี</option>
                                         <option value="4 สี">4 สี</option>
                                     </select>
-                                    <label for="print_type" class="text-white">การพิมพ์</label>
+                                    <label for="print_type">การพิมพ์</label>
                                 </div>
                             </div>
                             <div class="col-6 col-md-3">
@@ -398,14 +309,14 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                                         <option value="A4">A4</option>
                                         <option value="อื่นๆ">อื่นๆ</option>
                                     </select>
-                                    <label for="book_size" class="text-white">ขนาด</label>
+                                    <label for="book_size">ขนาด</label>
                                 </div>
                             </div>
                         </div>
 
                         <div class="d-grid gap-2 mt-5">
-                            <button type="submit" class="btn btn-monochrome btn-lg rounded-0 py-3 shadow-sm">
-                                ยืนยันการเพิ่มหนังสือ
+                            <button type="submit" class="btn btn-custom-primary btn-lg rounded-pill py-3">
+                                <i class="fa-solid fa-save me-2"></i> บันทึกข้อมูลหนังสือ
                             </button>
                         </div>
 
@@ -420,189 +331,20 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/particles.js@2.0.0/particles.min.js"></script>
     <script>
-        /* เรียกใช้ particles.js ที่กล่อง id="particles-js" */
-        particlesJS("particles-js", {
-            "particles": {
-                "number": {
-                    "value": 80,
-                    /* จำนวนดาว (ยิ่งเยอะยิ่งรก) ลองปรับดูที่ 50-100 */
-                    "density": {
-                        "enable": true,
-                        "value_area": 800
-                    }
-                },
-                "color": {
-                    "value": "#ffffff" /* สีของดาว (สีขาว) */
-                },
-                "shape": {
-                    "type": "circle",
-                    /* รูปร่าง (วงกลม) */
-                    "stroke": {
-                        "width": 0,
-                        "color": "#000000"
-                    },
-                    "polygon": {
-                        "nb_sides": 5
-                    }
-                },
-                "opacity": {
-                    "value": 0.5,
-                    /* ความจางของดาว (0.5 คือครึ่งๆ) */
-                    "random": true,
-                    /* ให้จางไม่เท่ากัน ดูมีมิติ */
-                    "anim": {
-                        "enable": false,
-                        "speed": 1,
-                        "opacity_min": 0.1,
-                        "sync": false
-                    }
-                },
-                "size": {
-                    "value": 3,
-                    /* ขนาดของดาว */
-                    "random": true,
-                    /* เล็กใหญ่ไม่เท่ากัน */
-                    "anim": {
-                        "enable": false,
-                        "speed": 40,
-                        "size_min": 0.1,
-                        "sync": false
-                    }
-                },
-                "line_linked": {
-                    "enable": true,
-                    /* ✅ ถ้าไม่อยากได้เส้นเชื่อม ให้แก้เป็น false */
-                    "distance": 150,
-                    /* ระยะห่างที่จะให้มีเส้นเชื่อม */
-                    "color": "#ffffff",
-                    /* สีของเส้น */
-                    "opacity": 0.4,
-                    /* ความจางของเส้น */
-                    "width": 1
-                },
-                "move": {
-                    "enable": true,
-                    /* สั่งให้ขยับ */
-                    "speed": 2,
-                    /* ความเร็วในการวิ่ง (ยิ่งเยอะยิ่งเร็ว) */
-                    "direction": "none",
-                    /* ทิศทาง (none คือมั่ว) */
-                    "random": false,
-                    "straight": false,
-                    "out_mode": "out",
-                    "bounce": false,
-                    "attract": {
-                        "enable": false,
-                        "rotateX": 600,
-                        "rotateY": 1200
-                    }
-                }
-            },
-            "interactivity": {
-                /* ส่วนนี้คือเวลาเอาเมาส์ไปโดน */
-                "detect_on": "canvas",
-                "events": {
-                    "onhover": {
-                        "enable": true,
-                        /* ถ้า true เวลาเอาเมาส์ไปชี้ ดาวจะวิ่งหนีหรือวิ่งเข้าหา */
-                        "mode": "grab" /* grab = มีเส้นดูดเข้าหาเมาส์, repulse = วิ่งหนี */
-                    },
-                    "onclick": {
-                        "enable": true,
-                        "mode": "push" /* คลิกแล้วมีดาวเพิ่ม */
-                    },
-                    "resize": true
-                },
-                "modes": {
-                    "grab": {
-                        "distance": 140,
-                        "line_linked": {
-                            "opacity": 1
-                        }
-                    },
-                    "bubble": {
-                        "distance": 400,
-                        "size": 40,
-                        "duration": 2,
-                        "opacity": 8,
-                        "speed": 3
-                    },
-                    "repulse": {
-                        "distance": 200,
-                        "duration": 0.4
-                    },
-                    "push": {
-                        "particles_nb": 4
-                    },
-                    "remove": {
-                        "particles_nb": 2
-                    }
-                }
-            },
-            "retina_detect": true
-        });
-    </script>
-    <script>
-        // Init Animation
-        AOS.init({
-            duration: 800,
-            once: true
-        });
+        AOS.init({ duration: 800, once: true });
 
-        // Particles
+        /* Particles สีฟ้า */
         particlesJS("particles-js", {
             "particles": {
-                "number": {
-                    "value": 80,
-                    "density": {
-                        "enable": true,
-                        "value_area": 800
-                    }
-                },
-                "color": {
-                    "value": "#ffffff"
-                },
-                "shape": {
-                    "type": "circle",
-                    "stroke": {
-                        "width": 0,
-                        "color": "#000000"
-                    }
-                },
-                "opacity": {
-                    "value": 0.5,
-                    "random": true
-                },
-                "size": {
-                    "value": 3,
-                    "random": true
-                },
-                "line_linked": {
-                    "enable": true,
-                    "distance": 150,
-                    "color": "#ffffff",
-                    "opacity": 0.4,
-                    "width": 1
-                },
-                "move": {
-                    "enable": true,
-                    "speed": 2
-                }
+                "number": { "value": 60, "density": { "enable": true, "value_area": 800 } },
+                "color": { "value": "#0d6efd" }, /* สีฟ้า */
+                "shape": { "type": "circle" },
+                "opacity": { "value": 0.5, "random": true },
+                "size": { "value": 3, "random": true },
+                "line_linked": { "enable": true, "distance": 150, "color": "#0d6efd", "opacity": 0.2, "width": 1 },
+                "move": { "enable": true, "speed": 2 }
             },
-            "interactivity": {
-                "detect_on": "canvas",
-                "events": {
-                    "onhover": {
-                        "enable": true,
-                        "mode": "grab"
-                    },
-                    "onclick": {
-                        "enable": true,
-                        "mode": "push"
-                    },
-                    "resize": true
-                }
-            },
+            "interactivity": { "detect_on": "canvas", "events": { "onhover": { "enable": true, "mode": "grab" } } },
             "retina_detect": true
         });
 
@@ -611,34 +353,30 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             const fileInput = document.getElementById('cover_img');
             const label = document.getElementById('upload-label');
             if (fileInput.files.length > 0) {
-                label.innerHTML = '<i class="fa-solid fa-check text-white fs-4 mb-2"></i><br><span class="text-white">' + fileInput.files[0].name + '</span>';
-                document.querySelector('.upload-zone').style.borderColor = '#fff';
+                label.innerHTML = '<i class="fa-solid fa-check-circle text-success fs-1 mb-2"></i><br><span class="fw-bold text-success">' + fileInput.files[0].name + '</span>';
+                document.querySelector('.upload-zone').style.borderColor = '#198754';
+                document.querySelector('.upload-zone').style.backgroundColor = '#f0fff4';
             }
         }
 
-        // SweetAlert Style B&W
+        // SweetAlert Style (Light Theme)
         <?php if ($msg == 'success'): ?>
             Swal.fire({
                 icon: 'success',
-                title: 'SUCCESS',
-                text: 'Book has been added.',
-                background: '#000',
-                color: '#fff',
-                iconColor: '#fff',
-                confirmButtonColor: '#fff',
-                confirmButtonText: '<span style="color:#000; font-weight:bold;">OK</span>'
+                title: 'สำเร็จ!',
+                text: 'เพิ่มข้อมูลหนังสือเรียบร้อยแล้ว',
+                confirmButtonColor: '#0d6efd',
+                confirmButtonText: 'ตกลง'
             }).then(() => {
                 window.location = 'index.php';
             });
         <?php elseif ($msg == 'error'): ?>
             Swal.fire({
                 icon: 'error',
-                title: 'ERROR',
-                text: 'Something went wrong.',
-                background: '#000',
-                color: '#fff',
-                iconColor: '#fff',
-                confirmButtonColor: '#333'
+                title: 'เกิดข้อผิดพลาด',
+                text: 'ไม่สามารถบันทึกข้อมูลได้ กรุณาลองใหม่',
+                confirmButtonColor: '#dc3545',
+                confirmButtonText: 'ปิด'
             });
         <?php endif; ?>
     </script>

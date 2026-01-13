@@ -39,41 +39,38 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['reset_password'])) {
     <title>จัดการผู้ใช้งาน - Admin</title>
     <link rel="icon" type="image/png" href="images/books.png">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Thai:wght@300;400;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Thai:wght@300;400;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link href="https://cdn.datatables.net/1.13.4/css/dataTables.bootstrap5.min.css" rel="stylesheet">
     <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
 
     <style>
-        /* --- Dark Theme Base --- */
+        /* --- 🎨 White & Blue Theme CSS --- */
         body {
             font-family: 'Noto Sans Thai', sans-serif;
-            background-color: #000000;
-            color: #e0e0e0;
+            background-color: #f0f4f8; /* พื้นหลังสีเทาอมฟ้าอ่อน */
+            background-image: radial-gradient(#dbeafe 1px, transparent 1px); /* ลายจุดจางๆ */
+            background-size: 20px 20px;
+            color: #333;
             overflow-x: hidden;
         }
 
         #particles-js {
-            position: fixed;
-            width: 100%;
-            height: 100%;
-            top: 0;
-            left: 0;
-            z-index: -1;
-            pointer-events: none;
+            position: fixed; width: 100%; height: 100%; top: 0; left: 0; z-index: -1; pointer-events: none;
         }
 
-        /* --- Glass Card --- */
+        /* --- White Card --- */
         .glass-card {
-            background: rgba(15, 15, 15, 0.85);
-            backdrop-filter: blur(20px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 0px;
-            box-shadow: 0 30px 60px rgba(0, 0, 0, 0.8);
+            background: #ffffff;
+            border: none;
+            border-radius: 20px;
+            box-shadow: 0 10px 40px rgba(13, 110, 253, 0.1); /* เงาสีฟ้าจางๆ */
             padding: 30px;
+            position: relative;
+            z-index: 1;
         }
 
-        /* --- Modern Table --- */
+        /* --- Table Styling (Light Theme) --- */
         .table-custom {
             width: 100%;
             border-collapse: separate;
@@ -81,177 +78,102 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['reset_password'])) {
         }
 
         .table-custom thead th {
-            color: #777;
+            background-color: #e7f1ff;
+            color: #0d6efd;
             font-size: 0.85rem;
-            font-weight: 600;
+            font-weight: 700;
             text-transform: uppercase;
             letter-spacing: 1px;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1) !important;
-            padding-bottom: 15px;
+            border-bottom: none;
+            padding: 15px;
         }
+        /* มุมโค้งหัวตาราง */
+        .table-custom thead th:first-child { border-top-left-radius: 10px; border-bottom-left-radius: 10px; }
+        .table-custom thead th:last-child { border-top-right-radius: 10px; border-bottom-right-radius: 10px; }
 
         .table-custom tbody tr {
-            background-color: rgba(255, 255, 255, 0.03);
+            background-color: #fff;
             transition: all 0.2s;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.02);
         }
 
         .table-custom tbody tr:hover {
-            background-color: rgba(255, 255, 255, 0.08);
-            transform: scale(1.005);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(13, 110, 253, 0.1);
+            background-color: #f8f9fa;
         }
 
         .table-custom td {
-            border: none;
+            border: 1px solid #f0f0f0;
+            border-width: 1px 0;
             padding: 15px;
             vertical-align: middle;
-            color: #ccc;
+            color: #555;
         }
-
-        .table-custom td:first-child {
-            border-top-left-radius: 6px;
-            border-bottom-left-radius: 6px;
-        }
-
-        .table-custom td:last-child {
-            border-top-right-radius: 6px;
-            border-bottom-right-radius: 6px;
-        }
+        .table-custom td:first-child { border-left: 1px solid #f0f0f0; border-top-left-radius: 10px; border-bottom-left-radius: 10px; }
+        .table-custom td:last-child { border-right: 1px solid #f0f0f0; border-top-right-radius: 10px; border-bottom-right-radius: 10px; }
 
         /* --- DataTables Overrides --- */
         .dataTables_wrapper .dataTables_length,
         .dataTables_wrapper .dataTables_filter,
         .dataTables_wrapper .dataTables_info,
         .dataTables_wrapper .dataTables_paginate {
-            color: #aaa !important;
+            color: #6c757d !important;
             margin-top: 15px;
+            font-size: 0.9rem;
         }
-
-        .dataTables_wrapper .form-select,
-        .dataTables_wrapper .form-control {
-            background-color: #111;
-            border: 1px solid #333;
-            color: #fff;
-        }
-
+        
         .page-item.active .page-link {
-            background-color: #fff;
-            border-color: #fff;
-            color: #000;
-        }
-
-        .page-link {
-            background-color: #111;
-            border-color: #333;
+            background-color: #0d6efd;
+            border-color: #0d6efd;
             color: #fff;
         }
-
-        .page-link:hover {
-            background-color: #333;
-            border-color: #333;
-            color: #fff;
-        }
+        .page-link { color: #0d6efd; }
 
         /* --- Badges --- */
         .role-badge {
-            padding: 5px 12px;
-            border-radius: 50px;
-            font-size: 0.75rem;
-            font-weight: 500;
-            letter-spacing: 0.5px;
+            padding: 5px 12px; border-radius: 50px; font-size: 0.75rem; font-weight: 600; letter-spacing: 0.5px;
         }
-
-        .role-admin {
-            background: rgba(220, 53, 69, 0.15);
-            color: #ff6b6b;
-            border: 1px solid rgba(220, 53, 69, 0.3);
-        }
-
-        .role-user {
-            background: rgba(25, 135, 84, 0.15);
-            color: #2ecc71;
-            border: 1px solid rgba(25, 135, 84, 0.3);
-        }
+        .role-admin { background: #f8d7da; color: #842029; border: 1px solid #f5c2c7; }
+        .role-user { background: #d1e7dd; color: #0f5132; border: 1px solid #badbcc; }
 
         /* --- Buttons --- */
-        .btn-monochrome {
-            background: #fff;
-            color: #000;
-            border: 1px solid #fff;
-            font-weight: 600;
-            padding: 8px 20px;
+        .btn-custom-primary {
+            background: linear-gradient(45deg, #0d6efd, #0dcaf0);
+            color: #fff; border: none; font-weight: 600;
+            border-radius: 10px; padding: 8px 20px;
             transition: all 0.3s;
+            box-shadow: 0 4px 6px rgba(13, 110, 253, 0.2);
         }
-
-        .btn-monochrome:hover {
-            background: #000;
+        .btn-custom-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(13, 110, 253, 0.3);
             color: #fff;
         }
+
+        .btn-outline-custom {
+            background: transparent; color: #0d6efd; border: 1px solid #0d6efd;
+            border-radius: 10px; font-weight: 600;
+            transition: all 0.3s;
+        }
+        .btn-outline-custom:hover { background: #0d6efd; color: #fff; }
 
         .btn-icon-only {
-            width: 35px;
-            height: 35px;
-            border-radius: 50%;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            background: rgba(255, 255, 255, 0.1);
-            color: #fff;
-            text-decoration: none;
-            transition: all 0.3s;
-            border: none;
+            width: 35px; height: 35px; border-radius: 50%;
+            display: inline-flex; align-items: center; justify-content: center;
+            background: #e7f1ff; color: #0d6efd;
+            border: none; transition: all 0.3s;
         }
-
         .btn-icon-only:hover {
-            background: #fff;
-            color: #000;
+            background: #0d6efd; color: #fff; transform: scale(1.1);
         }
 
-        .btn-back {
-            background: transparent;
-            border: 1px solid #fff;
-            color: #fff;
-            border-radius: 50px;
-            padding: 6px 20px;
-            font-size: 0.85rem;
-            transition: all 0.3s;
-        }
-
-        .btn-back:hover {
-            background: #fff;
-            color: #000;
-        }
-
-        /* --- Modal Dark --- */
+        /* --- Modal --- */
         .modal-content {
-            background-color: #111;
-            border: 1px solid #333;
-            color: #fff;
+            border-radius: 15px; border: none; box-shadow: 0 10px 40px rgba(0,0,0,0.2);
         }
-
-        .modal-header {
-            border-bottom: 1px solid #333;
-        }
-
-        .modal-footer {
-            border-top: 1px solid #333;
-        }
-
-        .btn-close {
-            filter: invert(1);
-        }
-
-        .form-control-dark {
-            background-color: #000;
-            border: 1px solid #333;
-            color: #fff;
-        }
-
-        .form-control-dark:focus {
-            background-color: #000;
-            border-color: #fff;
-            color: #fff;
-            box-shadow: none;
-        }
+        .modal-header { background-color: #0d6efd; color: white; border-top-left-radius: 15px; border-top-right-radius: 15px; }
+        .btn-close { filter: invert(1); }
     </style>
 </head>
 
@@ -263,16 +185,16 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['reset_password'])) {
 
         <div class="d-flex justify-content-between align-items-center mb-4" data-aos="fade-down">
             <div>
-                <h3 class="fw-light text-white mb-0" style="letter-spacing: 1px;">
-                    <i class="fa-solid fa-users-gear me-2 text-secondary"></i>MANAGE USERS
+                <h3 class="fw-bold text-primary mb-0" style="letter-spacing: 1px;">
+                    <i class="fa-solid fa-users-gear me-2"></i>MANAGE USERS
                 </h3>
-                <small class="text-secondary">จัดการข้อมูลสมาชิกและรหัสผ่าน</small>
+                <small class="text-muted">จัดการข้อมูลสมาชิกและรหัสผ่าน</small>
             </div>
             <div class="d-flex gap-2">
-                <a href="index.php" class="btn btn-monochrome">
+                <a href="index.php" class="btn btn-outline-custom">
                     <i class="fa-solid fa-arrow-left"></i> กลับหน้าหลัก
                 </a>
-                <a href="sync_students.php" class="btn btn-monochrome" onclick="return confirm('⚠️ ยืนยันการดึงข้อมูลจาก RMS?');">
+                <a href="sync_students.php" class="btn btn-custom-primary" onclick="return confirm('⚠️ ยืนยันการดึงข้อมูลจาก RMS?');">
                     <i class="fa-solid fa-cloud-arrow-down me-2"></i> SYNC RMS
                 </a>
             </div>
@@ -297,14 +219,14 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['reset_password'])) {
                         ?>
                             <tr>
                                 <td>
-                                    <span class="font-monospace text-white"><?php echo $row['student_id']; ?></span>
+                                    <span class="font-monospace text-primary fw-bold"><?php echo $row['student_id']; ?></span>
                                 </td>
                                 <td>
                                     <div class="d-flex align-items-center">
-                                        <div class="bg-secondary bg-opacity-25 rounded-circle me-2 d-flex justify-content-center align-items-center" style="width:30px; height:30px;">
-                                            <i class="fa-regular fa-user text-light" style="font-size: 0.8rem;"></i>
+                                        <div class="bg-primary bg-opacity-10 rounded-circle me-2 d-flex justify-content-center align-items-center" style="width:35px; height:35px;">
+                                            <i class="fa-regular fa-user text-primary"></i>
                                         </div>
-                                        <?php echo $row['fullname']; ?>
+                                        <span class="fw-bold text-dark"><?php echo $row['fullname']; ?></span>
                                     </div>
                                 </td>
                                 <td><?php echo $row['phone'] ? $row['phone'] : '<span class="text-muted small">-</span>'; ?></td>
@@ -317,7 +239,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['reset_password'])) {
                                 </td>
                                 <td class="text-center">
                                     <button onclick="openResetModal(<?php echo $row['id']; ?>, '<?php echo htmlspecialchars($row['fullname']); ?>')"
-                                        class="btn-icon-only" title="เปลี่ยนรหัสผ่าน">
+                                            class="btn-icon-only" title="เปลี่ยนรหัสผ่าน">
                                         <i class="fa-solid fa-key"></i>
                                     </button>
                                 </td>
@@ -332,9 +254,9 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['reset_password'])) {
 
     <div class="modal fade" id="resetModal" tabindex="-1">
         <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content rounded-0">
+            <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title fw-light text-white">
+                    <h5 class="modal-title fw-bold">
                         <i class="fa-solid fa-lock me-2"></i> RESET PASSWORD
                     </h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
@@ -345,19 +267,22 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['reset_password'])) {
                         <input type="hidden" name="user_id" id="modal_user_id">
 
                         <div class="text-center mb-4">
-                            <div class="text-secondary small mb-1">กำลังเปลี่ยนรหัสผ่านให้</div>
-                            <h4 class="text-white fw-bold" id="modal_user_name">...</h4>
+                            <div class="bg-primary bg-opacity-10 d-inline-block rounded-circle p-3 mb-2">
+                                <i class="fa-solid fa-user-lock fa-2x text-primary"></i>
+                            </div>
+                            <div class="text-muted small mb-1">กำลังเปลี่ยนรหัสผ่านให้</div>
+                            <h5 class="text-dark fw-bold" id="modal_user_name">...</h5>
                         </div>
 
                         <div class="mb-3">
-                            <label class="text-secondary small mb-2">NEW PASSWORD</label>
-                            <input type="text" name="new_pass" class="form-control form-control-dark py-2" required placeholder="กรอกรหัสผ่านใหม่..." autocomplete="off">
-                            <div class="form-text text-secondary opacity-50 mt-2">* กรอกรหัสใหม่ที่ต้องการให้ผู้ใช้งาน</div>
+                            <label class="text-secondary fw-bold small mb-2">NEW PASSWORD</label>
+                            <input type="text" name="new_pass" class="form-control" required placeholder="กรอกรหัสผ่านใหม่..." autocomplete="off">
+                            <div class="form-text text-muted mt-2">* กรอกรหัสใหม่ที่ต้องการให้ผู้ใช้งาน</div>
                         </div>
                     </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-outline-secondary rounded-0 btn-sm" data-bs-dismiss="modal">CANCEL</button>
-                        <button type="submit" class="btn btn-light rounded-0 btn-sm fw-bold">CONFIRM CHANGE</button>
+                    <div class="modal-footer bg-light">
+                        <button type="button" class="btn btn-secondary rounded-pill btn-sm px-3" data-bs-dismiss="modal">ยกเลิก</button>
+                        <button type="submit" class="btn btn-primary rounded-pill btn-sm fw-bold px-4">บันทึกการเปลี่ยนแปลง</button>
                     </div>
                 </form>
             </div>
@@ -373,51 +298,21 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['reset_password'])) {
     <script src="https://cdn.jsdelivr.net/npm/particles.js@2.0.0/particles.min.js"></script>
 
     <script>
-        AOS.init({
-            duration: 800,
-            once: true
-        });
+        AOS.init({ duration: 800, once: true });
 
-        // Particles
+        // Particles สีฟ้า
         particlesJS("particles-js", {
             "particles": {
-                "number": {
-                    "value": 60
-                },
-                "color": {
-                    "value": "#ffffff"
-                },
-                "shape": {
-                    "type": "circle"
-                },
-                "opacity": {
-                    "value": 0.2,
-                    "random": true
-                },
-                "size": {
-                    "value": 2,
-                    "random": true
-                },
-                "line_linked": {
-                    "enable": true,
-                    "distance": 150,
-                    "color": "#ffffff",
-                    "opacity": 0.1,
-                    "width": 1
-                },
-                "move": {
-                    "enable": true,
-                    "speed": 0.5
-                }
+                "number": { "value": 60 },
+                "color": { "value": "#0d6efd" },
+                "shape": { "type": "circle" },
+                "opacity": { "value": 0.5, "random": true },
+                "size": { "value": 3, "random": true },
+                "line_linked": { "enable": true, "distance": 150, "color": "#0d6efd", "opacity": 0.2, "width": 1 },
+                "move": { "enable": true, "speed": 2 }
             },
-            "interactivity": {
-                "detect_on": "canvas",
-                "events": {
-                    "onhover": {
-                        "enable": false
-                    }
-                }
-            }
+            "interactivity": { "detect_on": "canvas", "events": { "onhover": { "enable": false } } },
+            "retina_detect": true
         });
 
         // DataTable Config
@@ -427,15 +322,9 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['reset_password'])) {
                     search: "ค้นหา:",
                     lengthMenu: "แสดง _MENU_ รายการ",
                     info: "แสดง _START_ ถึง _END_ จาก _TOTAL_ คน",
-                    paginate: {
-                        first: "หน้าแรก",
-                        last: "สุดท้าย",
-                        next: "ถัดไป",
-                        previous: "ก่อนหน้า"
-                    },
+                    paginate: { first: "หน้าแรก", last: "สุดท้าย", next: "ถัดไป", previous: "ก่อนหน้า" },
                     zeroRecords: "ไม่พบข้อมูล"
                 },
-                // ปรับแต่ง DOM เพื่อจัดวางช่องค้นหาใหม่ (ถ้าต้องการ)
                 dom: '<"d-flex justify-content-between mb-3"lf>rt<"d-flex justify-content-between mt-3"ip>'
             });
         });
@@ -448,17 +337,14 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['reset_password'])) {
             myModal.show();
         }
 
-        // SweetAlert
+        // SweetAlert (Light Theme)
         <?php if ($message): ?>
             Swal.fire({
                 icon: '<?php echo $msg_type; ?>',
                 title: '<?php echo $msg_type == "success" ? "สำเร็จ!" : "ผิดพลาด"; ?>',
                 text: '<?php echo $message; ?>',
-                background: '#000',
-                color: '#fff',
-                iconColor: '#fff',
-                confirmButtonColor: '#fff',
-                confirmButtonText: '<span style="color:#000; font-weight:bold;">OK</span>'
+                confirmButtonColor: '#0d6efd',
+                confirmButtonText: 'ตกลง'
             });
         <?php endif; ?>
     </script>
