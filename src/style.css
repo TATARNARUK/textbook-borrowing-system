@@ -1,288 +1,256 @@
-       @import url('https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;600&display=swap');
+/* =========================================
+   1. Imports & Fonts
+   ========================================= */
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+Thai:wght@300;400;600;700&family=Prompt:wght@300;400;600;700&display=swap');
 
-       body {
-         font-family: 'Noto Sans Thai', sans-serif;
-         background-color: #f0f4f8;
-         /* พื้นหลังสีเทาอมฟ้าอ่อนสบายตา */
-         background-image: radial-gradient(#dbeafe 1px, transparent 1px);
-         /* ลายจุดจางๆ */
-         background-size: 20px 20px;
-         height: 100vh;
-         overflow: hidden;
-       }
+/* =========================================
+   2. Main Layout & Body
+   ========================================= */
+body {
+    font-family: 'Noto Sans Thai', sans-serif; /* ใช้ฟอนต์หลักเป็น Noto Sans Thai */
+    background-image: url('https://images.unsplash.com/photo-1524995997946-a1c2e315a42f?q=80&w=2070&auto=format&fit=crop');
+    background-size: cover;
+    background-position: center;
+    background-attachment: fixed; /* ให้ภาพพื้นหลังนิ่งเวลาเลื่อน */
+    height: 100vh;
+    margin: 0;
+    overflow-x: hidden;
+}
 
-       #particles-js {
-         position: fixed;
-         /* ให้มันลอยอยู่กับที่ ไม่ต้องเลื่อนตาม Scroll bar */
-         width: 100%;
-         height: 100%;
-         top: 0;
-         left: 0;
-         z-index: -1;
-         /* ✅ สำคัญมาก! สั่งให้ไปอยู่ข้างหลังสุด */
-         pointer-events: none;
-         /* สั่งให้เม้าส์คลิกทะลุผ่านไปได้ (เผื่อไว้ก่อน) */
-       }
+/* =========================================
+   3. Navbar
+   ========================================= */
+.navbar-custom {
+    background: rgba(255, 255, 255, 0.95) !important;
+    backdrop-filter: blur(10px);
+    padding: 15px 0;
+    position: relative; 
+    width: 100%;
+    z-index: 1000;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+}
 
+/* =========================================
+   4. Components (Card, Inputs, Buttons)
+   ========================================= */
+/* การ์ด Login */
+.login-card {
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(15px);
+    border-radius: 20px;
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
+    padding: 40px;
+    width: 100%;
+    max-width: 400px;
+    margin: auto; /* จัดกึ่งกลาง */
+}
 
-       .login-card {
-         background: rgba(255, 255, 255, 0.9);
-         backdrop-filter: blur(10px);
-         border-radius: 15px;
-         box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
-         padding: 40px;
-         width: 100%;
-         max-width: 400px;
-       }
-               .navbar-custom {
-            background: rgba(255, 255, 255, 0.9) !important;
-            padding: 15px 0;
-            /* ✅ เปลี่ยนจาก Fixed เป็น Relative เพื่อไม่ให้ลอยตาม */
-            position: relative;
-            width: 100%;
-            z-index: 1000;
-        }
+/* ช่องกรอกข้อมูล (Input Fields) */
+.input-group {
+    position: relative;
+    margin-bottom: 1rem;
+}
 
+.label {
+    display: block;
+    margin-bottom: .5rem;
+    font-size: .9rem;
+    font-weight: 600;
+    color: #333;
+}
 
-       .topbar-bncc {
-         position: fixed;
-         top: 0;
-         left: 0;
-         right: 0;
-         background: white;
-         padding: 15px 20px;
-         box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+.input {
+    width: 100%; /* แก้จาก max-width เป็น 100% ให้เต็มกรอบ */
+    height: 44px;
+    background-color: #f8f9fa;
+    border-radius: .5rem;
+    padding: 0 1rem;
+    border: 2px solid #e9ecef;
+    font-size: 1rem;
+    font-family: 'Noto Sans Thai', sans-serif;
+    transition: all .3s ease;
+    box-sizing: border-box; /* สำคัญ! ให้ Padding ไม่ดันกล่องขยาย */
+}
 
-         display: flex;
-         /* ต้องมีบรรทัดนี้ */
-         align-items: center;
-         /* จัดกึ่งกลางแนวตั้ง */
-         justify-content: center;
-         /* <--- เพิ่มบรรทัดนี้! เพื่อจัดกึ่งกลางแนวนอน */
+.input:focus {
+    outline: none;
+    border-color: #0b5ed7; /* สีฟ้าเมื่อกด */
+    background-color: #fff;
+    box-shadow: 0 0 0 4px rgba(11, 94, 215, 0.1);
+}
 
-         gap: 15px;
-         z-index: 1000;
-       }
+/* ปุ่มกดเท่ๆ (Button Style) */
+.btg {
+    display: block;
+    width: 100%;
+    text-align: center;
+    color: #0b5ed7;
+    text-transform: uppercase;
+    text-decoration: none;
+    border: 2px solid #0b5ed7;
+    padding: 12px 0;
+    font-size: 16px;
+    cursor: pointer;
+    font-weight: 700;
+    background: transparent;
+    position: relative;
+    transition: all 0.5s;
+    overflow: hidden;
+    border-radius: 50px; /* เพิ่มความมน */
+    font-family: 'Prompt', sans-serif;
+}
 
-       .topbar-bncc img {
-         height: 50px;
-       }
+.btg:hover {
+    color: white;
+    box-shadow: 0 5px 15px rgba(11, 94, 215, 0.3);
+}
 
-       .topbar-bncc-title {
-         font-weight: bold;
-         font-size: 1.5rem;
-         line-height: 1.2;
-       }
+.btg::before {
+    content: "";
+    position: absolute;
+    height: 100%;
+    width: 0%;
+    top: 0;
+    left: -10px;
+    transform: skewX(45deg);
+    background-color: #0b5ed7;
+    z-index: -1;
+    transition: all 0.5s;
+}
 
-       .topbar-bncc-subtitle {
-         font-size: 1rem;
-         color: #666;
-       }
+.btg:hover::before {
+    width: 150%;
+}
 
-       .btg {
-         color: #0b5ed7;
-         text-transform: uppercase;
-         text-decoration: none;
-         border: 2px solid #0b5ed7;
-         padding: 10px 20px;
-         font-size: 17px;
-         cursor: pointer;
-         font-weight: bold;
-         background: transparent;
-         position: relative;
-         transition: all 1s;
-         overflow: hidden;
-       }
+/* =========================================
+   5. Welcome Screen (Intro)
+   ========================================= */
+#welcome-screen {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100vh;
+    background-color: #ffffff;
+    z-index: 9999;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    
+    /* Animation ปิดฉาก */
+    animation: fadeOutScreen 1s ease-in-out forwards;
+    animation-delay: 5.5s;
+}
 
-       .btg:hover {
-         color: white;
-       }
+/* ไอคอน */
+.intro-icons i {
+    font-size: 2rem;
+    color: #0b5ed7;
+    margin: 0 15px;
+    opacity: 0;
+    transform: translateY(20px);
+    animation: popUpIcon 0.8s cubic-bezier(0.68, -0.55, 0.27, 1.55) forwards;
+}
 
-       .btg::before {
-         content: "";
-         position: absolute;
-         height: 100%;
-         width: 0%;
-         top: 0;
-         left: -40px;
-         transform: skewX(45deg);
-         background-color: #0b5ed7;
-         z-index: -1;
-         transition: all 1s;
-       }
+.intro-icons i:nth-child(1) { animation-delay: 0.5s; }
+.intro-icons i:nth-child(2) { animation-delay: 0.7s; }
+.intro-icons i:nth-child(3) { animation-delay: 0.9s; }
 
-       .btg:hover::before {
-         width: 160%;
-       }
+/* ข้อความ Welcome */
+.fade-in-text {
+    font-family: 'Prompt', sans-serif;
+    color: #333;
+    font-weight: 300;
+    font-size: 1.8rem;
+    margin-bottom: 10px;
+    opacity: 0;
+    animation: textFadeIn 1s ease-out forwards;
+    animation-delay: 1.5s;
+}
 
-       .input {
-         max-width: 190px;
-         height: 44px;
-         background-color: #05060f0a;
-         border-radius: .5rem;
-         padding: 0 1rem;
-         border: 2px solid transparent;
-         font-size: 1rem;
-         transition: border-color .3s cubic-bezier(.25, .01, .25, 1) 0s, color .3s cubic-bezier(.25, .01, .25, 1) 0s, background .2s cubic-bezier(.25, .01, .25, 1) 0s;
-       }
+/* ข้อความชื่อระบบ (ไล่สี) */
+.gradient-text {
+    font-family: 'Prompt', sans-serif;
+    font-weight: 800;
+    font-size: 3rem; /* ปรับขนาดให้พอดีจอ */
+    text-transform: uppercase;
+    margin: 0;
+    opacity: 0;
+    letter-spacing: 1px;
+    
+    background: linear-gradient(90deg, #0d6efd 0%, #0dcaf0 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    
+    animation: textFadeIn 1s ease-out forwards;
+    animation-delay: 2.0s;
+}
 
-       .label {
-         display: block;
-         margin-bottom: .3rem;
-         font-size: .9rem;
-         font-weight: bold;
-         color: #05060f99;
-         transition: color .3s cubic-bezier(.25, .01, .25, 1) 0s;
-       }
+/* Cursor กระพริบ */
+.cursor {
+    display: inline-block;
+    vertical-align: middle;
+    width: 3px;
+    height: 1em;
+    background-color: #0d6efd;
+    animation: blinkCursor 0.7s infinite;
+    margin-left: 5px;
+}
 
-       .input:hover,
-       .input:focus,
-       .input-group:hover .input {
-         outline: none;
-         border-color: #05060f;
-       }
+.typewriter-container {
+    height: 30px; /* จองพื้นที่ไว้กันกระตุก */
+    margin-top: 10px;
+}
 
-       .input-group:hover .label,
-       .input:focus {
-         color: #05060fc2;
-       }
+.delay-2 {
+    font-family: 'Noto Sans Thai', sans-serif;
+    animation: textFadeIn 1s ease-out forwards;
+    animation-delay: 3.5s;
+    font-size: 1.1rem;
+    color: #6c757d;
+    opacity: 0;
+}
 
-       #welcome-screen {
-         position: fixed;
-         top: 0;
-         left: 0;
-         width: 100%;
-         height: 100vh;
-         /* เต็มความสูงจอ */
-         background-color: #ffffff;
-         /* สีพื้นหลังดำด้าน (แบบ GitHub Dark Mode) */
-         z-index: 9999;
+/* =========================================
+   6. Keyframes Animations
+   ========================================= */
+@keyframes blinkCursor {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0; }
+}
 
-         /* ✅ สูตรจัดกึ่งกลางเป๊ะๆ */
-         display: flex;
-         justify-content: center;
-         /* กึ่งกลางแนวนอน */
-         align-items: center;
-         /* กึ่งกลางแนวตั้ง */
-         flex-direction: column;
-         /* เรียงลงมาเป็นแนวตั้ง */
+@keyframes popUpIcon {
+    100% {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
 
-         /* อนิเมชั่นปิดฉาก */
-         animation: fadeOutScreen 1s ease-in-out forwards;
-         animation-delay: 5.5s;
-         /* โชว์นาน 4.5 วิ แล้วค่อยหายไป */
-         pointer-events: none;
-       }
+@keyframes textFadeIn {
+    0% {
+        opacity: 0;
+        transform: translateY(20px);
+        filter: blur(5px);
+    }
+    100% {
+        opacity: 1;
+        transform: translateY(0);
+        filter: blur(0);
+    }
+}
 
-       /* ไอคอนด้านบน */
-       .intro-icons i {
-         font-size: 1.5rem;
-         color: #0b5ed7;
-         margin: 0 10px;
-         opacity: 0;
-         transform: translateY(20px);
-         animation: popUpIcon 0.8s cubic-bezier(0.68, -0.55, 0.27, 1.55) forwards;
-       }
+@keyframes fadeOutScreen {
+    to {
+        opacity: 0;
+        visibility: hidden; /* ซ่อนถาวรเมื่อจบ */
+    }
+}
 
-       /* ให้ไอคอนเด้งขึ้นมาทีละตัว */
-       .intro-icons i:nth-child(1) {
-         animation-delay: 0.5s;
-       }
-
-       .intro-icons i:nth-child(2) {
-         animation-delay: 0.7s;
-       }
-
-       .intro-icons i:nth-child(3) {
-         animation-delay: 0.9s;
-       }
-
-       /* ข้อความทั่วไป (Welcome To) */
-       .fade-in-text {
-         font-family: 'Prompt', sans-serif;
-         color: #0b5ed7;
-         font-weight: 300;
-         font-size: 2rem;
-         margin: 0;
-         opacity: 0;
-         animation: textFadeIn 1s ease-out forwards;
-         animation-delay: 1.2s;
-       }
-
-       /* ✅ ข้อความพระเอก (ชื่อระบบไล่สี) */
-       .gradient-text {
-         font-family: 'Prompt', sans-serif;
-         font-weight: 700;
-         font-size: 3.5rem;
-         /* ตัวใหญ่สะใจ */
-         text-transform: uppercase;
-         margin: 10px 0;
-         opacity: 0;
-
-         /* สูตรไล่สีตัวหนังสือ */
-         background: linear-gradient(90deg, #1158c2 0%, #0b5ed7 100%);
-         -webkit-background-clip: text;
-         -webkit-text-fill-color: transparent;
-         background-clip: text;
-
-         animation: textFadeIn 1s ease-out forwards;
-         animation-delay: 1.8s;
-         /* มาทีหลังสุด */
-       }
-
-       /* เส้นเคอร์เซอร์กระพริบ */
-       .cursor {
-         display: inline-block;
-         vertical-align: bottom;
-         width: 2px;
-         height: 1.2em;
-         background-color: #0b5ed7;
-         animation: blinkCursor 0.7s infinite;
-         margin-left: 2px;
-       }
-
-       @keyframes blinkCursor {
-
-         0%,
-         100% {
-           opacity: 1;
-         }
-
-         50% {
-           opacity: 0;
-         }
-       }
-
-       .delay-2 {
-         animation-delay: 3.5s;
-         font-size: 1rem;
-       }
-
-       /* Keyframes (คิวการขยับ) */
-       @keyframes popUpIcon {
-         100% {
-           opacity: 1;
-           transform: translateY(0);
-         }
-       }
-
-       @keyframes textFadeIn {
-         0% {
-           opacity: 0;
-           transform: translateY(20px);
-           filter: blur(5px);
-         }
-
-         100% {
-           opacity: 1;
-           transform: translateY(0);
-           filter: blur(0);
-         }
-       }
-
-       @keyframes fadeOutScreen {
-         to {
-           opacity: 0;
-           visibility: hidden;
-         }
-       }
+/* Responsive: ปรับขนาดตัวหนังสือสำหรับมือถือ */
+@media (max-width: 768px) {
+    .gradient-text { font-size: 2rem; }
+    .fade-in-text { font-size: 1.5rem; }
+    .login-card { padding: 25px; margin: 20px; }
+}

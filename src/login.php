@@ -65,8 +65,6 @@ if (isset($_POST['student_id']) && isset($_POST['password'])) {
         </div>
     </div>
 
-    <div id="particles-js"></div>
-
     <nav class="navbar navbar-expand-lg navbar-custom fixed-top py-3" data-aos="fade-down" data-aos-duration="1500">
         <div class="container">
             <a class="navbar-brand d-flex align-items-center gap-3" href="index.php">
@@ -147,33 +145,8 @@ if (isset($_POST['student_id']) && isset($_POST['password'])) {
 
     <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/particles.js@2.0.0/particles.min.js"></script>
-    
-    <script>
-        /* --- ตั้งค่า Particles สีฟ้า/เทา สำหรับพื้นขาว --- */
-        particlesJS("particles-js", {
-            "particles": {
-                "number": { "value": 60, "density": { "enable": true, "value_area": 800 } },
-                "color": { "value": "#0d6efd" }, /* เปลี่ยนดาวเป็นสีฟ้า */
-                "shape": { "type": "circle" },
-                "opacity": { "value": 0.5, "random": true },
-                "size": { "value": 3, "random": true },
-                "line_linked": {
-                    "enable": true,
-                    "distance": 150,
-                    "color": "#0d6efd", /* เปลี่ยนเส้นเชื่อมเป็นสีฟ้า */
-                    "opacity": 0.2,
-                    "width": 1
-                },
-                "move": { "enable": true, "speed": 2, "direction": "none", "random": false, "straight": false, "out_mode": "out", "bounce": false }
-            },
-            "interactivity": {
-                "detect_on": "canvas",
-                "events": { "onhover": { "enable": true, "mode": "grab" }, "onclick": { "enable": true, "mode": "push" } },
-                "modes": { "grab": { "distance": 140, "line_linked": { "opacity": 1 } } }
-            },
-            "retina_detect": true
-        });
-    </script>
+
+
 
      <script>
         document.addEventListener("DOMContentLoaded", function() {

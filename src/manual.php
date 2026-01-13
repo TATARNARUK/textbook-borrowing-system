@@ -19,35 +19,50 @@ require_once 'config.php';
   <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
 
   <style>
-    /* --- 🎨 White & Blue Theme --- */
+    /* --- 🎨 Style Settings --- */
     body {
       font-family: 'Noto Sans Thai', sans-serif;
-      background-color: #f0f4f8; /* พื้นหลังสีเทาอมฟ้าอ่อน */
-      background-image: radial-gradient(#dbeafe 1px, transparent 1px); /* ลายจุดจางๆ */
-      background-size: 20px 20px;
+      /* ✅ ใช้รูปพื้นหลังเดียวกับหน้า Login/Index */
+      background-image: url('https://images.unsplash.com/photo-1524995997946-a1c2e315a42f?q=80&w=2070&auto=format&fit=crop');
+      background-size: cover;
+      background-position: center;
+      background-attachment: fixed;
       margin: 0;
       min-height: 100vh;
       color: #333;
-      overflow-x: hidden;
     }
 
-    /* Particles ให้เป็นสีฟ้า */
     #particles-js {
       position: fixed; width: 100%; height: 100%; top: 0; left: 0; z-index: -1; pointer-events: none;
     }
 
-    /* Navbar สีขาว เงาบางๆ */
+    /* Navbar แบบ Glassmorphism */
     .navbar {
-      background-color: rgba(255, 255, 255, 0.95) !important;
-      backdrop-filter: blur(10px);
-      border-bottom: 1px solid #e9ecef;
+    background: rgba(255, 255, 255, 0.95) !important;
+    backdrop-filter: blur(10px);
+    padding: 15px 0;
+    position: relative; 
+    width: 100%;
+    z-index: 1000;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.05);
     }
-    .navbar-brand { color: #0d6efd !important; font-weight: 700; } /* สีหัวข้อเป็นสีฟ้า */
+    .navbar-brand { color: #0d6efd !important; font-weight: 700; }
 
-    /* วงกลมตัวเลข (Step) */
+    /* ✅ กล่องขาวสำหรับเนื้อหา (Manual Box) */
+    .manual-box {
+        background-color: rgba(255, 255, 255, 0.92); /* สีขาวโปร่งแสงนิดๆ */
+        backdrop-filter: blur(15px);
+        border-radius: 20px;
+        box-shadow: 0 10px 40px rgba(0,0,0,0.2); /* เงานุ่มๆ */
+        padding: 40px;
+        margin-bottom: 50px;
+        border: 1px solid rgba(255,255,255,0.5);
+    }
+
+    /* Step Circle */
     .step-circle {
       width: 50px; height: 50px;
-      background: linear-gradient(45deg, #0d6efd, #0dcaf0); /* สีฟ้าไล่ระดับ */
+      background: linear-gradient(45deg, #0d6efd, #0dcaf0);
       color: white;
       border-radius: 50%;
       display: flex; align-items: center; justify-content: center;
@@ -56,18 +71,7 @@ require_once 'config.php';
       box-shadow: 0 4px 10px rgba(13, 110, 253, 0.3);
     }
 
-    /* กล่องรูปภาพ */
-    .screenshot-box {
-      border: 2px dashed #0d6efd;
-      background-color: #fff;
-      border-radius: 10px;
-      padding: 20px;
-      text-align: center;
-      margin: 20px 0;
-      color: #aaa;
-    }
-
-    /* Effect รูปภาพ */
+    /* รูปภาพ Effect */
     .img-hover-zoom {
       transition: transform 0.5s ease, box-shadow 0.5s ease;
       border: 1px solid #dee2e6;
@@ -77,7 +81,7 @@ require_once 'config.php';
       box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15) !important;
     }
 
-    /* ปุ่มเลือกหัวข้อ (Tabs) */
+    /* Tabs Design */
     .nav-pills .nav-link {
       color: #6c757d;
       background-color: #fff;
@@ -87,12 +91,11 @@ require_once 'config.php';
       transition: all 0.3s;
       border: 1px solid #dee2e6;
     }
-
     .nav-pills .nav-link:hover {
-      background-color: #e9ecef;
+      background-color: #f8f9fa;
       color: #0d6efd;
+      transform: translateY(-2px);
     }
-
     .nav-pills .nav-link.active {
       background: linear-gradient(45deg, #0d6efd, #0dcaf0);
       color: white;
@@ -101,16 +104,16 @@ require_once 'config.php';
       transform: scale(1.05);
     }
 
-    /* Footer */
     footer {
-        background-color: #fff !important;
-        border-top: 1px solid #e9ecef;
+        background: rgba(255, 255, 255, 0.95);
+        backdrop-filter: blur(5px);
         color: #6c757d;
+        margin-top: auto;
     }
   </style>
 </head>
 
-<body>
+<body class="d-flex flex-column min-vh-100">
   <?php require_once 'loader.php'; ?>
   <div id="particles-js"></div>
 
@@ -128,126 +131,105 @@ require_once 'config.php';
 
   <div style="padding-top: 100px;"></div>
 
-  <div class="py-4 text-center mb-4" data-aos="zoom-in" data-aos-duration="1200">
-    <div class="container">
-      <div class="d-inline-block bg-primary bg-opacity-10 rounded-circle p-3 mb-3">
-        <i class="fa-solid fa-book-open fa-3x text-primary"></i>
-      </div>
-      <h2 class="fw-bold text-dark mb-2">คู่มือการใช้งานระบบ</h2>
-      <p class="text-secondary">เรียนรู้วิธีการใช้งานระบบยืม-คืนหนังสือเรียนฟรี ง่ายๆ ใน 3 นาที</p>
-    </div>
-  </div>
-
-  <div class="container mb-5">
-    <div class="row justify-content-center">
-      <div class="col-lg-10">
-
-        <ul class="nav nav-pills mb-5 justify-content-center" id="pills-tab" role="tablist" 
-            data-aos="fade-up" data-aos-delay="200" data-aos-duration="1000">
-          <li class="nav-item">
-            <button class="nav-link active fw-bold" data-bs-toggle="pill" data-bs-target="#step1">
-              1. การเข้าสู่ระบบ
-            </button>
-          </li>
-          <li class="nav-item">
-            <button class="nav-link fw-bold" data-bs-toggle="pill" data-bs-target="#step2">
-              2. การค้นหาและยืม
-            </button>
-          </li>
-          <li class="nav-item">
-            <button class="nav-link fw-bold" data-bs-toggle="pill" data-bs-target="#step3">
-              3. ตรวจสอบประวัติ
-            </button>
-          </li>
-        </ul>
-
-        <div class="tab-content" id="pills-tabContent" data-aos="fade-up" data-aos-delay="400" data-aos-duration="1000">
-
-          <div class="tab-pane fade show active" id="step1">
-            <div class="card border-0 shadow rounded-4 p-4 p-lg-5 bg-white">
-              <div class="d-flex align-items-center mb-4 border-bottom pb-3">
-                <div class="step-circle">1</div>
-                <div>
-                    <h4 class="fw-bold m-0 text-dark">การเข้าสู่ระบบ (Login)</h4>
-                    <small class="text-muted">ขั้นตอนแรกสำหรับการใช้งาน</small>
-                </div>
-              </div>
-              
-              <div class="alert alert-primary bg-primary bg-opacity-10 border-0 rounded-3 text-primary">
-                <i class="fas fa-info-circle me-2"></i> หากท่านยังไม่มีบัญชี ให้ติดต่อเจ้าหน้าที่ห้องสมุดเพื่อขอรับรหัสนักเรียน
-              </div>
-              
-              <h6 class="fw-bold mt-4 text-dark">1.1 กรอกข้อมูลเพื่อยืนยันตัวตน</h6>
-              <p class="text-secondary">ท่านต้องการเข้าใช้งาน ให้ท่านกรอก <strong>รหัสนักเรียน</strong> และ <strong>รหัสผ่าน</strong> ลงในช่องให้ครบถ้วน แล้วกดปุ่ม "เข้าสู่ระบบ"</p>
-              
-              <div class="mt-4 text-center">
-                  <img src="images/manual_login1.png" class="img-fluid rounded shadow-sm img-hover-zoom" alt="หน้า Login" style="max-width: 80%;">
-              </div>
+  <div class="container flex-grow-1">
+    
+    <div class="manual-box" data-aos="zoom-in" data-aos-duration="1000">
+        
+        <div class="text-center mb-5">
+            <div class="d-inline-block bg-primary bg-opacity-10 rounded-circle p-3 mb-3">
+                <i class="fa-solid fa-book-open fa-3x text-primary"></i>
             </div>
-          </div>
-
-          <div class="tab-pane fade" id="step2">
-            <div class="card border-0 shadow rounded-4 p-4 p-lg-5 bg-white">
-              <div class="d-flex align-items-center mb-4 border-bottom pb-3">
-                <div class="step-circle">2</div>
-                <div>
-                    <h4 class="fw-bold m-0 text-dark">การค้นหาและยืมหนังสือ</h4>
-                    <small class="text-muted">ค้นหาหนังสือที่ต้องการได้อย่างรวดเร็ว</small>
-                </div>
-              </div>
-
-              <h6 class="fw-bold mt-3 text-dark">2.1 ค้นหาหนังสือที่ต้องการ</h6>
-              <p class="text-secondary">พิมพ์ชื่อหนังสือ, รหัสวิชา หรือชื่อผู้แต่ง ในช่อง <strong>"ค้นหา"</strong> ระบบจะแสดงผลทันทีแบบ Real-time</p>
-
-              <div class="mt-3 mb-5 text-center">
-                <img src="images/index2.png" class="img-fluid rounded shadow-sm img-hover-zoom" alt="หน้า index" style="max-width: 90%;">
-              </div>
-
-              <h6 class="fw-bold mt-4 text-dark">2.2 ดูรายละเอียดและกดขอยืม</h6>
-              <ul class="text-secondary">
-                <li>คลิกที่ <strong>รูปปกหนังสือ</strong> หรือปุ่ม <strong>รายละเอียด</strong> เพื่อดูข้อมูลเพิ่มเติม</li>
-                <li>หากสถานะหนังสือเป็น <span class="badge bg-success">ว่าง</span> ให้กดปุ่ม <strong>"ยืมหนังสือ"</strong></li>
-              </ul>
-
-              <div class="mt-3 text-center">
-                <img src="images/manual_borrow1.png" class="img-fluid rounded shadow-sm img-hover-zoom" alt="หน้า Modal" style="max-width: 60%;">
-              </div>
-            </div>
-          </div>
-
-          <div class="tab-pane fade" id="step3">
-            <div class="card border-0 shadow rounded-4 p-4 p-lg-5 bg-white">
-              <div class="d-flex align-items-center mb-4 border-bottom pb-3">
-                <div class="step-circle">3</div>
-                <div>
-                    <h4 class="fw-bold m-0 text-dark">การตรวจสอบประวัติ</h4>
-                    <small class="text-muted">เช็ครายการที่ยืมและวันกำหนดส่งคืน</small>
-                </div>
-              </div>
-
-              <ul class="list-group list-group-flush mb-4">
-                <li class="list-group-item border-0 ps-0"><i class="fa-solid fa-circle-check text-primary me-2"></i> กดที่เมนู <strong>"ประวัติการยืม"</strong> ในหน้าหลัก</li>
-                
-                <div class="my-3 text-center">
-                    <img src="images/index1.png" class="img-fluid rounded shadow-sm img-hover-zoom" alt="ปุ่มประวัติ" style="max-width: 80%;">
-                </div>
-                
-                <li class="list-group-item border-0 ps-0"><i class="fa-solid fa-circle-check text-primary me-2"></i> ระบบจะแสดงรายการหนังสือทั้งหมด พร้อม <strong>"วันกำหนดส่ง"</strong></li>
-                <li class="list-group-item border-0 ps-0"><i class="fa-solid fa-circle-check text-danger me-2"></i> หากเกินกำหนดส่ง ระบบจะแจ้งเตือนเป็นสถานะสีแดง</li>
-                
-                <div class="mt-3 text-center">
-                    <img src="images/history.png" class="img-fluid rounded shadow-sm img-hover-zoom" alt="หน้า history" style="max-width: 90%;">
-                </div>
-              </ul>
-            </div>
-          </div>
-
+            <h2 class="fw-bold text-dark mb-2">คู่มือการใช้งานระบบ</h2>
+            <p class="text-secondary">เรียนรู้วิธีการใช้งานระบบยืม-คืนหนังสือเรียนฟรี ง่ายๆ ใน 3 นาที</p>
         </div>
-      </div>
-    </div>
-  </div>
 
-  <footer class="text-center py-4 mt-5">
+        <div class="row justify-content-center">
+            <div class="col-lg-10">
+                
+                <ul class="nav nav-pills mb-4 justify-content-center" id="pills-tab" role="tablist">
+                    <li class="nav-item">
+                        <button class="nav-link active fw-bold" data-bs-toggle="pill" data-bs-target="#step1">1. การเข้าสู่ระบบ</button>
+                    </li>
+                    <li class="nav-item">
+                        <button class="nav-link fw-bold" data-bs-toggle="pill" data-bs-target="#step2">2. การค้นหาและยืม</button>
+                    </li>
+                    <li class="nav-item">
+                        <button class="nav-link fw-bold" data-bs-toggle="pill" data-bs-target="#step3">3. ตรวจสอบประวัติ</button>
+                    </li>
+                </ul>
+
+                <div class="tab-content" id="pills-tabContent">
+                    
+                    <div class="tab-pane fade show active" id="step1">
+                        <div class="border-start border-4 border-primary ps-4 py-2 mb-4 bg-light rounded-end">
+                            <h4 class="fw-bold m-0 text-dark">การเข้าสู่ระบบ (Login)</h4>
+                            <small class="text-muted">ขั้นตอนแรกสำหรับการใช้งาน</small>
+                        </div>
+                        
+                        <div class="alert alert-info border-0 rounded-3 shadow-sm">
+                            <i class="fas fa-info-circle me-2"></i> หากท่านยังไม่มีบัญชี ให้ติดต่อเจ้าหน้าที่ห้องสมุดเพื่อขอรับรหัสนักเรียน
+                        </div>
+
+                        <p class="mt-3 text-secondary">กรอก <strong>รหัสนักเรียน</strong> และ <strong>รหัสผ่าน</strong> ของท่านลงในช่องให้ครบถ้วน แล้วกดปุ่ม "เข้าสู่ระบบ"</p>
+                        
+                        <div class="text-center mt-4">
+                            <img src="images/manual_login1.png" class="img-fluid rounded shadow img-hover-zoom" alt="Login" style="max-width: 80%;">
+                        </div>
+                    </div>
+
+                    <div class="tab-pane fade" id="step2">
+                        <div class="border-start border-4 border-primary ps-4 py-2 mb-4 bg-light rounded-end">
+                            <h4 class="fw-bold m-0 text-dark">การค้นหาและยืมหนังสือ</h4>
+                            <small class="text-muted">ค้นหาหนังสือที่ต้องการได้อย่างรวดเร็ว</small>
+                        </div>
+
+                        <h6 class="fw-bold text-primary"><i class="fas fa-search me-2"></i>2.1 ค้นหาหนังสือ</h6>
+                        <p class="text-secondary ms-4">พิมพ์ชื่อหนังสือ, รหัสวิชา หรือชื่อผู้แต่ง ในช่องค้นหา ระบบจะแสดงผลทันที</p>
+                        <div class="text-center mb-5">
+                            <img src="images/index2.png" class="img-fluid rounded shadow img-hover-zoom" alt="Search" style="max-width: 90%;">
+                        </div>
+
+                        <h6 class="fw-bold text-primary"><i class="fas fa-hand-holding-heart me-2"></i>2.2 กดขอยืม</h6>
+                        <p class="text-secondary ms-4">หากสถานะหนังสือเป็น <span class="badge bg-success">ว่าง</span> ให้กดปุ่ม <strong>"ยืมหนังสือ"</strong> สีเขียว</p>
+                        <div class="text-center">
+                            <img src="images/manual_borrow1.png" class="img-fluid rounded shadow img-hover-zoom" alt="Borrow" style="max-width: 60%;">
+                        </div>
+                    </div>
+
+                    <div class="tab-pane fade" id="step3">
+                        <div class="border-start border-4 border-primary ps-4 py-2 mb-4 bg-light rounded-end">
+                            <h4 class="fw-bold m-0 text-dark">การตรวจสอบประวัติ</h4>
+                            <small class="text-muted">เช็ครายการที่ยืมและวันกำหนดส่งคืน</small>
+                        </div>
+
+                        <div class="row g-4">
+                            <div class="col-md-6">
+                                <div class="card h-100 border-0 shadow-sm">
+                                    <div class="card-body">
+                                        <h6 class="fw-bold text-primary">1. เข้าเมนูประวัติ</h6>
+                                        <p class="small text-secondary">กดที่เมนู "ประวัติการยืม" ด้านบน</p>
+                                        <img src="images/index1.png" class="img-fluid rounded border mt-2" alt="History Menu">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="card h-100 border-0 shadow-sm">
+                                    <div class="card-body">
+                                        <h6 class="fw-bold text-danger">2. ตรวจสอบวันคืน</h6>
+                                        <p class="small text-secondary">ระบบจะแจ้งเตือนหากเกินกำหนดส่ง</p>
+                                        <img src="images/history.png" class="img-fluid rounded border mt-2" alt="History Table">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div> </div>
+
+  <footer class="text-center py-4 border-top">
     <div class="container">
       <small class="text-muted">&copy; 2025 TEXTBOOK BORROWING SYSTEM. All rights reserved.</small>
     </div>
@@ -258,28 +240,21 @@ require_once 'config.php';
   <script src="https://cdn.jsdelivr.net/npm/particles.js@2.0.0/particles.min.js"></script>
 
   <script>
-    // เริ่มต้น AOS
-    AOS.init({
-      duration: 800,
-      easing: 'ease-out-cubic',
-      once: true
-    });
-
-    // เริ่มต้น Particles (เปลี่ยนเป็นสีฟ้า)
+    AOS.init({ duration: 800, easing: 'ease-out-cubic', once: true });
     particlesJS("particles-js", {
       "particles": {
         "number": { "value": 60, "density": { "enable": true, "value_area": 800 } },
-        "color": { "value": "#0d6efd" }, /* สีฟ้า */
-        "shape": { "type": "circle", "stroke": { "width": 0, "color": "#000000" }, "polygon": { "nb_sides": 5 } },
-        "opacity": { "value": 0.5, "random": true, "anim": { "enable": false, "speed": 1, "opacity_min": 0.1, "sync": false } },
-        "size": { "value": 3, "random": true, "anim": { "enable": false, "speed": 40, "size_min": 0.1, "sync": false } },
-        "line_linked": { "enable": true, "distance": 150, "color": "#0d6efd", "opacity": 0.2, "width": 1 }, /* เส้นสีฟ้าจางๆ */
-        "move": { "enable": true, "speed": 2, "direction": "none", "random": false, "straight": false, "out_mode": "out", "bounce": false }
+        "color": { "value": "#0d6efd" },
+        "shape": { "type": "circle" },
+        "opacity": { "value": 0.5, "random": true },
+        "size": { "value": 3, "random": true },
+        "line_linked": { "enable": true, "distance": 150, "color": "#0d6efd", "opacity": 0.2, "width": 1 },
+        "move": { "enable": true, "speed": 2 }
       },
       "interactivity": {
         "detect_on": "canvas",
-        "events": { "onhover": { "enable": true, "mode": "grab" }, "onclick": { "enable": true, "mode": "push" }, "resize": true },
-        "modes": { "grab": { "distance": 140, "line_linked": { "opacity": 1 } }, "bubble": { "distance": 400, "size": 40, "duration": 2, "opacity": 8, "speed": 3 }, "repulse": { "distance": 200, "duration": 0.4 }, "push": { "particles_nb": 4 }, "remove": { "particles_nb": 2 } }
+        "events": { "onhover": { "enable": true, "mode": "grab" }, "onclick": { "enable": true, "mode": "push" } },
+        "modes": { "grab": { "distance": 140, "line_linked": { "opacity": 1 } }, "push": { "particles_nb": 4 } }
       },
       "retina_detect": true
     });
