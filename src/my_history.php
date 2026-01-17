@@ -281,7 +281,7 @@ if ($role == 'admin') {
         // ✅ ตั้งค่า Particles สีฟ้า
         particlesJS("particles-js", {
             "particles": {
-                "number": { "value": 60, "density": { "enable": true, "value_area": 800 } },
+                "number": { "value": 160, "density": { "enable": true, "value_area": 800 } },
                 "color": { "value": "#0d6efd" }, /* สีฟ้า */
                 "shape": { "type": "circle" },
                 "opacity": { "value": 0.5, "random": true },

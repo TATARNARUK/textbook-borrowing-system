@@ -9,7 +9,9 @@ services:
       - "8099:80" 
     volumes:
       - ./src:/var/www/html
-      - ./uploads:/var/www/html/uploads # โฟลเดอร์ src ในเครื่องเรา คือหน้าเว็บ
+      - ./uploads:/var/www/html/uploads
+      # ✅ เพิ่มบรรทัดนี้เข้าไปครับ
+      - ./php.ini:/usr/local/etc/php/conf.d/custom.ini
       
     networks:
       - lib-network
@@ -22,8 +24,8 @@ services:
     image: mysql:8.0
     container_name: lib_db
     environment:
-      MYSQL_ROOT_PASSWORD: rootpassword # รหัสผ่าน Root
-      MYSQL_DATABASE: library_db      # ชื่อฐานข้อมูล
+      MYSQL_ROOT_PASSWORD: rootpassword
+      MYSQL_DATABASE: library_db
       MYSQL_USER: user
       MYSQL_PASSWORD: password
     volumes:
@@ -38,7 +40,7 @@ services:
     links:
       - db
     ports:
-      - "8083:80" # เข้าจัดการ Database ผ่าน http://localhost:8081
+      - "8083:80"
     environment:
       PMA_HOST: db
       MYSQL_ROOT_PASSWORD: rootpassword

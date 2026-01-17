@@ -2,56 +2,73 @@
 session_start();
 require_once 'config.php';
 
-// 1. ตรวจสอบว่าล็อกอินหรือยัง
+// 1. เช็คว่า Login หรือยัง
 if (!isset($_SESSION['user_id'])) {
     header("Location: login.php");
     exit();
 }
 
-if (isset($_GET['id'])) {
-    $user_id = $_SESSION['user_id'];
-    $master_id = $_GET['id']; // รับ ID หนังสือแม่แบบที่ต้องการยืม
+if (!isset($_GET['id'])) {
+    header("Location: index.php");
+    exit();
+}
 
-    try {
-        // เริ่มต้น Transaction (เพื่อให้การทำงานเชื่อมโยงกัน พลาดจุดหนึ่งให้ยกเลิกทั้งหมด)
+$user_id = $_SESSION['user_id'];
+$book_master_id = $_GET['id'];
+
+try {
+    // ---------------------------------------------------------
+    // 🛑 Step 2: เช็คว่า "ยืมซ้ำ" หรือไม่? (Logic ใหม่)
+    // ---------------------------------------------------------
+    // เช็คในตาราง transactions ว่า user คนนี้ ยืมหนังสือรหัส master นี้ และยังไม่คืน (status='borrowed') หรือไม่
+    $checkDup = $pdo->prepare("
+        SELECT COUNT(*) FROM transactions t
+        JOIN book_items bi ON t.book_item_id = bi.id
+        WHERE t.user_id = ? 
+        AND bi.book_master_id = ? 
+        AND t.status = 'borrowed'
+    ");
+    $checkDup->execute([$user_id, $book_master_id]);
+    $is_duplicate = $checkDup->fetchColumn();
+
+    if ($is_duplicate > 0) {
+        // ถ้ายืมอยู่แล้ว ให้ดีดกลับไปพร้อม status = duplicate
+        header("Location: index.php?status=duplicate");
+        exit();
+    }
+
+    // ---------------------------------------------------------
+    // Step 3: เช็คว่ามีของว่างไหม (หาเล่มที่ available)
+    // ---------------------------------------------------------
+    $stmt = $pdo->prepare("SELECT id FROM book_items WHERE book_master_id = ? AND status = 'available' LIMIT 1");
+    $stmt->execute([$book_master_id]);
+    $item = $stmt->fetch();
+
+    if ($item) {
+        $book_item_id = $item['id'];
+        
+        // เริ่ม Transaction (เพื่อให้ทำงานพร้อมกัน ถ้าพลาดให้ rollback)
         $pdo->beginTransaction();
 
-        // 2. ค้นหาหนังสือเล่มที่ "ว่าง" (Available) มา 1 เล่ม (เรียงตาม id น้อยสุดก่อน)
-        $stmt = $pdo->prepare("SELECT id, book_code FROM book_items WHERE book_master_id = ? AND status = 'available' LIMIT 1");
-        $stmt->execute([$master_id]);
-        $item = $stmt->fetch();
+        // 3.1 อัพเดทสถานะเล่มหนังสือเป็น borrowed
+        $updateItem = $pdo->prepare("UPDATE book_items SET status = 'borrowed' WHERE id = ?");
+        $updateItem->execute([$book_item_id]);
 
-        if ($item) {
-            $item_id = $item['id'];
+        // 3.2 สร้างรายการยืมใน transactions (กำหนดคืนอีก 7 วัน)
+        $return_due = date('Y-m-d', strtotime('+7 days'));
+        $insertTrans = $pdo->prepare("INSERT INTO transactions (user_id, book_item_id, borrow_date, due_date, status) VALUES (?, ?, NOW(), ?, 'borrowed')");
+        $insertTrans->execute([$user_id, $book_item_id, $return_due]);
 
-            // 3. บันทึกลงตาราง transactions (ประวัติการยืม)
-            // กำหนดคืน 7 วัน (INTERVAL 7 DAY)
-            $sqlTrans = "INSERT INTO transactions (user_id, book_item_id, borrow_date, due_date, status) 
-                         VALUES (:uid, :bid, NOW(), DATE_ADD(NOW(), INTERVAL 7 DAY), 'borrowed')";
-            $stmtTrans = $pdo->prepare($sqlTrans);
-            $stmtTrans->execute(['uid' => $user_id, 'bid' => $item_id]);
+        $pdo->commit(); // ยืนยันการทำงาน
 
-            // 4. อัปเดตสถานะหนังสือเล่มนั้นเป็น "ถูกยืม" (borrowed)
-            $sqlUpdate = $pdo->prepare("UPDATE book_items SET status = 'borrowed' WHERE id = ?");
-            $sqlUpdate->execute([$item_id]);
-
-            // ยืนยันการทำงานทั้งหมด
-            $pdo->commit();
-            
-            // ส่งค่ากลับไปบอกหน้าแรกว่าสำเร็จ
-            header("Location: index.php?status=success");
-
-        } else {
-            // กรณีหนังสือหมดพอดี (อาจมีคนกดตัดหน้า)
-            $pdo->rollBack();
-            header("Location: index.php?status=error");
-        }
-
-    } catch (Exception $e) {
-        $pdo->rollBack();
-        echo "Error: " . $e->getMessage();
+        header("Location: index.php?status=success");
+    } else {
+        // ถ้าหนังสือหมดพอดี
+        header("Location: index.php?status=error");
     }
-} else {
-    header("Location: index.php");
+
+} catch (Exception $e) {
+    $pdo->rollBack();
+    header("Location: index.php?status=error");
 }
 ?>

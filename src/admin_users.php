@@ -48,130 +48,62 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['reset_password'])) {
         /* --- 🎨 White & Blue Theme CSS --- */
         body {
             font-family: 'Noto Sans Thai', sans-serif;
-            background-color: #f0f4f8; /* พื้นหลังสีเทาอมฟ้าอ่อน */
-            background-image: radial-gradient(#dbeafe 1px, transparent 1px); /* ลายจุดจางๆ */
+            background-color: #f0f4f8;
+            background-image: radial-gradient(#dbeafe 1px, transparent 1px);
             background-size: 20px 20px;
             color: #333;
             overflow-x: hidden;
         }
 
-        #particles-js {
-            position: fixed; width: 100%; height: 100%; top: 0; left: 0; z-index: -1; pointer-events: none;
-        }
+        #particles-js { position: fixed; width: 100%; height: 100%; top: 0; left: 0; z-index: -1; pointer-events: none; }
 
         /* --- White Card --- */
         .glass-card {
-            background: #ffffff;
-            border: none;
-            border-radius: 20px;
-            box-shadow: 0 10px 40px rgba(13, 110, 253, 0.1); /* เงาสีฟ้าจางๆ */
-            padding: 30px;
-            position: relative;
-            z-index: 1;
+            background: #ffffff; border: none; border-radius: 20px;
+            box-shadow: 0 10px 40px rgba(13, 110, 253, 0.1); padding: 30px; position: relative; z-index: 1;
         }
 
-        /* --- Table Styling (Light Theme) --- */
-        .table-custom {
-            width: 100%;
-            border-collapse: separate;
-            border-spacing: 0 10px;
-        }
-
+        /* --- Table Styling --- */
+        .table-custom { width: 100%; border-collapse: separate; border-spacing: 0 10px; }
         .table-custom thead th {
-            background-color: #e7f1ff;
-            color: #0d6efd;
-            font-size: 0.85rem;
-            font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            border-bottom: none;
-            padding: 15px;
+            background-color: #e7f1ff; color: #0d6efd; font-size: 0.85rem; font-weight: 700;
+            text-transform: uppercase; letter-spacing: 1px; border-bottom: none; padding: 15px;
         }
-        /* มุมโค้งหัวตาราง */
         .table-custom thead th:first-child { border-top-left-radius: 10px; border-bottom-left-radius: 10px; }
         .table-custom thead th:last-child { border-top-right-radius: 10px; border-bottom-right-radius: 10px; }
-
-        .table-custom tbody tr {
-            background-color: #fff;
-            transition: all 0.2s;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.02);
-        }
-
-        .table-custom tbody tr:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(13, 110, 253, 0.1);
-            background-color: #f8f9fa;
-        }
-
-        .table-custom td {
-            border: 1px solid #f0f0f0;
-            border-width: 1px 0;
-            padding: 15px;
-            vertical-align: middle;
-            color: #555;
-        }
+        .table-custom tbody tr { background-color: #fff; transition: all 0.2s; box-shadow: 0 2px 5px rgba(0,0,0,0.02); }
+        .table-custom tbody tr:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(13, 110, 253, 0.1); background-color: #f8f9fa; }
+        .table-custom td { border: 1px solid #f0f0f0; border-width: 1px 0; padding: 15px; vertical-align: middle; color: #555; }
         .table-custom td:first-child { border-left: 1px solid #f0f0f0; border-top-left-radius: 10px; border-bottom-left-radius: 10px; }
         .table-custom td:last-child { border-right: 1px solid #f0f0f0; border-top-right-radius: 10px; border-bottom-right-radius: 10px; }
 
         /* --- DataTables Overrides --- */
-        .dataTables_wrapper .dataTables_length,
-        .dataTables_wrapper .dataTables_filter,
-        .dataTables_wrapper .dataTables_info,
-        .dataTables_wrapper .dataTables_paginate {
-            color: #6c757d !important;
-            margin-top: 15px;
-            font-size: 0.9rem;
+        .dataTables_wrapper .dataTables_length, .dataTables_wrapper .dataTables_filter, .dataTables_wrapper .dataTables_info, .dataTables_wrapper .dataTables_paginate {
+            color: #6c757d !important; margin-top: 15px; font-size: 0.9rem;
         }
-        
-        .page-item.active .page-link {
-            background-color: #0d6efd;
-            border-color: #0d6efd;
-            color: #fff;
-        }
+        .page-item.active .page-link { background-color: #0d6efd; border-color: #0d6efd; color: #fff; }
         .page-link { color: #0d6efd; }
 
-        /* --- Badges --- */
-        .role-badge {
-            padding: 5px 12px; border-radius: 50px; font-size: 0.75rem; font-weight: 600; letter-spacing: 0.5px;
-        }
+        /* --- Badges & Buttons --- */
+        .role-badge { padding: 5px 12px; border-radius: 50px; font-size: 0.75rem; font-weight: 600; letter-spacing: 0.5px; }
         .role-admin { background: #f8d7da; color: #842029; border: 1px solid #f5c2c7; }
         .role-user { background: #d1e7dd; color: #0f5132; border: 1px solid #badbcc; }
 
-        /* --- Buttons --- */
-        .btn-custom-primary {
-            background: linear-gradient(45deg, #0d6efd, #0dcaf0);
-            color: #fff; border: none; font-weight: 600;
-            border-radius: 10px; padding: 8px 20px;
-            transition: all 0.3s;
-            box-shadow: 0 4px 6px rgba(13, 110, 253, 0.2);
-        }
-        .btn-custom-primary:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 12px rgba(13, 110, 253, 0.3);
-            color: #fff;
-        }
-
-        .btn-outline-custom {
-            background: transparent; color: #0d6efd; border: 1px solid #0d6efd;
-            border-radius: 10px; font-weight: 600;
-            transition: all 0.3s;
-        }
+        .btn-custom-primary { background: linear-gradient(45deg, #0d6efd, #0dcaf0); color: #fff; border: none; font-weight: 600; border-radius: 10px; padding: 8px 20px; transition: all 0.3s; box-shadow: 0 4px 6px rgba(13, 110, 253, 0.2); }
+        .btn-custom-primary:hover { transform: translateY(-2px); box-shadow: 0 6px 12px rgba(13, 110, 253, 0.3); color: #fff; }
+        
+        .btn-outline-custom { background: transparent; color: #0d6efd; border: 1px solid #0d6efd; border-radius: 10px; font-weight: 600; transition: all 0.3s; }
         .btn-outline-custom:hover { background: #0d6efd; color: #fff; }
 
-        .btn-icon-only {
-            width: 35px; height: 35px; border-radius: 50%;
-            display: inline-flex; align-items: center; justify-content: center;
-            background: #e7f1ff; color: #0d6efd;
-            border: none; transition: all 0.3s;
-        }
-        .btn-icon-only:hover {
-            background: #0d6efd; color: #fff; transform: scale(1.1);
-        }
+        .btn-icon-only { width: 35px; height: 35px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; background: #e7f1ff; color: #0d6efd; border: none; transition: all 0.3s; }
+        .btn-icon-only:hover { background: #0d6efd; color: #fff; transform: scale(1.1); }
+
+        /* Link Hover Effect */
+        .user-link { cursor: pointer; text-decoration: none; color: #333; transition: 0.2s; }
+        .user-link:hover { color: #0d6efd; text-decoration: underline; }
 
         /* --- Modal --- */
-        .modal-content {
-            border-radius: 15px; border: none; box-shadow: 0 10px 40px rgba(0,0,0,0.2);
-        }
+        .modal-content { border-radius: 15px; border: none; box-shadow: 0 10px 40px rgba(0,0,0,0.2); }
         .modal-header { background-color: #0d6efd; color: white; border-top-left-radius: 15px; border-top-right-radius: 15px; }
         .btn-close { filter: invert(1); }
     </style>
@@ -206,7 +138,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['reset_password'])) {
                     <thead>
                         <tr>
                             <th width="20%">USERNAME / ID</th>
-                            <th width="30%">FULL NAME</th>
+                            <th width="30%">FULL NAME (CLICK TO VIEW HISTORY)</th>
                             <th width="20%">PHONE</th>
                             <th width="15%">ROLE</th>
                             <th width="15%" class="text-center">ACTION</th>
@@ -226,7 +158,9 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['reset_password'])) {
                                         <div class="bg-primary bg-opacity-10 rounded-circle me-2 d-flex justify-content-center align-items-center" style="width:35px; height:35px;">
                                             <i class="fa-regular fa-user text-primary"></i>
                                         </div>
-                                        <span class="fw-bold text-dark"><?php echo $row['fullname']; ?></span>
+                                        <span class="fw-bold user-link" onclick="openHistoryModal(<?php echo $row['id']; ?>, '<?php echo htmlspecialchars($row['fullname']); ?>')">
+                                            <?php echo $row['fullname']; ?> <i class="fa-solid fa-circle-info text-primary small ms-1 opacity-50"></i>
+                                        </span>
                                     </div>
                                 </td>
                                 <td><?php echo $row['phone'] ? $row['phone'] : '<span class="text-muted small">-</span>'; ?></td>
@@ -256,16 +190,13 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['reset_password'])) {
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title fw-bold">
-                        <i class="fa-solid fa-lock me-2"></i> RESET PASSWORD
-                    </h5>
+                    <h5 class="modal-title fw-bold"><i class="fa-solid fa-lock me-2"></i> RESET PASSWORD</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
                 <form method="POST">
                     <div class="modal-body p-4">
                         <input type="hidden" name="reset_password" value="1">
                         <input type="hidden" name="user_id" id="modal_user_id">
-
                         <div class="text-center mb-4">
                             <div class="bg-primary bg-opacity-10 d-inline-block rounded-circle p-3 mb-2">
                                 <i class="fa-solid fa-user-lock fa-2x text-primary"></i>
@@ -273,11 +204,9 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['reset_password'])) {
                             <div class="text-muted small mb-1">กำลังเปลี่ยนรหัสผ่านให้</div>
                             <h5 class="text-dark fw-bold" id="modal_user_name">...</h5>
                         </div>
-
                         <div class="mb-3">
                             <label class="text-secondary fw-bold small mb-2">NEW PASSWORD</label>
                             <input type="text" name="new_pass" class="form-control" required placeholder="กรอกรหัสผ่านใหม่..." autocomplete="off">
-                            <div class="form-text text-muted mt-2">* กรอกรหัสใหม่ที่ต้องการให้ผู้ใช้งาน</div>
                         </div>
                     </div>
                     <div class="modal-footer bg-light">
@@ -285,6 +214,25 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['reset_password'])) {
                         <button type="submit" class="btn btn-primary rounded-pill btn-sm fw-bold px-4">บันทึกการเปลี่ยนแปลง</button>
                     </div>
                 </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="historyModal" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered modal-lg"> <div class="modal-content">
+                <div class="modal-header bg-primary text-white">
+                    <h5 class="modal-title fw-bold"><i class="fa-solid fa-clock-rotate-left me-2"></i> ประวัติการยืม-คืน</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body p-4">
+                    <h5 class="text-primary fw-bold mb-3" id="history_user_name">...</h5>
+                    <div id="history_content" class="text-center">
+                        <div class="spinner-border text-primary" role="status"><span class="visually-hidden">Loading...</span></div>
+                    </div>
+                </div>
+                <div class="modal-footer bg-light">
+                    <button type="button" class="btn btn-secondary rounded-pill btn-sm px-3" data-bs-dismiss="modal">ปิดหน้าต่าง</button>
+                </div>
             </div>
         </div>
     </div>
@@ -300,36 +248,19 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['reset_password'])) {
     <script>
         AOS.init({ duration: 800, once: true });
 
-        // Particles สีฟ้า
         particlesJS("particles-js", {
-            "particles": {
-                "number": { "value": 60 },
-                "color": { "value": "#0d6efd" },
-                "shape": { "type": "circle" },
-                "opacity": { "value": 0.5, "random": true },
-                "size": { "value": 3, "random": true },
-                "line_linked": { "enable": true, "distance": 150, "color": "#0d6efd", "opacity": 0.2, "width": 1 },
-                "move": { "enable": true, "speed": 2 }
-            },
-            "interactivity": { "detect_on": "canvas", "events": { "onhover": { "enable": false } } },
-            "retina_detect": true
+            "particles": { "number": { "value": 160 }, "color": { "value": "#0d6efd" }, "shape": { "type": "circle" }, "opacity": { "value": 0.5, "random": true }, "size": { "value": 3, "random": true }, "line_linked": { "enable": true, "distance": 150, "color": "#0d6efd", "opacity": 0.2, "width": 1 }, "move": { "enable": true, "speed": 2 } },
+            "interactivity": { "detect_on": "canvas", "events": { "onhover": { "enable": false } } }, "retina_detect": true
         });
 
-        // DataTable Config
         $(document).ready(function() {
             $('#userTable').DataTable({
-                language: {
-                    search: "ค้นหา:",
-                    lengthMenu: "แสดง _MENU_ รายการ",
-                    info: "แสดง _START_ ถึง _END_ จาก _TOTAL_ คน",
-                    paginate: { first: "หน้าแรก", last: "สุดท้าย", next: "ถัดไป", previous: "ก่อนหน้า" },
-                    zeroRecords: "ไม่พบข้อมูล"
-                },
+                language: { search: "ค้นหา:", lengthMenu: "แสดง _MENU_ รายการ", info: "แสดง _START_ ถึง _END_ จาก _TOTAL_ คน", paginate: { first: "หน้าแรก", last: "สุดท้าย", next: "ถัดไป", previous: "ก่อนหน้า" }, zeroRecords: "ไม่พบข้อมูล" },
                 dom: '<"d-flex justify-content-between mb-3"lf>rt<"d-flex justify-content-between mt-3"ip>'
             });
         });
 
-        // Modal Logic
+        // เปิด Modal เปลี่ยนรหัสผ่าน
         function openResetModal(id, name) {
             document.getElementById('modal_user_id').value = id;
             document.getElementById('modal_user_name').innerText = name;
@@ -337,7 +268,28 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['reset_password'])) {
             myModal.show();
         }
 
-        // SweetAlert (Light Theme)
+        // ✅ เปิด Modal ประวัติการยืม (AJAX)
+        function openHistoryModal(id, name) {
+            document.getElementById('history_user_name').innerText = 'ผู้ใช้งาน: ' + name;
+            document.getElementById('history_content').innerHTML = '<div class="spinner-border text-primary" role="status"><span class="visually-hidden">Loading...</span></div>';
+            
+            var myModal = new bootstrap.Modal(document.getElementById('historyModal'));
+            myModal.show();
+
+            // ส่ง AJAX ไปขอข้อมูล
+            $.ajax({
+                url: 'get_user_history.php',
+                type: 'POST',
+                data: { user_id: id },
+                success: function(response) {
+                    $('#history_content').html(response);
+                },
+                error: function() {
+                    $('#history_content').html('<p class="text-danger">เกิดข้อผิดพลาดในการโหลดข้อมูล</p>');
+                }
+            });
+        }
+
         <?php if ($message): ?>
             Swal.fire({
                 icon: '<?php echo $msg_type; ?>',

@@ -57,10 +57,11 @@ if (isset($_POST['student_id']) && isset($_POST['password'])) {
                 <i class="fas fa-user-graduate"></i>
                 <i class="fas fa-book"></i>
             </div>
-            <h1 class="fade-in-text fw-bold">Welcome To Website</h1>
+            <h1 class="fade-in-text fw-bold text-dark">Welcome To Website</h1>
             <h2 class="gradient-text">Textbook Borrowing System</h2>
-            <p class="text-white-50 mt-2" style="min-height: 30px; font-size: 1.1rem;">
-                <span id="typewriter-text"></span><span class="cursor">|</span>
+            
+            <p class="text-black mt-2 fw-bold" style="min-height: 30px; font-size: 1.1rem;">
+                <span id="typewriter-text"></span><span class="cursor" style="color: black;">|</span>
             </p>
         </div>
     </div>
@@ -145,8 +146,6 @@ if (isset($_POST['student_id']) && isset($_POST['password'])) {
 
     <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/particles.js@2.0.0/particles.min.js"></script>
-
-
 
      <script>
         document.addEventListener("DOMContentLoaded", function() {

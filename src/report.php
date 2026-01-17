@@ -32,24 +32,30 @@ $transactions = $stmt->fetchAll();
     <title>รายงานสรุปการยืม-คืน</title>
     <link rel="icon" type="image/png" href="images/books.png">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Thai:wght@300;400;600;700&display=swap" rel="stylesheet">
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
 
     <style>
         /* --- 🎨 White & Blue Theme CSS --- */
         body {
-            font-family: 'Noto Sans Thai', sans-serif;
-            background-color: #f0f4f8; /* พื้นหลังสีเทาอมฟ้าอ่อน */
-            background-image: radial-gradient(#dbeafe 1px, transparent 1px); /* ลายจุดจางๆ */
+            /* ✅ 2. Apply Font */
+            font-family: 'Sarabun', sans-serif;
+            background-color: #f0f4f8; 
+            background-image: radial-gradient(#dbeafe 1px, transparent 1px);
             background-size: 20px 20px;
             color: #333;
             overflow-x: hidden;
+            font-size: 1.1rem; /* ปรับขนาดตัวอักษรให้อ่านง่ายขึ้นสำหรับ Sarabun */
         }
 
-       #particles-js {
-         position: fixed; width: 100%; height: 100%; top: 0; left: 0; z-index: -1; pointer-events: none;
-       }
+        #particles-js {
+          position: fixed; width: 100%; height: 100%; top: 0; left: 0; z-index: -1; pointer-events: none;
+        }
 
         /* White Card Panel */
         .glass-panel {
@@ -70,6 +76,7 @@ $transactions = $stmt->fetchAll();
             color: #333;
             border-radius: 10px;
             padding: 10px;
+            font-family: 'Sarabun', sans-serif; /* บังคับฟอนต์ใน Input */
         }
         .form-control:focus {
             background-color: #fff;
@@ -85,6 +92,7 @@ $transactions = $stmt->fetchAll();
             font-weight: 600; border-radius: 10px; padding: 10px 20px;
             transition: all 0.3s;
             box-shadow: 0 4px 6px rgba(13, 110, 253, 0.2);
+            font-family: 'Sarabun', sans-serif;
         }
         .btn-custom-primary:hover {
             transform: translateY(-2px);
@@ -95,6 +103,7 @@ $transactions = $stmt->fetchAll();
         .btn-outline-custom {
             background: transparent; color: #0d6efd; border: 1px solid #0d6efd;
             border-radius: 10px; font-weight: 600;
+            font-family: 'Sarabun', sans-serif;
         }
         .btn-outline-custom:hover {
             background: #0d6efd; color: #fff;
@@ -105,9 +114,9 @@ $transactions = $stmt->fetchAll();
             width: 100%; border-collapse: separate; border-spacing: 0 10px;
         }
         .table-custom thead th {
-            background-color: #e7f1ff; /* หัวตารางสีฟ้าอ่อน */
+            background-color: #e7f1ff; 
             color: #0d6efd;
-            font-size: 0.9rem;
+            font-size: 1rem; /* ปรับขนาดหัวตาราง */
             font-weight: 700;
             letter-spacing: 0.5px; border: none; padding: 15px;
         }
@@ -126,13 +135,14 @@ $transactions = $stmt->fetchAll();
         .table-custom td {
             border: 1px solid #f0f0f0; border-width: 1px 0;
             padding: 15px; vertical-align: middle; color: #555;
+            font-size: 1.05rem; /* ปรับขนาดเนื้อหาตาราง */
         }
         .table-custom td:first-child { border-left: 1px solid #f0f0f0; border-top-left-radius: 10px; border-bottom-left-radius: 10px; }
         .table-custom td:last-child { border-right: 1px solid #f0f0f0; border-top-right-radius: 10px; border-bottom-right-radius: 10px; }
 
         /* Status Badges */
         .status-pill {
-            padding: 4px 12px; border-radius: 50px; font-size: 0.8rem; font-weight: 600;
+            padding: 4px 12px; border-radius: 50px; font-size: 0.9rem; font-weight: 600;
         }
         .st-borrow { background: #fff3cd; color: #856404; border: 1px solid #ffeeba; }
         .st-return { background: #d1e7dd; color: #0f5132; border: 1px solid #badbcc; }
@@ -140,7 +150,12 @@ $transactions = $stmt->fetchAll();
 
         /* --- 🖨️ PRINT MODE (Clean White) --- */
         @media print {
-            body { background-color: #fff !important; color: #000 !important; }
+            body { 
+                background-color: #fff !important; 
+                color: #000 !important; 
+                font-family: 'Sarabun', sans-serif !important; /* บังคับใช้ Sarabun ตอนปริ้น */
+                font-size: 16pt !important; /* ขนาดมาตรฐานเอกสารราชการ */
+            }
             #particles-js, .no-print, .btn, header, nav { display: none !important; }
             
             .glass-panel {
@@ -148,17 +163,22 @@ $transactions = $stmt->fetchAll();
                 box-shadow: none !important; padding: 0 !important; margin: 0 !important;
             }
 
-            .table-custom { border-collapse: collapse !important; border-spacing: 0 !important; }
+            .table-custom { border-collapse: collapse !important; border-spacing: 0 !important; width: 100%; }
             .table-custom th, .table-custom td {
-                border: 1px solid #000 !important; color: #000 !important; padding: 8px !important;
+                border: 1px solid #000 !important; 
+                color: #000 !important; 
+                padding: 8px !important;
+                font-size: 16pt !important;
             }
             .table-custom tbody tr { background: none !important; box-shadow: none !important; }
             
             /* Hide Badges Background for print clarity */
-            .status-pill { border: none !important; color: #000 !important; padding: 0 !important; }
+            .status-pill { border: none !important; color: #000 !important; padding: 0 !important; font-weight: normal; }
             
+            h2, h3, h4, p { color: #000 !important; }
+
             /* Page Setup */
-            @page { size: auto; margin: 10mm; }
+            @page { size: A4; margin: 2cm; }
             .container { max-width: 100% !important; padding: 0 !important; }
         }
     </style>
@@ -208,8 +228,8 @@ $transactions = $stmt->fetchAll();
         <div class="glass-panel" data-aos="fade-up" data-aos-delay="100">
             
             <div class="d-none d-print-block text-center mb-4">
-                <h2 class="fw-bold">รายงานสรุปการยืม-คืนหนังสือเรียน</h2>
-                <p>แผนกเทคโนโลยีสารสนเทศ (IT Textbook System)</p>
+                <h2 class="fw-bold mb-3">รายงานสรุปการยืม-คืนหนังสือเรียน</h2>
+                <p class="mb-1" style="font-size: 18pt;">แผนกเทคโนโลยีสารสนเทศ (IT Textbook System)</p>
                 <p class="small">ข้อมูลระหว่างวันที่: <?php echo date('d/m/Y', strtotime($start_date)); ?> ถึง <?php echo date('d/m/Y', strtotime($end_date)); ?></p>
             </div>
 
@@ -240,7 +260,7 @@ $transactions = $stmt->fetchAll();
                                 <td class="text-dark fw-bold"><?php echo $row['fullname']; ?></td>
                                 <td>
                                     <div class="text-primary fw-bold"><?php echo $row['title']; ?></div>
-                                    <small class="text-muted" style="font-size: 0.8rem;">รหัสเล่ม: <?php echo $row['book_code']; ?></small>
+                                    <small class="text-muted" style="font-size: 0.85rem;">รหัสเล่ม: <?php echo $row['book_code']; ?></small>
                                 </td>
                                 <td class="text-center">
                                     <?php if($is_borrowed): ?>
@@ -292,7 +312,7 @@ $transactions = $stmt->fetchAll();
         // Particles สีฟ้า (Blue)
         particlesJS("particles-js", {
             "particles": {
-                "number": { "value": 60, "density": { "enable": true, "value_area": 800 } },
+                "number": { "value": 160, "density": { "enable": true, "value_area": 800 } },
                 "color": { "value": "#0d6efd" }, /* สีฟ้า */
                 "shape": { "type": "circle" },
                 "opacity": { "value": 0.5, "random": true },

@@ -25,17 +25,23 @@ if (isset($_POST['delete_book'])) {
     if ($check_stock->fetchColumn() > 0) {
         $error_msg = "ลบไม่ได้! ยังมีหนังสือเล่มจริงเหลืออยู่ในสต็อก กรุณาลบเล่มในสต็อกออกให้หมดก่อน";
     } else {
-        // ลบรูปภาพเก่า (ถ้ามี)
-        $stmt_img = $pdo->prepare("SELECT cover_image FROM book_masters WHERE id = ?");
-        $stmt_img->execute([$id_book]);
-        $img = $stmt_img->fetchColumn();
-        if ($img && file_exists("uploads/" . $img)) {
-            unlink("uploads/" . $img);
+        // ดึงชื่อไฟล์รูปและ PDF เก่ามาลบ
+        $stmt_file = $pdo->prepare("SELECT cover_image, sample_pdf FROM book_masters WHERE id = ?");
+        $stmt_file->execute([$id_book]);
+        $files = $stmt_file->fetch();
+
+        // ลบรูป
+        if ($files['cover_image'] && file_exists("uploads/" . $files['cover_image'])) {
+            unlink("uploads/" . $files['cover_image']);
+        }
+        // ลบ PDF
+        if ($files['sample_pdf'] && file_exists("uploads/pdfs/" . $files['sample_pdf'])) {
+            unlink("uploads/pdfs/" . $files['sample_pdf']);
         }
 
         $stmt = $pdo->prepare("DELETE FROM book_masters WHERE id = ?");
         $stmt->execute([$id_book]);
-        $success_msg = "deleted"; // ส่งสัญญาณเพื่อ JS Redirect
+        $success_msg = "deleted";
     }
 }
 
@@ -55,29 +61,42 @@ if (isset($_POST['update_book'])) {
     $print_type = $_POST['print_type'];
     $book_size = $_POST['book_size'];
 
-    // SQL เริ่มต้น
+    // SQL พื้นฐาน
     $sql_update = "UPDATE book_masters SET 
-                    isbn=?, title=?, author=?, publisher=?, price=?,
-                    approval_no=?, approval_order=?, page_count=?, paper_type=?, print_type=?, book_size=?
+                   isbn=?, title=?, author=?, publisher=?, price=?,
+                   approval_no=?, approval_order=?, page_count=?, paper_type=?, print_type=?, book_size=?
                    WHERE id=?";
 
     $data_update = [$isbn, $title, $author, $publisher, $price, $approval_no, $approval_order, $page_count, $paper_type, $print_type, $book_size, $id_book];
 
-    // เช็ครูปภาพ
+    // 1. จัดการรูปภาพ (Image)
     if (isset($_FILES['cover_image']) && $_FILES['cover_image']['error'] == 0) {
         $file_ext = pathinfo($_FILES["cover_image"]["name"], PATHINFO_EXTENSION);
         $new_name = "book_" . uniqid() . "." . $file_ext;
         move_uploaded_file($_FILES["cover_image"]["tmp_name"], "uploads/" . $new_name);
 
-        // SQL กรณีมีรูป
-        $sql_update = "UPDATE book_masters SET 
-                        isbn=?, title=?, author=?, publisher=?, price=?,
-                        approval_no=?, approval_order=?, page_count=?, paper_type=?, print_type=?, book_size=?,
-                        cover_image=? 
-                       WHERE id=?";
-        
-        // แทรกชื่อรูปเข้าไปใน array ก่อนตัวสุดท้าย (id)
-        array_splice($data_update, count($data_update)-1, 0, $new_name);
+        // แทรก SQL และ Parameter สำหรับรูปภาพ
+        $sql_update = str_replace("WHERE id=?", ", cover_image=? WHERE id=?", $sql_update);
+        array_splice($data_update, count($data_update) - 1, 0, $new_name);
+    }
+
+    // 2. จัดการไฟล์ตัวอย่าง (PDF) -- [เพิ่มใหม่]
+    if (isset($_FILES['sample_pdf']) && $_FILES['sample_pdf']['error'] == 0) {
+        $pdf_ext = pathinfo($_FILES["sample_pdf"]["name"], PATHINFO_EXTENSION);
+        if (strtolower($pdf_ext) == 'pdf') {
+            $new_pdf_name = "sample_" . uniqid() . ".pdf";
+
+            // สร้างโฟลเดอร์ pdfs ถ้ายังไม่มี
+            if (!is_dir('uploads/pdfs')) {
+                mkdir('uploads/pdfs', 0777, true);
+            }
+
+            move_uploaded_file($_FILES["sample_pdf"]["tmp_name"], "uploads/pdfs/" . $new_pdf_name);
+
+            // แทรก SQL และ Parameter สำหรับ PDF
+            $sql_update = str_replace("WHERE id=?", ", sample_pdf=? WHERE id=?", $sql_update);
+            array_splice($data_update, count($data_update) - 1, 0, $new_pdf_name);
+        }
     }
 
     $stmt = $pdo->prepare($sql_update);
@@ -119,7 +138,13 @@ $old_data = $stmt_show->fetch();
         }
 
         #particles-js {
-            position: fixed; width: 100%; height: 100%; top: 0; left: 0; z-index: -1; pointer-events: none;
+            position: fixed;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            z-index: -1;
+            pointer-events: none;
         }
 
         /* White Card */
@@ -133,7 +158,8 @@ $old_data = $stmt_show->fetch();
         }
 
         /* Form Styling */
-        .form-control, .form-select {
+        .form-control,
+        .form-select {
             background-color: #f8f9fa !important;
             border: 1px solid #dee2e6;
             color: #333 !important;
@@ -141,21 +167,27 @@ $old_data = $stmt_show->fetch();
             padding: 12px 15px;
         }
 
-        .form-control:focus, .form-select:focus {
+        .form-control:focus,
+        .form-select:focus {
             background-color: #fff !important;
             border-color: #0d6efd;
             box-shadow: 0 0 0 4px rgba(13, 110, 253, 0.1);
         }
 
-        .form-floating > label { color: #6c757d; }
-        .form-floating > .form-control:focus ~ label,
-        .form-floating > .form-control:not(:placeholder-shown) ~ label {
+        .form-floating>label {
+            color: #6c757d;
+        }
+
+        .form-floating>.form-control:focus~label,
+        .form-floating>.form-control:not(:placeholder-shown)~label {
             color: #0d6efd;
             background-color: transparent !important;
             font-weight: 600;
         }
-        
-        .form-floating>.form-control:-webkit-autofill~label { background-color: transparent !important; }
+
+        .form-floating>.form-control:-webkit-autofill~label {
+            background-color: transparent !important;
+        }
 
         /* Typography */
         .section-title {
@@ -168,31 +200,41 @@ $old_data = $stmt_show->fetch();
             border-left: 4px solid #0d6efd;
             padding-left: 12px;
             background-color: #e7f1ff;
-            padding-top: 5px; padding-bottom: 5px;
+            padding-top: 5px;
+            padding-bottom: 5px;
             border-radius: 0 5px 5px 0;
         }
 
-        /* Image Preview */
+        /* Image & File Preview Box */
         .current-img-box {
             border: 1px solid #dee2e6;
             padding: 10px;
             border-radius: 10px;
             background: #fff;
             text-align: center;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+            min-height: 180px;
+
         }
+
         .current-img-box img {
-            max-height: 150px; object-fit: cover; border-radius: 5px;
+            max-height: 150px;
+            object-fit: cover;
+            border-radius: 5px;
         }
 
         /* Buttons */
         .btn-custom-primary {
             background: linear-gradient(45deg, #0d6efd, #0dcaf0);
-            color: #fff; border: none; font-weight: 600;
-            border-radius: 10px; padding: 10px 25px;
+            color: #fff;
+            border: none;
+            font-weight: 600;
+            border-radius: 10px;
+            padding: 10px 25px;
             transition: all 0.3s;
             box-shadow: 0 4px 6px rgba(13, 110, 253, 0.2);
         }
+
         .btn-custom-primary:hover {
             transform: translateY(-2px);
             box-shadow: 0 6px 12px rgba(13, 110, 253, 0.3);
@@ -200,21 +242,35 @@ $old_data = $stmt_show->fetch();
         }
 
         .btn-outline-custom {
-            background: transparent; color: #6c757d; border: 1px solid #dee2e6;
-            border-radius: 10px; font-weight: 600; padding: 10px 20px;
+            background: transparent;
+            color: #6c757d;
+            border: 1px solid #dee2e6;
+            border-radius: 10px;
+            font-weight: 600;
+            padding: 10px 20px;
             transition: all 0.3s;
         }
+
         .btn-outline-custom:hover {
-            border-color: #6c757d; background: #e9ecef; color: #333;
+            border-color: #6c757d;
+            background: #e9ecef;
+            color: #333;
         }
 
         .btn-outline-danger-custom {
-            background: #fff; color: #dc3545; border: 1px solid #f5c2c7;
-            border-radius: 10px; font-weight: 600; padding: 10px 20px;
+            background: #fff;
+            color: #dc3545;
+            border: 1px solid #f5c2c7;
+            border-radius: 10px;
+            font-weight: 600;
+            padding: 10px 20px;
             transition: all 0.3s;
         }
+
         .btn-outline-danger-custom:hover {
-            background: #dc3545; color: #fff; border-color: #dc3545;
+            background: #dc3545;
+            color: #fff;
+            border-color: #dc3545;
         }
     </style>
 </head>
@@ -276,22 +332,51 @@ $old_data = $stmt_show->fetch();
                                             <label for="publisher">สำนักพิมพ์</label>
                                         </div>
                                     </div>
+                                    <div class="current-img-box">
+                                        <label class="small text-secondary fw-bold mb-2"><i class="fa-solid fa-file-pdf text-danger"></i> ไฟล์ตัวอย่าง (PDF)</label>
+                                        <?php if (!empty($old_data['sample_pdf'])): ?>
+                                            <div class="mb-2">
+                                                <a href="uploads/pdfs/<?php echo $old_data['sample_pdf']; ?>" target="_blank" class="btn btn-sm btn-outline-danger w-100">
+                                                    <i class="fa-solid fa-eye me-1"></i> ดูไฟล์เดิม
+                                                </a>
+                                            </div>
+                                        <?php else: ?>
+                                            <div class="text-muted small mb-2">- ยังไม่มีไฟล์ -</div>
+                                        <?php endif; ?>
+                                        <div class="text-start">
+                                            <label class="form-label small text-primary fw-bold">อัปโหลด PDF ใหม่</label>
+                                            <input type="file" name="sample_pdf" class="form-control form-control-sm" accept="application/pdf">
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
 
-                            <div class="col-md-4">
-                                <div class="current-img-box h-100 d-flex flex-column justify-content-center align-items-center">
-                                    <label class="small text-secondary fw-bold mb-2">รูปปกปัจจุบัน</label>
-                                    <?php if ($old_data['cover_image']): ?>
-                                        <img src="uploads/<?php echo $old_data['cover_image']; ?>" class="img-fluid shadow-sm mb-3">
-                                    <?php else: ?>
-                                        <div class="text-muted py-4"><i class="fa-regular fa-image fa-3x"></i><br>ไม่มีรูปภาพ</div>
-                                    <?php endif; ?>
-                                    
-                                    <div class="w-100 mt-auto">
-                                        <label class="form-label small text-primary fw-bold text-start w-100">เปลี่ยนรูปปก (ถ้าต้องการ)</label>
-                                        <input type="file" name="cover_image" class="form-control form-control-sm">
+                            <div class="col-md-4 d-flex flex-column gap-3">
+                                <div class="current-img-box flex-grow-1 d-flex flex-column justify-content-between p-3">
+
+                                    <div>
+                                        <label class="small text-center text-primary fw-bold mb-3 d-block">
+                                            <i class="fa-regular fa-image me-1"></i> รูปปกหนังสือ
+                                        </label>
+
+                                        <div class="text-center mb-3">
+                                            <?php if ($old_data['cover_image']): ?>
+                                                <img src="uploads/<?php echo $old_data['cover_image']; ?>" class="img-fluid shadow rounded" style="max-height: 200px;">
+                                            <?php else: ?>
+                                                <div class="text-muted py-4 bg-light rounded border border-dashed">
+                                                    <i class="fa-regular fa-image fa-3x mb-2"></i><br>ยังไม่มีรูปภาพ
+                                                </div>
+                                            <?php endif; ?>
+                                        </div>
+
+                                        <div class="mb-4">
+                                            <label class="form-label small text-muted fw-bold">เปลี่ยนรูปใหม่</label>
+                                            <input type="file" name="cover_image" class="form-control form-control-sm">
+                                        </div>
                                     </div>
+
+                                    <hr class="my-2 border-secondary opacity-25">
+
                                 </div>
                             </div>
                         </div>
@@ -317,7 +402,7 @@ $old_data = $stmt_show->fetch();
                                     <label for="page_count">จำนวนหน้า</label>
                                 </div>
                             </div>
-                            
+
                             <div class="col-md-4">
                                 <div class="form-floating">
                                     <select name="paper_type" class="form-select" id="paper_type">
@@ -376,20 +461,56 @@ $old_data = $stmt_show->fetch();
     <script src="https://cdn.jsdelivr.net/npm/particles.js@2.0.0/particles.min.js"></script>
 
     <script>
-        AOS.init({ duration: 800, once: true });
+        AOS.init({
+            duration: 800,
+            once: true
+        });
 
         /* Particles Config (Blue) */
         particlesJS("particles-js", {
             "particles": {
-                "number": { "value": 60, "density": { "enable": true, "value_area": 800 } },
-                "color": { "value": "#0d6efd" },
-                "shape": { "type": "circle" },
-                "opacity": { "value": 0.5, "random": true },
-                "size": { "value": 3, "random": true },
-                "line_linked": { "enable": true, "distance": 150, "color": "#0d6efd", "opacity": 0.2, "width": 1 },
-                "move": { "enable": true, "speed": 2 }
+                "number": {
+                    "value": 160,
+                    "density": {
+                        "enable": true,
+                        "value_area": 800
+                    }
+                },
+                "color": {
+                    "value": "#0d6efd"
+                },
+                "shape": {
+                    "type": "circle"
+                },
+                "opacity": {
+                    "value": 0.5,
+                    "random": true
+                },
+                "size": {
+                    "value": 3,
+                    "random": true
+                },
+                "line_linked": {
+                    "enable": true,
+                    "distance": 150,
+                    "color": "#0d6efd",
+                    "opacity": 0.2,
+                    "width": 1
+                },
+                "move": {
+                    "enable": true,
+                    "speed": 2
+                }
             },
-            "interactivity": { "detect_on": "canvas", "events": { "onhover": { "enable": true, "mode": "grab" } } },
+            "interactivity": {
+                "detect_on": "canvas",
+                "events": {
+                    "onhover": {
+                        "enable": true,
+                        "mode": "grab"
+                    }
+                }
+            },
             "retina_detect": true
         });
 
@@ -397,16 +518,29 @@ $old_data = $stmt_show->fetch();
         <?php if (isset($success_msg)): ?>
             <?php if ($success_msg == 'deleted'): ?>
                 Swal.fire({
-                    icon: 'success', title: 'ลบข้อมูลสำเร็จ', text: 'หนังสือถูกลบออกจากระบบแล้ว', confirmButtonColor: '#0d6efd'
-                }).then(() => { window.location = 'index.php'; });
+                    icon: 'success',
+                    title: 'ลบข้อมูลสำเร็จ',
+                    text: 'หนังสือถูกลบออกจากระบบแล้ว',
+                    confirmButtonColor: '#0d6efd'
+                }).then(() => {
+                    window.location = 'index.php';
+                });
             <?php else: ?>
                 Swal.fire({
-                    icon: 'success', title: 'บันทึกสำเร็จ', text: 'ข้อมูลหนังสือถูกอัปเดตแล้ว', confirmButtonColor: '#0d6efd'
-                }).then(() => { window.location = 'book_detail.php?id=<?php echo $id_book; ?>'; });
+                    icon: 'success',
+                    title: 'บันทึกสำเร็จ',
+                    text: 'ข้อมูลหนังสือถูกอัปเดตแล้ว',
+                    confirmButtonColor: '#0d6efd'
+                }).then(() => {
+                    window.location = 'book_detail.php?id=<?php echo $id_book; ?>';
+                });
             <?php endif; ?>
         <?php elseif (isset($error_msg)): ?>
             Swal.fire({
-                icon: 'error', title: 'เกิดข้อผิดพลาด', text: '<?php echo $error_msg; ?>', confirmButtonColor: '#dc3545'
+                icon: 'error',
+                title: 'เกิดข้อผิดพลาด',
+                text: '<?php echo $error_msg; ?>',
+                confirmButtonColor: '#dc3545'
             });
         <?php endif; ?>
     </script>

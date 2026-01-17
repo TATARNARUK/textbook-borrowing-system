@@ -25,7 +25,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $print_type = $_POST['print_type'];
     $book_size = $_POST['book_size'];
 
-    // รูปภาพ
+    // 1. จัดการรูปภาพ (Cover Image)
     $image_path = "";
     if (isset($_FILES['cover_img']) && $_FILES['cover_img']['error'] == 0) {
         $ext = pathinfo($_FILES['cover_img']['name'], PATHINFO_EXTENSION);
@@ -34,12 +34,27 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         $image_path = $new_name;
     }
 
-    // SQL
-    $sql = "INSERT INTO book_masters (isbn, title, author, publisher, price, approval_no, approval_order, page_count, paper_type, print_type, book_size, cover_image) 
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+    // 2. ✅ จัดการไฟล์ตัวอย่าง (PDF Sample) - เพิ่มส่วนนี้
+    $pdf_path = "";
+    if (isset($_FILES['sample_pdf']) && $_FILES['sample_pdf']['error'] == 0) {
+        $ext_pdf = pathinfo($_FILES['sample_pdf']['name'], PATHINFO_EXTENSION);
+        if (strtolower($ext_pdf) == 'pdf') {
+            $new_pdf_name = "sample_" . uniqid() . ".pdf";
+            
+            // สร้างโฟลเดอร์ uploads/pdfs ถ้ายังไม่มี
+            if (!is_dir('uploads/pdfs')) { mkdir('uploads/pdfs', 0777, true); }
+            
+            move_uploaded_file($_FILES['sample_pdf']['tmp_name'], "uploads/pdfs/" . $new_pdf_name);
+            $pdf_path = $new_pdf_name;
+        }
+    }
+
+    // SQL (เพิ่ม sample_pdf เข้าไป)
+    $sql = "INSERT INTO book_masters (isbn, title, author, publisher, price, approval_no, approval_order, page_count, paper_type, print_type, book_size, cover_image, sample_pdf) 
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
     $stmt = $pdo->prepare($sql);
 
-    if ($stmt->execute([$isbn, $title, $author, $publisher, $price, $approval_no, $approval_order, $page_count, $paper_type, $print_type, $book_size, $image_path])) {
+    if ($stmt->execute([$isbn, $title, $author, $publisher, $price, $approval_no, $approval_order, $page_count, $paper_type, $print_type, $book_size, $image_path, $pdf_path])) {
         $msg = "success";
     } else {
         $msg = "error";
@@ -242,9 +257,11 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                                     <label for="price">ราคาหน้าปก (บาท)</label>
                                 </div>
                             </div>
+                            
+                            <div class="col-md-6 d-none d-md-block"></div>
 
                             <div class="col-md-6">
-                                <div class="upload-zone h-100 d-flex flex-column justify-content-center">
+                                <div class="upload-zone h-100 d-flex flex-column justify-content-center" id="img-zone">
                                     <input type="file" name="cover_img" id="cover_img" accept="image/*" onchange="previewFile()">
                                     <div id="upload-label">
                                         <div class="mb-2">
@@ -252,6 +269,19 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                                         </div>
                                         <span class="fw-bold text-dark">อัปโหลดรูปหน้าปก</span><br>
                                         <small class="text-muted">คลิกเพื่อเลือกไฟล์รูปภาพ</small>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-md-6">
+                                <div class="upload-zone h-100 d-flex flex-column justify-content-center" id="pdf-zone">
+                                    <input type="file" name="sample_pdf" id="sample_pdf" accept="application/pdf" onchange="previewPdf()">
+                                    <div id="pdf-upload-label">
+                                        <div class="mb-2">
+                                            <i class="fa-regular fa-file-pdf fs-1 text-danger bg-danger bg-opacity-10 rounded-circle p-3"></i>
+                                        </div>
+                                        <span class="fw-bold text-dark">อัปโหลดไฟล์ตัวอย่าง (PDF)</span><br>
+                                        <small class="text-muted">คลิกเพื่อเลือกไฟล์ PDF</small>
                                     </div>
                                 </div>
                             </div>
@@ -336,7 +366,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         /* Particles สีฟ้า */
         particlesJS("particles-js", {
             "particles": {
-                "number": { "value": 60, "density": { "enable": true, "value_area": 800 } },
+                "number": { "value": 160, "density": { "enable": true, "value_area": 800 } },
                 "color": { "value": "#0d6efd" }, /* สีฟ้า */
                 "shape": { "type": "circle" },
                 "opacity": { "value": 0.5, "random": true },
@@ -348,14 +378,44 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             "retina_detect": true
         });
 
-        // Script Show Filename
+        // Script Show Filename (Image)
         function previewFile() {
             const fileInput = document.getElementById('cover_img');
             const label = document.getElementById('upload-label');
+            const zone = document.getElementById('img-zone');
+            
             if (fileInput.files.length > 0) {
                 label.innerHTML = '<i class="fa-solid fa-check-circle text-success fs-1 mb-2"></i><br><span class="fw-bold text-success">' + fileInput.files[0].name + '</span>';
-                document.querySelector('.upload-zone').style.borderColor = '#198754';
-                document.querySelector('.upload-zone').style.backgroundColor = '#f0fff4';
+                zone.style.borderColor = '#198754';
+                zone.style.backgroundColor = '#f0fff4';
+            }
+        }
+
+        // ✅ Script Show Filename (PDF) - เพิ่มฟังก์ชันนี้
+        function previewPdf() {
+            const fileInput = document.getElementById('sample_pdf');
+            const label = document.getElementById('pdf-upload-label');
+            const zone = document.getElementById('pdf-zone');
+
+            if (fileInput.files.length > 0) {
+                const fileName = fileInput.files[0].name;
+                const fileSize = (fileInput.files[0].size / 1024 / 1024).toFixed(2); // แปลงเป็น MB
+
+                // เช็คขนาดไฟล์ (เตือนถ้าเกิน 40MB)
+                if(fileSize > 40) {
+                    Swal.fire({
+                        icon: 'warning',
+                        title: 'ไฟล์ใหญ่เกินไป',
+                        text: 'ไฟล์ PDF ควรมีขนาดไม่เกิน 40MB (ไฟล์ของคุณ: ' + fileSize + ' MB)',
+                        confirmButtonColor: '#ffc107'
+                    });
+                    fileInput.value = ""; // ล้างค่า
+                    return;
+                }
+
+                label.innerHTML = '<i class="fa-solid fa-file-pdf text-danger fs-1 mb-2"></i><br><span class="fw-bold text-danger">' + fileName + '</span><br><small class="text-muted">(' + fileSize + ' MB)</small>';
+                zone.style.borderColor = '#dc3545';
+                zone.style.backgroundColor = '#fff5f5';
             }
         }
 

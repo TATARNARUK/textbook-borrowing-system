@@ -1,129 +1,136 @@
 <style>
-    /* --- แก้ไข: ฉากหลังเป็นกระจกโปร่งแสง (See-through) --- */
+    /* 1. Wrapper สำหรับจัดกึ่งกลางและบังหน้าจอ (พื้นหลังโปร่งใส) */
     #global-loader-wrapper {
         position: fixed;
         top: 0;
         left: 0;
         width: 100%;
         height: 100%;
-        
-        /* ✅ สีดำโปร่งแสง 80% (เห็นข้างหลังลางๆ) */
-        background-color: rgba(0, 0, 0, 0.8); 
-        
-        /* ✅ เพิ่มความเบลอให้ฉากหลัง (Glass Effect) */
-        backdrop-filter: blur(5px);
-        -webkit-backdrop-filter: blur(5px);
-        
-        z-index: 99999;
+        background-color: transparent; /* ✅ เปลี่ยนเป็นโปร่งใส */
+        z-index: 99999; /* อยู่บนสุด */
         display: flex;
         justify-content: center;
         align-items: center;
-        transition: opacity 0.5s ease;
+        transition: opacity 0.5s ease, visibility 0.5s ease;
+        pointer-events: none; /* ✅ เพิ่มเพื่อให้คลิกทะลุได้ (ถ้าต้องการบล็อกคลิกให้ลบบรรทัดนี้) */
     }
 
-    body.loading {
-        overflow: hidden;
+    /* 2. Keyframes Animation */
+    @-webkit-keyframes honeycomb {
+        0%, 20%, 80%, 100% {
+            opacity: 0;
+            -webkit-transform: scale(0);
+            transform: scale(0);
+        }
+        30%, 70% {
+            opacity: 1;
+            -webkit-transform: scale(1);
+            transform: scale(1);
+        }
     }
 
-    /* --- อนิเมชั่นตัวหนังสือ (เหมือนเดิม) --- */
-    .loader {
-        width: 80px;
-        height: 50px;
+    @keyframes honeycomb {
+        0%, 20%, 80%, 100% {
+            opacity: 0;
+            -webkit-transform: scale(0);
+            transform: scale(0);
+        }
+        30%, 70% {
+            opacity: 1;
+            -webkit-transform: scale(1);
+            transform: scale(1);
+        }
+    }
+
+    /* 3. Honeycomb Styles */
+    .honeycomb {
+        height: 24px;
         position: relative;
+        width: 24px;
+        /* เพิ่มเงาหรือ Background เล็กๆ ให้ตัวโหลดเด่นขึ้น (ถ้าต้องการ) */
+        /* filter: drop-shadow(0 0 5px rgba(255,255,255,0.8)); */
     }
 
-    .loader-text {
+    .honeycomb div {
+        -webkit-animation: honeycomb 2.1s infinite backwards;
+        animation: honeycomb 2.1s infinite backwards;
+        background: #0d6efd; /* สีฟ้า */
+        height: 12px;
+        margin-top: 6px;
         position: absolute;
-        top: 0;
-        padding: 0;
-        margin: 0;
-        color: #ffffff;
-        animation: text_713 3.5s ease both infinite;
-        font-size: .8rem;
-        letter-spacing: 1px;
-        font-family: sans-serif;
-        font-weight: bold;
-        text-transform: uppercase;
+        width: 24px;
     }
 
-    .load {
-        background-color: #000000;
-        border-radius: 50px;
-        display: block;
-        height: 16px;
-        width: 16px;
-        bottom: 0;
+    .honeycomb div:after,
+    .honeycomb div:before {
+        content: '';
+        border-left: 12px solid transparent;
+        border-right: 12px solid transparent;
         position: absolute;
-        transform: translateX(64px);
-        animation: loading_713 3.5s ease both infinite;
+        left: 0;
+        right: 0;
     }
 
-    .load::before {
-        position: absolute;
-        content: "";
-        width: 100%;
-        height: 100%;
-        background-color: #ffffff;
-        border-radius: inherit;
-        animation: loading2_713 3.5s ease both infinite;
+    .honeycomb div:after {
+        top: -6px;
+        border-bottom: 6px solid #0d6efd; /* ขอบล่างสีฟ้า */
     }
 
-    @keyframes text_713 {
-        0% { letter-spacing: 1px; transform: translateX(0px); }
-        40% { letter-spacing: 2px; transform: translateX(26px); }
-        80% { letter-spacing: 1px; transform: translateX(32px); }
-        90% { letter-spacing: 2px; transform: translateX(0px); }
-        100% { letter-spacing: 1px; transform: translateX(0px); }
+    .honeycomb div:before {
+        bottom: -6px;
+        border-top: 6px solid #0d6efd; /* ขอบบนสีฟ้า */
     }
 
-    @keyframes loading_713 {
-        0% { width: 16px; transform: translateX(0px); }
-        40% { width: 100%; transform: translateX(0px); }
-        80% { width: 16px; transform: translateX(64px); }
-        90% { width: 100%; transform: translateX(0px); }
-        100% { width: 16px; transform: translateX(0px); }
-    }
-
-    @keyframes loading2_713 {
-        0% { transform: translateX(0px); width: 16px; }
-        40% { transform: translateX(0%); width: 80%; }
-        80% { width: 100%; transform: translateX(0px); }
-        90% { width: 80%; transform: translateX(15px); }
-        100% { transform: translateX(0px); width: 16px; }
-    }
+    /* จัดวางตำแหน่งแต่ละชิ้น */
+    .honeycomb div:nth-child(1) { -webkit-animation-delay: 0s; animation-delay: 0s; left: -28px; top: 0; }
+    .honeycomb div:nth-child(2) { -webkit-animation-delay: 0.1s; animation-delay: 0.1s; left: -14px; top: 22px; }
+    .honeycomb div:nth-child(3) { -webkit-animation-delay: 0.2s; animation-delay: 0.2s; left: 14px; top: 22px; }
+    .honeycomb div:nth-child(4) { -webkit-animation-delay: 0.3s; animation-delay: 0.3s; left: 28px; top: 0; }
+    .honeycomb div:nth-child(5) { -webkit-animation-delay: 0.4s; animation-delay: 0.4s; left: 14px; top: -22px; }
+    .honeycomb div:nth-child(6) { -webkit-animation-delay: 0.5s; animation-delay: 0.5s; left: -14px; top: -22px; }
+    .honeycomb div:nth-child(7) { -webkit-animation-delay: 0.6s; animation-delay: 0.6s; left: 0; top: 0; }
 </style>
 
 <div id="global-loader-wrapper">
-    <div class="loader">
-        <span class="loader-text">loading</span>
-        <span class="load"></span>
+    <div class="honeycomb">
+        <div></div>
+        <div></div>
+        <div></div>
+        <div></div>
+        <div></div>
+        <div></div>
+        <div></div>
     </div>
 </div>
 
 <script>
-    document.body.classList.add('loading');
-
+    // เมื่อโหลดหน้าเว็บเสร็จ
     window.addEventListener('load', function() {
         var loader = document.getElementById('global-loader-wrapper');
         
         if(loader){
-            // สั่งให้รอ 3 วินาที (เพื่อให้เห็นอนิเมชั่นบนฉากหลังโปร่งแสง)
+            // หน่วงเวลา 1200ms
             setTimeout(function() {
                 loader.style.opacity = '0';
+                loader.style.visibility = 'hidden'; 
+                
                 setTimeout(function() {
                     loader.style.display = 'none';
-                    document.body.classList.remove('loading');
-                }, 500);
-            }, 200); // รอ 0.2 วินาทีก่อนซ่อน
+                }, 500); 
+            }, 1000); 
         }
     });
 
+    // เมื่อมีการกด Submit Form
     document.addEventListener('submit', function(e) {
         if (e.target.checkValidity()) {
             var loader = document.getElementById('global-loader-wrapper');
             if(loader) {
                 loader.style.display = 'flex';
-                setTimeout(() => { loader.style.opacity = '1'; }, 10);
+                loader.style.visibility = 'visible';
+                setTimeout(() => { 
+                    loader.style.opacity = '1'; 
+                }, 10);
             }
         }
     });
