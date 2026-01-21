@@ -2,29 +2,10 @@
 session_start();
 require_once 'config.php';
 
-// ตรวจสอบข้อมูลเมื่อมีการกดปุ่ม Login
-if (isset($_POST['student_id']) && isset($_POST['password'])) {
-
-    $student_id = trim($_POST['student_id']); 
-    $password = $_POST['password'];
-
-    $stmt = $pdo->prepare("SELECT id, fullname, role, password FROM users WHERE student_id = :id");
-    $stmt->bindValue(':id', $student_id, PDO::PARAM_STR);
-    $stmt->execute();
-
-    $user = $stmt->fetch(PDO::FETCH_ASSOC);
-
-    if ($user && password_verify($password, $user['password'])) {
-        $_SESSION['user_id'] = $user['id'];
-        $_SESSION['fullname'] = $user['fullname'];
-        $_SESSION['role'] = $user['role'];
-        $_SESSION['student_id'] = $student_id; 
-
-        header('location: index.php');
-        exit();
-    } else {
-        $error_msg = "รหัสนักเรียน หรือ รหัสผ่าน ไม่ถูกต้อง";
-    }
+// ถ้าล็อกอินค้างไว้อยู่แล้ว ให้เด้งไปหน้าหลักทันที
+if (isset($_SESSION['user_id'])) {
+    header("Location: index.php");
+    exit();
 }
 ?>
 
@@ -46,10 +27,10 @@ if (isset($_POST['student_id']) && isset($_POST['password'])) {
     <link rel="stylesheet" href="style.css">
 </head>
 
-<body> 
-    
+<body>
+
     <?php require_once 'loader.php'; ?>
-    
+
     <div id="welcome-screen">
         <div class="intro-content text-center">
             <div class="intro-icons mb-3 text-white">
@@ -59,7 +40,7 @@ if (isset($_POST['student_id']) && isset($_POST['password'])) {
             </div>
             <h1 class="fade-in-text fw-bold text-dark">Welcome To Website</h1>
             <h2 class="gradient-text">Textbook Borrowing System</h2>
-            
+
             <p class="text-black mt-2 fw-bold" style="min-height: 30px; font-size: 1.1rem;">
                 <span id="typewriter-text"></span><span class="cursor" style="color: black;">|</span>
             </p>
@@ -92,7 +73,7 @@ if (isset($_POST['student_id']) && isset($_POST['password'])) {
     </nav>
 
     <div class="container d-flex justify-content-center align-items-center" style="min-height: 80vh;">
-        <div class="login-card" data-aos="fade-up" data-aos-duration="1200">
+        <div class="login-card" data-aos="fade-up">
             <div class="text-center mb-4">
                 <div class="bg-primary bg-opacity-10 rounded-circle d-inline-flex p-3 mb-3">
                     <i class="fas fa-user-lock fa-2x text-primary"></i>
@@ -101,7 +82,7 @@ if (isset($_POST['student_id']) && isset($_POST['password'])) {
                 <p class="text-muted small">กรุณากรอกข้อมูลเพื่อยืนยันตัวตน</p>
             </div>
 
-            <form action="" method="post">
+            <form id="loginForm">
                 <div class="mb-3">
                     <label class="form-label text-secondary fw-medium">รหัสนักเรียน / ชื่อผู้ใช้</label>
                     <div class="input-group">
@@ -114,19 +95,19 @@ if (isset($_POST['student_id']) && isset($_POST['password'])) {
                     <label class="form-label text-secondary fw-medium">รหัสผ่าน</label>
                     <div class="input-group">
                         <span class="input-group-text bg-white border-end-0 text-primary"><i class="fas fa-key"></i></span>
-                        <input type="password" name="password" class="form-control border-start-0 ps-0" placeholder="กรอกรหัสผ่าน" required>
+                        <input type="password" name="password" class="form-control border-start-0 ps-0" placeholder="กรอกรหัสผ่านrms" required>
                     </div>
                 </div>
 
                 <button type="submit" class="btg w-100 mb-3 rounded-pill">
-                    <i class="fas fa-sign-in-alt me-2"></i> เข้าสู่ระบบ
+                    <i class="fas fa-sign-in-alt me-2"></i> กำลังตรวจสอบ...
                 </button>
-
                 <div class="text-center">
                     <a href="forgot_password.php" class="text-decoration-none text-primary small fw-medium">
                         ลืมรหัสผ่านใช่หรือไม่?
                     </a>
                 </div>
+
             </form>
         </div>
     </div>
@@ -144,44 +125,77 @@ if (isset($_POST['student_id']) && isset($_POST['password'])) {
         </script>
     <?php endif; ?>
 
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/particles.js@2.0.0/particles.min.js"></script>
 
-     <script>
-        document.addEventListener("DOMContentLoaded", function() {
-            const welcomeScreen = document.getElementById('welcome-screen');
-            const typewriterText = document.getElementById('typewriter-text');
+    <script>
+        AOS.init();
 
-            function startAOS() {
-                AOS.init({ duration: 1000, once: true, easing: 'ease-out-cubic' });
-            }
-
-            if (sessionStorage.getItem('introShown')) {
-                if (welcomeScreen) welcomeScreen.style.display = 'none';
-                startAOS();
-            } else {
-                sessionStorage.setItem('introShown', 'true');
-                const textToType = "ระบบยืม-คืนหนังสือเรียน";
-                let charIndex = 0;
-
-                function type() {
-                    if (charIndex < textToType.length) {
-                        typewriterText.innerHTML += textToType.charAt(charIndex);
-                        charIndex++;
-                        setTimeout(type, 80);
-                    }
+        // จัดการ Intro Screen
+        const welcomeScreen = document.getElementById('welcome-screen');
+        if (sessionStorage.getItem('introShown')) {
+            if (welcomeScreen) welcomeScreen.style.display = 'none';
+        } else {
+            sessionStorage.setItem('introShown', 'true');
+            setTimeout(() => {
+                if (welcomeScreen) {
+                    welcomeScreen.style.opacity = '0';
+                    setTimeout(() => welcomeScreen.style.display = 'none', 1000);
                 }
-                setTimeout(type, 1500); // เริ่มพิมพ์เร็วขึ้นหน่อย
+            }, 2500);
+        }
 
-                setTimeout(function() {
-                    if(welcomeScreen) {
-                        welcomeScreen.style.opacity = '0';
-                        setTimeout(() => welcomeScreen.style.display = 'none', 1000);
+        // 🔥 AJAX Login Logic
+        document.getElementById('loginForm').addEventListener('submit', function(e) {
+            e.preventDefault(); // ปิดการ Refresh หน้าจอ
+
+            const btn = this.querySelector('button[type="submit"]');
+            const originalText = btn.innerHTML;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> กำลังตรวจสอบ...';
+            btn.disabled = true;
+
+            const formData = new FormData(this);
+
+            fetch('auth.php', {
+                    method: 'POST',
+                    body: formData
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.status === 'success') {
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'สำเร็จ!',
+                            text: 'กำลังเข้าสู่ระบบ...',
+                            timer: 1500,
+                            showConfirmButton: false
+                        }).then(() => {
+                            window.location.href = 'index.php'; // เด้งไปหน้าแรก
+                        });
+                    } else {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'เข้าสู่ระบบไม่สำเร็จ',
+                            text: data.message,
+                            confirmButtonColor: '#0d6efd'
+                        });
+                        btn.innerHTML = originalText;
+                        btn.disabled = false;
                     }
-                    startAOS();
-                }, 4500); // ลดเวลา intro ลงนิดหน่อยให้กระชับ
-            }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'เกิดข้อผิดพลาด',
+                        text: 'ไม่สามารถเชื่อมต่อกับเซิร์ฟเวอร์ได้',
+                    });
+                    btn.innerHTML = originalText;
+                    btn.disabled = false;
+                });
         });
     </script>
+
 </body>
+
 </html>
