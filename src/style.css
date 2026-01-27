@@ -247,7 +247,133 @@ body {
         visibility: hidden; /* ซ่อนถาวรเมื่อจบ */
     }
 }
+/* =========================================
+   5. Welcome Screen (Intro)
+   ========================================= */
+#welcome-screen {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100vh;
+    background-color: #ffffff;
+    z-index: 9999;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    
+    /* 🔥 ตั้งค่าเริ่มต้นสำหรับการหายไปแบบ Smooth */
+    opacity: 1;
+    transform: scale(1);
+    visibility: visible;
+    
+    /* 🔥 Key Magic: กำหนดระยะเวลาการเปลี่ยนสถานะ 1.5 วินาที */
+    transition: opacity 2s ease-in-out, transform 2s ease-in-out, visibility 1.5s;
+}
 
+/* 🔥 คลาสนี้จะถูกเติมโดย JavaScript เมื่อถึงเวลาปิดฉาก */
+#welcome-screen.fade-out {
+    opacity: 0;           /* จางหาย */
+    transform: scale(1.1); /* ขยายใหญ่ขึ้นเล็กน้อย (ดูพรีเมียม) */
+    visibility: hidden;    /* ซ่อนการมองเห็น */
+}
+
+/* ไอคอน */
+.intro-icons i {
+    font-size: 2rem;
+    color: #0b5ed7;
+    margin: 0 15px;
+    opacity: 0;
+    transform: translateY(20px);
+    animation: popUpIcon 0.8s cubic-bezier(0.68, -0.55, 0.27, 1.55) forwards;
+}
+
+.intro-icons i:nth-child(1) { animation-delay: 0.5s; }
+.intro-icons i:nth-child(2) { animation-delay: 0.7s; }
+.intro-icons i:nth-child(3) { animation-delay: 0.9s; }
+
+/* ข้อความ Welcome */
+.fade-in-text {
+    font-family: 'Prompt', sans-serif;
+    color: #333;
+    font-weight: 300;
+    font-size: 1.8rem;
+    margin-bottom: 10px;
+    opacity: 0;
+    animation: textFadeIn 1s ease-out forwards;
+    animation-delay: 1.5s;
+}
+
+/* ข้อความชื่อระบบ (ไล่สี) */
+.gradient-text {
+    font-family: 'Prompt', sans-serif;
+    font-weight: 800;
+    font-size: 3rem;
+    text-transform: uppercase;
+    margin: 0;
+    opacity: 0;
+    letter-spacing: 1px;
+    
+    background: linear-gradient(90deg, #0d6efd 0%, #0dcaf0 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    
+    animation: textFadeIn 1s ease-out forwards;
+    animation-delay: 2.0s;
+}
+
+/* Cursor กระพริบ */
+.cursor {
+    display: inline-block;
+    vertical-align: middle;
+    width: 3px;
+    height: 1em;
+    background-color: #0d6efd;
+    animation: blinkCursor 0.7s infinite;
+    margin-left: 5px;
+}
+
+.typewriter-container {
+    height: 30px;
+    margin-top: 10px;
+}
+
+/* =========================================
+   6. Keyframes Animations
+   ========================================= */
+@keyframes blinkCursor {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0; }
+}
+
+@keyframes popUpIcon {
+    100% {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes textFadeIn {
+    0% {
+        opacity: 0;
+        transform: translateY(20px);
+        filter: blur(5px);
+    }
+    100% {
+        opacity: 1;
+        transform: translateY(0);
+        filter: blur(0);
+    }
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .gradient-text { font-size: 2rem; }
+    .fade-in-text { font-size: 1.5rem; }
+    .login-card { padding: 25px; margin: 20px; }
+}
 /* Responsive: ปรับขนาดตัวหนังสือสำหรับมือถือ */
 @media (max-width: 768px) {
     .gradient-text { font-size: 2rem; }

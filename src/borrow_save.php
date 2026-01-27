@@ -2,73 +2,73 @@
 session_start();
 require_once 'config.php';
 
-// 1. เช็คว่า Login หรือยัง
+// 1. เช็ค Login
 if (!isset($_SESSION['user_id'])) {
     header("Location: login.php");
     exit();
 }
 
-if (!isset($_GET['id'])) {
-    header("Location: index.php");
-    exit();
-}
+// ตรวจสอบว่าส่ง ID มาไหม
+if (isset($_GET['id'])) {
+    $book_id = $_GET['id'];
+    $user_id = $_SESSION['user_id'];
 
-$user_id = $_SESSION['user_id'];
-$book_master_id = $_GET['id'];
+    try {
+        // 2. เช็คสต็อก (ใช้รหัส book_master_id)
+        $stmt = $pdo->prepare("SELECT COUNT(*) FROM book_items WHERE book_master_id = ? AND status = 'available'");
+        $stmt->execute([$book_id]);
+        $stock = $stmt->fetchColumn();
 
-try {
-    // ---------------------------------------------------------
-    // 🛑 Step 2: เช็คว่า "ยืมซ้ำ" หรือไม่? (Logic ใหม่)
-    // ---------------------------------------------------------
-    // เช็คในตาราง transactions ว่า user คนนี้ ยืมหนังสือรหัส master นี้ และยังไม่คืน (status='borrowed') หรือไม่
-    $checkDup = $pdo->prepare("
-        SELECT COUNT(*) FROM transactions t
-        JOIN book_items bi ON t.book_item_id = bi.id
-        WHERE t.user_id = ? 
-        AND bi.book_master_id = ? 
-        AND t.status = 'borrowed'
-    ");
-    $checkDup->execute([$user_id, $book_master_id]);
-    $is_duplicate = $checkDup->fetchColumn();
+        if ($stock > 0) {
+            
+            // 3. ป้องกันการยืมซ้ำ (เล่มเดิมยังไม่คืน)
+            $stmtCheck = $pdo->prepare("SELECT COUNT(*) FROM transactions 
+                                        WHERE user_id = ? AND book_master_id = ? AND status = 'borrowed'");
+            $stmtCheck->execute([$user_id, $book_id]);
+            $alreadyBorrowed = $stmtCheck->fetchColumn();
 
-    if ($is_duplicate > 0) {
-        // ถ้ายืมอยู่แล้ว ให้ดีดกลับไปพร้อม status = duplicate
-        header("Location: index.php?status=duplicate");
-        exit();
-    }
+            if ($alreadyBorrowed > 0) {
+                header("Location: index.php?status=duplicate");
+                exit();
+            }
 
-    // ---------------------------------------------------------
-    // Step 3: เช็คว่ามีของว่างไหม (หาเล่มที่ available)
-    // ---------------------------------------------------------
-    $stmt = $pdo->prepare("SELECT id FROM book_items WHERE book_master_id = ? AND status = 'available' LIMIT 1");
-    $stmt->execute([$book_master_id]);
-    $item = $stmt->fetch();
+            // 4. สุ่มหยิบเล่มว่าง 1 เล่ม
+            $stmtItem = $pdo->prepare("SELECT id FROM book_items WHERE book_master_id = ? AND status = 'available' LIMIT 1");
+            $stmtItem->execute([$book_id]);
+            $item = $stmtItem->fetch(PDO::FETCH_ASSOC);
+            
+            if ($item) {
+                $item_id = $item['id'];
 
-    if ($item) {
-        $book_item_id = $item['id'];
+                // 5. บันทึก Transaction
+                $pdo->beginTransaction();
+
+                $sqlInsert = "INSERT INTO transactions (user_id, book_item_id, book_master_id, borrow_date, due_date, status) 
+                              VALUES (?, ?, ?, NOW(), DATE_ADD(NOW(), INTERVAL 7 DAY), 'borrowed')";
+                $stmtInsert = $pdo->prepare($sqlInsert);
+                $stmtInsert->execute([$user_id, $item_id, $book_id]);
+
+                // อัปเดตสถานะหนังสือ
+                $sqlUpdate = "UPDATE book_items SET status = 'borrowed' WHERE id = ?";
+                $stmtUpdate = $pdo->prepare($sqlUpdate);
+                $stmtUpdate->execute([$item_id]);
+
+                $pdo->commit();
+
+                header("Location: index.php?status=success");
+                exit();
+            }
+        } 
         
-        // เริ่ม Transaction (เพื่อให้ทำงานพร้อมกัน ถ้าพลาดให้ rollback)
-        $pdo->beginTransaction();
+        header("Location: index.php?status=error");
+        exit();
 
-        // 3.1 อัพเดทสถานะเล่มหนังสือเป็น borrowed
-        $updateItem = $pdo->prepare("UPDATE book_items SET status = 'borrowed' WHERE id = ?");
-        $updateItem->execute([$book_item_id]);
-
-        // 3.2 สร้างรายการยืมใน transactions (กำหนดคืนอีก 7 วัน)
-        $return_due = date('Y-m-d', strtotime('+7 days'));
-        $insertTrans = $pdo->prepare("INSERT INTO transactions (user_id, book_item_id, borrow_date, due_date, status) VALUES (?, ?, NOW(), ?, 'borrowed')");
-        $insertTrans->execute([$user_id, $book_item_id, $return_due]);
-
-        $pdo->commit(); // ยืนยันการทำงาน
-
-        header("Location: index.php?status=success");
-    } else {
-        // ถ้าหนังสือหมดพอดี
+    } catch (Exception $e) {
+        if ($pdo->inTransaction()) { $pdo->rollBack(); }
         header("Location: index.php?status=error");
     }
-
-} catch (Exception $e) {
-    $pdo->rollBack();
-    header("Location: index.php?status=error");
+} else {
+    header("Location: index.php");
+    exit();
 }
 ?>
