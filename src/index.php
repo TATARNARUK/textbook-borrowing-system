@@ -14,7 +14,6 @@ $user_role = $_SESSION['role'];
 $user_id = $_SESSION['user_id'];
 
 // 🔥 BLOCKING LOGIC: เช็คว่ามีหนังสือเกินกำหนดส่งหรือไม่?
-// (ถ้ามี overdue > 0 แปลว่าโดนระงับสิทธิ์)
 $stmtCheck = $pdo->prepare("SELECT COUNT(*) FROM transactions 
                             WHERE user_id = ? 
                             AND status = 'borrowed' 
@@ -51,54 +50,128 @@ $is_blocked = ($overdue_count > 0);
             overflow-x: hidden;
         }
 
-        #particles-js { position: fixed; width: 100%; height: 100%; top: 0; left: 0; z-index: -1; pointer-events: none; }
-        .book-cover { width: 80px; height: 120px; object-fit: cover; border-radius: 5px; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); transition: transform 0.3s ease; }
-        .navbar-custom { background: rgba(255, 255, 255, 0.9) !important; padding: 15px 0; position: relative; width: 100%; z-index: 1000; }
-        .nav-item .nav-link { color: #000000 !important; font-size: 0.9rem; font-weight: 500; margin: 0 12px; position: relative; transition: all 0.3s; }
-        .nav-item .nav-link:hover, .nav-item .nav-link.active { color: #000000 !important; }
-        .nav-item .nav-link::after { content: ''; position: absolute; width: 0; height: 2px; bottom: -5px; left: 50%; background: linear-gradient(90deg, #000000, #000000); transition: width 0.3s ease, left 0.3s ease; }
-        .nav-item .nav-link:hover::after { width: 100%; left: 0; }
-        .user-profile-box { border-left: 1px solid rgb(0, 0, 0); padding-left: 20px; }
-        .stat-card-hover { transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1); }
-        .stat-card-hover:hover { transform: translateY(-5px); box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1) !important; }
-        
-        #bookTable tbody tr { transition: all 0.2s ease-in-out; }
-        #bookTable tbody tr:hover { transform: scale(1.01); background-color: #ffffff; box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08); z-index: 10; position: relative; }
-        #bookTable tbody tr:hover .book-cover { transform: scale(1.05); }
+        #particles-js {
+            position: fixed;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            z-index: -1;
+            pointer-events: none;
+        }
+
+        .book-cover {
+            width: 80px;
+            height: 120px;
+            object-fit: cover;
+            border-radius: 5px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease;
+        }
+
+        .navbar-custom {
+            background: rgba(255, 255, 255, 0.9) !important;
+            padding: 15px 0;
+            position: relative;
+            width: 100%;
+            z-index: 1000;
+        }
+
+        .nav-item .nav-link {
+            color: #000000 !important;
+            font-size: 0.9rem;
+            font-weight: 500;
+            margin: 0 12px;
+            position: relative;
+            transition: all 0.3s;
+        }
+
+        .nav-item .nav-link:hover,
+        .nav-item .nav-link.active {
+            color: #000000 !important;
+        }
+
+        .nav-item .nav-link::after {
+            content: '';
+            position: absolute;
+            width: 0;
+            height: 2px;
+            bottom: -5px;
+            left: 50%;
+            background: linear-gradient(90deg, #000000, #000000);
+            transition: width 0.3s ease, left 0.3s ease;
+        }
+
+        .nav-item .nav-link:hover::after {
+            width: 100%;
+            left: 0;
+        }
+
+        .user-profile-box {
+            border-left: 1px solid rgb(0, 0, 0);
+            padding-left: 20px;
+        }
+
+        .stat-card-hover {
+            transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+        }
+
+        .stat-card-hover:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1) !important;
+        }
+
+        #bookTable tbody tr {
+            transition: all 0.2s ease-in-out;
+            cursor: pointer;
+        }
+
+        #bookTable tbody tr:hover {
+            transform: scale(1.01);
+            background-color: #ffffff;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+            z-index: 10;
+            position: relative;
+        }
+
+        #bookTable tbody tr:hover .book-cover {
+            transform: scale(1.05);
+        }
 
         /* 🔥 CSS สำหรับ Popup รูปใหญ่ (Hover) */
-        #img-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.6); backdrop-filter: blur(5px); z-index: 9999; display: none; justify-content: center; align-items: center; opacity: 0; transition: opacity 0.3s ease; pointer-events: none; }
-        #img-overlay.show { opacity: 1; }
-        #large-book-img { max-width: 90vw; max-height: 90vh; border-radius: 15px; box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5); transform: scale(0.8); transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
-        #img-overlay.show #large-book-img { transform: scale(1); }
+        #img-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(5px);
+            z-index: 9999;
+            display: none;
+            justify-content: center;
+            align-items: center;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            pointer-events: none;
+        }
 
-        /* 🔥 Custom Modal Styling (Book Detail Style) */
-        .modal-xl { max-width: 1140px; }
-        .modal-content { border-radius: 20px; border: none; overflow: hidden; background: #fff; }
-        .modal-body { padding: 40px; }
-        
-        /* รูปใน Modal */
-        .detail-cover { width: auto; max-width: 100%; max-height: 450px; border-radius: 10px; box-shadow: 0 10px 30px rgba(0,0,0,0.15); object-fit: contain; }
+        #img-overlay.show {
+            opacity: 1;
+        }
 
-        .status-dot { display: inline-block; width: 10px; height: 10px; border-radius: 50%; margin-right: 5px; }
-        .status-dot.active { background-color: #198754; box-shadow: 0 0 10px rgba(25, 135, 84, 0.5); }
-        .status-dot.inactive { background-color: #dc3545; }
-        
-        .spec-box { border: 1px solid #dee2e6; padding: 15px; text-align: center; background: #fff; height: 100%; }
-        .spec-box .text-label { font-size: 0.8rem; color: #6c757d; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 5px; }
-        .spec-box .text-value { font-weight: bold; font-size: 1.1rem; color: #0d6efd; }
-        
-        .price-tag { font-size: 2rem; font-weight: 800; color: #0d6efd; line-height: 1; }
-        
-        /* ปุ่มใน Modal */
-        .btn-modal-borrow { background: #0d6efd; color: white; border: none; padding: 12px; border-radius: 10px; font-weight: bold; width: 100%; transition: all 0.3s; }
-        .btn-modal-borrow:hover { background: #0b5ed7; transform: translateY(-2px); box-shadow: 0 5px 15px rgba(13, 110, 253, 0.3); }
-        
-        /* ปุ่มเมื่อโดนบล็อก */
-        .btn-blocked { background: #6c757d !important; cursor: not-allowed; opacity: 0.8; }
-        
-        .btn-modal-close { border: 2px solid #dee2e6; color: #6c757d; border-radius: 10px; padding: 10px 20px; font-weight: bold; }
-        .btn-modal-close:hover { background: #f8f9fa; color: #000; }
+        #large-book-img {
+            max-width: 90vw;
+            max-height: 90vh;
+            border-radius: 15px;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+            transform: scale(0.8);
+            transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        #img-overlay.show #large-book-img {
+            transform: scale(1);
+        }
     </style>
 </head>
 
@@ -137,9 +210,27 @@ $is_blocked = ($overdue_count > 0);
                         <a class="nav-link" href="my_history.php">ประวัติการยืม</a>
                     </li>
                     <?php if ($user_role == 'admin') { ?>
-                        <li class="nav-item"><a class="nav-link" href="report.php">รายงานสรุป</a></li>
-                        <li class="nav-item"><a class="nav-link" href="add_book.php">เพิ่มหนังสือ</a></li>
-                        <li class="nav-item"><a class="nav-link" href="admin_users.php">จัดการผู้ใช้</a></li>
+                        <li class="nav-item dropdown ms-lg-2">
+                            <a class="nav-link dropdown-toggle btn btn-light text-primary border px-3 rounded-pill" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                <i class="fa-solid fa-screwdriver-wrench me-1"></i> ส่วนผู้ดูแล
+                            </a>
+                            <ul class="dropdown-menu dropdown-menu-end shadow-sm border-0 mt-2 rounded-3">
+                                <li>
+                                    <h6 class="dropdown-header text-uppercase small text-muted">รายงาน & สถิติ</h6>
+                                </li>
+                                <li><a class="dropdown-item" href="report.php"><i class="fa-solid fa-chart-pie me-2 text-warning"></i> รายงานสรุป</a></li>
+                                <li>
+                                    <hr class="dropdown-divider">
+                                </li>
+                                <li>
+                                    <h6 class="dropdown-header text-uppercase small text-muted">จัดการข้อมูล</h6>
+                                </li>
+                                <li><a class="dropdown-item" href="add_book.php"><i class="fa-solid fa-book-medical me-2 text-success"></i> เพิ่มหนังสือใหม่</a></li>
+                                <li><a class="dropdown-item" href="manage_categories.php"><i class="fa-solid fa-layer-group me-2 text-info"></i> จัดการหมวดหมู่</a></li>
+                                <li><a class="dropdown-item" href="admin_users.php"><i class="fa-solid fa-users-gear me-2 text-danger"></i> จัดการผู้ใช้</a></li>
+                                <li><a class="dropdown-item" href="import_api.php"><i class="fa-solid fa-cloud-arrow-down me-2 text-primary"></i> นำเข้าหนังสือจาก API</a></li>
+                            </ul>
+                        </li>
                     <?php } ?>
                 </ul>
 
@@ -163,7 +254,7 @@ $is_blocked = ($overdue_count > 0);
     <div style="padding-top: 100px;"></div>
 
     <div class="container">
-        
+
         <?php if ($is_blocked): ?>
             <div class="alert alert-danger shadow-sm rounded-4 mb-4 border-0 d-flex align-items-center" role="alert" data-aos="fade-down">
                 <i class="fa-solid fa-circle-exclamation fa-2x me-3"></i>
@@ -181,13 +272,53 @@ $is_blocked = ($overdue_count > 0);
             $cnt_available = $pdo->query("SELECT COUNT(*) FROM book_items WHERE status='available'")->fetchColumn();
             $cnt_overdue = $pdo->query("SELECT COUNT(*) FROM transactions WHERE status='borrowed' AND due_date < NOW()")->fetchColumn();
         ?>
-            <div class="row mb-5" data-aos="fade-up"> 
+            <div class="row mb-5" data-aos="fade-up">
                 <div class="col-md-8">
                     <div class="row g-3">
-                        <div class="col-md-6"><div class="card stat-card-hover p-3 border-start border-4 border-primary h-100"><div class="d-flex justify-content-between align-items-center"><div><h6 class="text-muted text-uppercase mb-1">นักเรียนทั้งหมด</h6><h2 class="mb-0 fw-bold text-primary"><?php echo number_format($cnt_users); ?></h2></div><div class="fs-1 text-primary opacity-25"><i class="fa-solid fa-users"></i></div></div></div></div>
-                        <div class="col-md-6"><div class="card stat-card-hover p-3 border-start border-4 border-success h-100"><div class="d-flex justify-content-between align-items-center"><div><h6 class="text-muted text-uppercase mb-1">หนังสือทั้งหมด (เล่ม)</h6><h2 class="mb-0 fw-bold text-success"><?php echo number_format($cnt_books); ?></h2></div><div class="fs-1 text-success opacity-25"><i class="fa-solid fa-book"></i></div></div></div></div>
-                        <div class="col-md-6"><div class="card stat-card-hover p-3 border-start border-4 border-warning h-100"><div class="d-flex justify-content-between align-items-center"><div><h6 class="text-muted text-uppercase mb-1">กำลังถูกยืม</h6><h2 class="mb-0 fw-bold text-warning"><?php echo number_format($cnt_borrow); ?></h2></div><div class="fs-1 text-warning opacity-25"><i class="fa-solid fa-hand-holding-heart"></i></div></div></div></div>
-                        <div class="col-md-6"><div class="card stat-card-hover p-3 border-start border-4 border-danger h-100"><div class="d-flex justify-content-between align-items-center"><div><h6 class="text-muted text-uppercase mb-1">เกินกำหนดส่ง!</h6><h2 class="mb-0 fw-bold text-danger"><?php echo number_format($cnt_overdue); ?></h2></div><div class="fs-1 text-danger opacity-25"><i class="fa-solid fa-bell"></i></div></div></div></div>
+                        <div class="col-md-6">
+                            <div class="card stat-card-hover p-3 border-start border-4 border-primary h-100">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <h6 class="text-muted text-uppercase mb-1">นักเรียนทั้งหมด</h6>
+                                        <h2 class="mb-0 fw-bold text-primary"><?php echo number_format($cnt_users); ?></h2>
+                                    </div>
+                                    <div class="fs-1 text-primary opacity-25"><i class="fa-solid fa-users"></i></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="card stat-card-hover p-3 border-start border-4 border-success h-100">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <h6 class="text-muted text-uppercase mb-1">หนังสือทั้งหมด (เล่ม)</h6>
+                                        <h2 class="mb-0 fw-bold text-success"><?php echo number_format($cnt_books); ?></h2>
+                                    </div>
+                                    <div class="fs-1 text-success opacity-25"><i class="fa-solid fa-book"></i></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="card stat-card-hover p-3 border-start border-4 border-warning h-100">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <h6 class="text-muted text-uppercase mb-1">กำลังถูกยืม</h6>
+                                        <h2 class="mb-0 fw-bold text-warning"><?php echo number_format($cnt_borrow); ?></h2>
+                                    </div>
+                                    <div class="fs-1 text-warning opacity-25"><i class="fa-solid fa-hand-holding-heart"></i></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="card stat-card-hover p-3 border-start border-4 border-danger h-100">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <h6 class="text-muted text-uppercase mb-1">เกินกำหนดส่ง!</h6>
+                                        <h2 class="mb-0 fw-bold text-danger"><?php echo number_format($cnt_overdue); ?></h2>
+                                    </div>
+                                    <div class="fs-1 text-danger opacity-25"><i class="fa-solid fa-bell"></i></div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
                 <div class="col-md-4">
@@ -203,7 +334,27 @@ $is_blocked = ($overdue_count > 0);
             <script>
                 document.addEventListener("DOMContentLoaded", function() {
                     const ctx = document.getElementById('stockChart').getContext('2d');
-                    new Chart(ctx, { type: 'doughnut', data: { labels: ['ว่างพร้อมยืม', 'ถูกยืมออกไป'], datasets: [{ data: [<?php echo $cnt_available; ?>, <?php echo $cnt_borrow; ?>], backgroundColor: ['#198754', '#ffc107'], borderWidth: 0, hoverOffset: 4 }] }, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom' } } } });
+                    new Chart(ctx, {
+                        type: 'doughnut',
+                        data: {
+                            labels: ['ว่างพร้อมยืม', 'ถูกยืมออกไป'],
+                            datasets: [{
+                                data: [<?php echo $cnt_available; ?>, <?php echo $cnt_borrow; ?>],
+                                backgroundColor: ['#198754', '#ffc107'],
+                                borderWidth: 0,
+                                hoverOffset: 4
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            plugins: {
+                                legend: {
+                                    position: 'bottom'
+                                }
+                            }
+                        }
+                    });
                 });
             </script>
         <?php } ?>
@@ -258,35 +409,19 @@ $is_blocked = ($overdue_count > 0);
                                 $count = 0;
                                 while ($book = $stmt->fetch()) {
                                     $count++;
-                                    $countStmt = $pdo->prepare("SELECT COUNT(*) FROM book_items WHERE book_master_id = ? AND status = 'available'");
-                                    $countStmt->execute([$book['id']]);
-                                    $available = $countStmt->fetchColumn();
-                                    
-                                    $totalStmt = $pdo->prepare("SELECT COUNT(*) FROM book_items WHERE book_master_id = ?");
-                                    $totalStmt->execute([$book['id']]);
-                                    $total = $totalStmt->fetchColumn();
+                                    $stmtCount = $pdo->prepare("SELECT COUNT(*) FROM book_items WHERE book_master_id = ? AND status = 'available'");
+                                    $stmtCount->execute([$book['id']]);
+                                    $available = $stmtCount->fetchColumn();
 
-                                    $showImg = $book['cover_image'] ? "uploads/" . $book['cover_image'] : "https://via.placeholder.com/150?text=No+Image";
-                                    $stockStatus = ($available > 0) ? "ว่าง $available เล่ม" : "หมด";
-                                    $pdfFile = !empty($book['sample_pdf']) ? $book['sample_pdf'] : '';
+                                    // 🔥 Logic รูปภาพ: ถ้าเป็น URL (http) ให้ใช้เลย ถ้าไม่ใช่เติม uploads/
+                                    $cover = $book['cover_image'];
+                                    if (strpos($cover, 'http') === 0) {
+                                        $showImg = $cover;
+                                    } else {
+                                        $showImg = $cover ? "uploads/" . $cover : "https://via.placeholder.com/150?text=No+Image";
+                                    }
                                 ?>
-                                    <tr class="hover-row book-row" style="cursor: pointer;"
-                                        data-img="<?php echo $showImg; ?>"
-                                        data-title="<?php echo htmlspecialchars($book['title']); ?>"
-                                        data-author="<?php echo htmlspecialchars($book['author']); ?>"
-                                        data-publisher="<?php echo htmlspecialchars($book['publisher']); ?>"
-                                        data-isbn="<?php echo htmlspecialchars($book['isbn']); ?>"
-                                        data-price="<?php echo number_format($book['price'], 0); ?>"
-                                        data-pdf="<?php echo htmlspecialchars($pdfFile); ?>"
-                                        data-stock="<?php echo $available; ?>"
-                                        data-total="<?php echo $total; ?>"
-                                        data-pages="<?php echo $book['page_count'] ?? '-'; ?>"
-                                        data-paper="<?php echo $book['paper_type'] ?? '-'; ?>"
-                                        data-print="<?php echo $book['print_type'] ?? '-'; ?>"
-                                        data-size="<?php echo $book['book_size'] ?? '-'; ?>"
-                                        data-appno="<?php echo $book['approval_no'] ?? '-'; ?>"
-                                        data-apporder="<?php echo $book['approval_order'] ?? '-'; ?>">
-                                        
+                                    <tr class="hover-row book-row" data-id="<?php echo $book['id']; ?>" data-img="<?php echo $showImg; ?>">
                                         <td>
                                             <img src="<?php echo $showImg; ?>" class="book-cover">
                                         </td>
@@ -309,13 +444,13 @@ $is_blocked = ($overdue_count > 0);
                                                     <i class="fa-solid fa-layer-group"></i> จัดการสต็อก
                                                 </a>
                                             <?php } ?>
-                                            
-                                            <button class="btn btn-sm btn-primary w-100 mb-1 btn-view btn-action">
+
+                                            <a href="book_detail.php?id=<?php echo $book['id']; ?>" class="btn btn-sm btn-primary w-100 mb-1 btn-action" onclick="event.stopPropagation();">
                                                 <i class="fa-solid fa-circle-info"></i> รายละเอียด
-                                            </button>
+                                            </a>
 
                                             <?php if ($is_blocked): ?>
-                                                <button class="btn btn-sm btn-secondary w-100" disabled>
+                                                <button class="btn btn-sm btn-secondary w-100" disabled onclick="event.stopPropagation();">
                                                     <i class="fa-solid fa-ban me-1"></i> ระงับสิทธิ์
                                                 </button>
                                             <?php elseif ($available > 0): ?>
@@ -346,81 +481,47 @@ $is_blocked = ($overdue_count > 0);
         <script src="https://cdn.jsdelivr.net/npm/particles.js@2.0.0/particles.min.js"></script>
 
         <script>
-            // ส่งค่า Block status ไปให้ JS รู้ด้วย (เผื่อใช้ใน Modal)
-            const isUserBlocked = <?php echo $is_blocked ? 'true' : 'false'; ?>;
-
             $(document).ready(function() {
-                AOS.init({ duration: 800, once: true });
+                AOS.init({
+                    duration: 800,
+                    once: true
+                });
 
                 const table = $('#bookTable').DataTable({
-                    language: { search: "ค้นหา:", lengthMenu: "แสดง _MENU_ รายการ", info: "แสดง _START_ ถึง _END_ จาก _TOTAL_ รายการ", paginate: { first: "หน้าแรก", last: "หน้าสุดท้าย", next: "ถัดไป", previous: "ก่อนหน้า" }, zeroRecords: "ไม่พบข้อมูลหนังสือ" }
+                    language: {
+                        search: "ค้นหา:",
+                        lengthMenu: "แสดง _MENU_ รายการ",
+                        info: "แสดง _START_ ถึง _END_ จาก _TOTAL_ รายการ",
+                        paginate: {
+                            first: "หน้าแรก",
+                            last: "หน้าสุดท้าย",
+                            next: "ถัดไป",
+                            previous: "ก่อนหน้า"
+                        },
+                        zeroRecords: "ไม่พบข้อมูลหนังสือ"
+                    }
                 });
 
-                // --- 1. Event: คลิกปุ่ม "รายละเอียด" หรือแถว ---
-                $('#bookTable tbody').on('click', '.btn-view, tr.book-row', function(e) {
-                    if ($(e.target).closest('.btn-borrow, .btn-warning').length) return;
-                    
-                    const tr = $(this).closest('tr');
-                    const d = tr.data(); 
+                // 🔥 คลิกที่แถว -> ไปหน้า Detail
+                $('#bookTable tbody').on('click', 'tr.book-row', function(e) {
+                    // ถ้าคลิกโดนปุ่มยืมหรือสต็อก ไม่ต้องไปหน้า Detail
+                    if ($(e.target).closest('.btn-borrow, .btn-warning, .btn-secondary').length) return;
 
-                    // Fill Modal Data
-                    $('#m_cover').attr('src', d.img);
-                    $('#m_title').text(d.title);
-                    $('#m_isbn').text('ISBN: ' + d.isbn);
-                    $('#m_author').text(d.author);
-                    $('#m_publisher').text(d.publisher);
-                    $('#m_price').text(d.price);
-                    $('#m_pages').text(d.pages);
-                    $('#m_paper').text(d.paper);
-                    $('#m_print').text(d.print);
-                    $('#m_size').text(d.size);
-                    $('#m_approval').text(d.appno + ' (ลำดับที่ ' + d.apporder + ')');
-
-                    // Stock Status Logic
-                    const available = parseInt(d.stock);
-                    const total = parseInt(d.total);
-                    const percent = total > 0 ? (available / total) * 100 : 0;
-                    
-                    $('#m_available_text').text('ว่าง: ' + available);
-                    $('#m_total_text').text('ทั้งหมด: ' + total);
-                    $('#m_progress').css('width', percent + '%').removeClass('bg-success bg-secondary').addClass(available > 0 ? 'bg-success' : 'bg-secondary');
-                    
-                    // 🔥 Logic ปุ่มใน Modal (เช็ค Block ด้วย)
-                    if(isUserBlocked) {
-                        $('#m_stock_badge').html('<span class="status-dot inactive"></span> <span class="text-danger fw-bold small">ระงับสิทธิ์</span>');
-                        $('#m_btn_borrow').prop('disabled', true).html('<i class="fa-solid fa-ban me-2"></i> คืนของเก่าก่อน').removeClass('btn-modal-borrow').addClass('btn-blocked btn-secondary w-100');
-                    } else if(available > 0) {
-                        $('#m_stock_badge').html('<span class="status-dot active"></span> <span class="text-success fw-bold small">พร้อมยืม</span>');
-                        $('#m_btn_borrow').prop('disabled', false).html('<i class="fa-solid fa-book-open me-2"></i> ยืมหนังสือ').removeClass('btn-blocked btn-secondary').addClass('btn-modal-borrow');
-                        
-                        // Bind Event ปุ่มยืมใน Modal
-                        $('#m_btn_borrow').off('click').on('click', function() {
-                            confirmBorrow(d.id, d.title);
-                        });
-                    } else {
-                        $('#m_stock_badge').html('<span class="status-dot inactive"></span> <span class="text-danger fw-bold small">หมดชั่วคราว</span>');
-                        $('#m_btn_borrow').prop('disabled', true).html('<i class="fa-solid fa-lock me-2"></i> หนังสือหมด').removeClass('btn-modal-borrow').addClass('btn btn-secondary w-100');
+                    const id = $(this).data('id');
+                    if (id) {
+                        window.location.href = 'book_detail.php?id=' + id;
                     }
-
-                    // PDF Button
-                    if (d.pdf && d.pdf !== '') {
-                        $('#m_pdf_section').html(`<a href="uploads/pdfs/${d.pdf}" target="_blank" class="btn btn-sm btn-outline-danger rounded-pill px-3 mb-3"><i class="fa-regular fa-file-pdf me-1"></i> ทดลองอ่านตัวอย่าง</a>`);
-                    } else {
-                        $('#m_pdf_section').empty();
-                    }
-
-                    new bootstrap.Modal(document.getElementById('bookModal')).show();
                 });
 
-                // --- 2. Event: ปุ่มยืมหนังสือ (แก้ปัญหา Quote ตีกัน) ---
+                // ปุ่มยืมหนังสือ
                 $('#bookTable tbody').on('click', '.btn-borrow', function(e) {
-                    e.stopPropagation(); 
+                    e.stopPropagation(); // หยุดไม่ให้คลิกทะลุไปโดนแถว
                     const id = $(this).data('id');
                     const title = $(this).data('title');
                     confirmBorrow(id, title);
                 });
 
-                // --- 3. Hover รูปใหญ่ ---
+                // Hover รูปใหญ่
                 let hoverTimeout;
                 const overlay = $('#img-overlay');
                 const largeImg = $('#large-book-img');
@@ -437,9 +538,60 @@ $is_blocked = ($overdue_count > 0);
                     clearTimeout(hoverTimeout);
                     overlay.removeClass('show').hide();
                 });
-                overlay.on('click', function() { $(this).removeClass('show').hide(); });
-                
-                particlesJS("particles-js", { "particles": { "number": { "value": 160, "density": { "enable": true, "value_area": 800 } }, "color": { "value": "#0d6efd" }, "shape": { "type": "circle" }, "opacity": { "value": 0.5, "random": true }, "size": { "value": 3, "random": true }, "line_linked": { "enable": true, "distance": 150, "color": "#0d6efd", "opacity": 0.2, "width": 1 }, "move": { "enable": true, "speed": 2 } }, "interactivity": { "detect_on": "canvas", "events": { "onhover": { "enable": true, "mode": "grab" } }, "onclick": { "enable": true, "mode": "push" } }, "retina_detect": true });
+                overlay.on('click', function() {
+                    $(this).removeClass('show').hide();
+                });
+
+                particlesJS("particles-js", {
+                    "particles": {
+                        "number": {
+                            "value": 160,
+                            "density": {
+                                "enable": true,
+                                "value_area": 800
+                            }
+                        },
+                        "color": {
+                            "value": "#0d6efd"
+                        },
+                        "shape": {
+                            "type": "circle"
+                        },
+                        "opacity": {
+                            "value": 0.5,
+                            "random": true
+                        },
+                        "size": {
+                            "value": 3,
+                            "random": true
+                        },
+                        "line_linked": {
+                            "enable": true,
+                            "distance": 150,
+                            "color": "#0d6efd",
+                            "opacity": 0.2,
+                            "width": 1
+                        },
+                        "move": {
+                            "enable": true,
+                            "speed": 2
+                        }
+                    },
+                    "interactivity": {
+                        "detect_on": "canvas",
+                        "events": {
+                            "onhover": {
+                                "enable": true,
+                                "mode": "grab"
+                            }
+                        },
+                        "onclick": {
+                            "enable": true,
+                            "mode": "push"
+                        }
+                    },
+                    "retina_detect": true
+                });
             });
 
             // Confirm Borrow Function
@@ -463,84 +615,29 @@ $is_blocked = ($overdue_count > 0);
             // Alerts
             const urlParams = new URLSearchParams(window.location.search);
             const status = urlParams.get('status');
-            if (status === 'success') Swal.fire({ title: 'ยืมสำเร็จ!', text: 'อย่าลืมคืนหนังสือภายใน 7 วันนะครับ', icon: 'success', confirmButtonText: 'ตกลง' }).then(() => { window.history.replaceState(null, null, window.location.pathname); });
-            else if (status === 'duplicate') Swal.fire({ title: 'ยืมไม่ได้!', text: 'คุณมีหนังสือเล่มนี้อยู่แล้ว', icon: 'warning', confirmButtonText: 'เข้าใจแล้ว' }).then(() => { window.history.replaceState(null, null, window.location.pathname); });
-            else if (status === 'error') Swal.fire({ title: 'ขออภัย', text: 'หนังสือเล่มนี้หมดพอดี', icon: 'error', confirmButtonText: 'ปิด' });
+            if (status === 'success') Swal.fire({
+                title: 'ยืมสำเร็จ!',
+                text: 'อย่าลืมคืนหนังสือภายใน 7 วันนะครับ',
+                icon: 'success',
+                confirmButtonText: 'ตกลง'
+            }).then(() => {
+                window.history.replaceState(null, null, window.location.pathname);
+            });
+            else if (status === 'duplicate') Swal.fire({
+                title: 'ยืมไม่ได้!',
+                text: 'คุณมีหนังสือเล่มนี้อยู่แล้ว',
+                icon: 'warning',
+                confirmButtonText: 'เข้าใจแล้ว'
+            }).then(() => {
+                window.history.replaceState(null, null, window.location.pathname);
+            });
+            else if (status === 'error') Swal.fire({
+                title: 'ขออภัย',
+                text: 'หนังสือเล่มนี้หมดพอดี',
+                icon: 'error',
+                confirmButtonText: 'ปิด'
+            });
         </script>
-
-        <div class="modal fade" id="bookModal" tabindex="-1" aria-hidden="true">
-            <div class="modal-dialog modal-dialog-centered modal-xl">
-                <div class="modal-content">
-                    <div class="modal-header border-0 pb-0">
-                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                    </div>
-                    <div class="modal-body pt-0">
-                        <div class="row g-5">
-                            <div class="col-md-4 text-center">
-                                <div class="mb-4 d-flex justify-content-center">
-                                    <img id="m_cover" src="" class="detail-cover img-fluid" alt="Cover">
-                                </div>
-                                
-                                <div class="p-3 rounded-3 bg-light border border-secondary-subtle">
-                                    <div class="d-flex justify-content-between align-items-center mb-2">
-                                        <span class="text-label" style="font-size: 0.75rem; font-weight: bold; color: #6c757d;">STOCK STATUS</span>
-                                        <div id="m_stock_badge"></div>
-                                    </div>
-                                    <div class="progress" style="height: 6px; background-color: #e9ecef;">
-                                        <div id="m_progress" class="progress-bar" role="progressbar" style="width: 0%;"></div>
-                                    </div>
-                                    <div class="d-flex justify-content-between mt-2 small text-secondary fw-bold">
-                                        <span id="m_available_text"></span>
-                                        <span id="m_total_text"></span>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="col-md-8">
-                                <div class="mb-4 border-bottom pb-4">
-                                    <div class="d-flex justify-content-between align-items-start">
-                                        <div>
-                                            <span class="badge bg-primary bg-opacity-10 text-primary mb-2 px-3 py-2 rounded-pill" id="m_isbn"></span>
-                                            <h1 class="fw-bold text-dark mb-2" id="m_title"></h1>
-                                            <div class="d-flex gap-3 text-secondary small mb-3">
-                                                <span><i class="fa-regular fa-user me-1 text-primary"></i> <span id="m_author"></span></span>
-                                                <span><i class="fa-regular fa-building me-1 text-primary"></i> <span id="m_publisher"></span></span>
-                                            </div>
-                                            <div id="m_pdf_section"></div>
-                                        </div>
-                                        <div class="text-end">
-                                            <div class="price-tag"><span id="m_price"></span>.-</div>
-                                            <div class="text-secondary small">THB</div>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <div class="mb-5">
-                                    <div class="text-secondary fw-bold mb-3 small"><i class="fa-solid fa-layer-group me-2"></i>SPECIFICATIONS</div>
-                                    <div class="row g-0">
-                                        <div class="col-6 col-md-3"><div class="spec-box rounded-start-2"><div class="text-label">จำนวนหน้า</div><div class="text-value" id="m_pages"></div></div></div>
-                                        <div class="col-6 col-md-3"><div class="spec-box" style="border-left:0;"><div class="text-label">รูปแบบกระดาษ</div><div class="text-value text-dark" id="m_paper"></div></div></div>
-                                        <div class="col-6 col-md-3"><div class="spec-box" style="border-left:0;"><div class="text-label">การพิมพ์</div><div class="text-value text-dark" id="m_print"></div></div></div>
-                                        <div class="col-6 col-md-3"><div class="spec-box rounded-end-2" style="border-left:0;"><div class="text-label">ขนาด</div><div class="text-value text-dark" id="m_size"></div></div></div>
-                                    </div>
-                                    <div class="row g-0 mt-2">
-                                        <div class="col-12"><div class="spec-box d-flex justify-content-between rounded-2"><span class="text-label">APPROVAL NO.</span><span class="text-dark fw-bold" id="m_approval"></span></div></div>
-                                    </div>
-                                </div>
-
-                                <div class="d-flex gap-3 mt-auto">
-                                    <button id="m_btn_borrow" class="btn-modal-borrow shadow-sm">
-                                        <i class="fa-solid fa-book-open me-2"></i> ยืมหนังสือ
-                                    </button>
-                                    <button type="button" class="btn-modal-close" data-bs-dismiss="modal">
-                                        <i class="fa-solid fa-xmark"></i>
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
 </body>
+
 </html>
