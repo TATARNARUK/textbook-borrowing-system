@@ -11,7 +11,7 @@ if (!isset($_SESSION['user_id'])) {
 // ดึงข้อมูล User
 $user_id = $_SESSION['user_id'];
 
-// 🔥 BLOCKING LOGIC: เช็คว่ามีหนังสือเกินกำหนดส่งหรือไม่?
+// 🔥 BLOCKING LOGIC
 $stmtCheck = $pdo->prepare("SELECT COUNT(*) FROM transactions 
                             WHERE user_id = ? 
                             AND status = 'borrowed' 
@@ -75,7 +75,6 @@ $books = $stmt->fetchAll(PDO::FETCH_ASSOC);
         body { font-family: 'Noto Sans Thai', sans-serif; background-color: #f8f9fa; }
         .navbar-custom { background: rgba(255, 255, 255, 0.95); box-shadow: 0 2px 15px rgba(0, 0, 0, 0.05); }
         
-        /* Book Card */
         .book-card {
             transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
             border: none; border-radius: 15px; overflow: hidden; height: 100%;
@@ -87,10 +86,16 @@ $books = $stmt->fetchAll(PDO::FETCH_ASSOC);
         .book-cover-container { position: relative; padding-top: 140%; overflow: hidden; background: #eee; }
         .book-cover { position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; transition: transform 0.5s; }
         .book-card:hover .book-cover { transform: scale(1.05); }
-        .status-badge { position: absolute; top: 10px; right: 10px; z-index: 2; box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2); }
+        
+        .status-badge { position: absolute; top: 10px; right: 10px; z-index: 2; box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2); font-weight: bold; }
+        
         .btn-modal-borrow { background: #0d6efd; color: white; border: none; padding: 12px; border-radius: 10px; font-weight: bold; width: 100%; transition: all 0.3s; }
         .btn-modal-borrow:hover { background: #0b5ed7; transform: translateY(-2px); box-shadow: 0 5px 15px rgba(13, 110, 253, 0.3); }
         .btn-blocked { background: #6c757d !important; cursor: not-allowed; opacity: 0.8; }
+        
+        /* ปุ่ม PDF */
+        .btn-pdf { color: #dc3545; border: 1px solid #dc3545; font-size: 0.8rem; padding: 2px 8px; border-radius: 20px; transition: 0.2s; background: white; }
+        .btn-pdf:hover { background: #dc3545; color: white; }
     </style>
 </head>
 
@@ -167,11 +172,7 @@ $books = $stmt->fetchAll(PDO::FETCH_ASSOC);
                     $stmtCount->execute([$book['id']]);
                     $available = $stmtCount->fetchColumn();
                     
-                    $stmtTotal = $pdo->prepare("SELECT COUNT(*) FROM book_items WHERE book_master_id = ?");
-                    $stmtTotal->execute([$book['id']]);
-                    $total = $stmtTotal->fetchColumn();
-
-                    // 🔥 แก้ไข Logic การดึงรูปภาพ (เพื่อให้รูปขึ้น)
+                    // Logic รูปภาพ
                     $cover = $book['cover_image'];
                     $cover = str_replace(' ', '%20', $cover);
 
@@ -187,8 +188,22 @@ $books = $stmt->fetchAll(PDO::FETCH_ASSOC);
                         $img = "https://via.placeholder.com/300x450?text=No+Cover";
                     }
 
-                    $statusClass = $available > 0 ? 'bg-success' : 'bg-secondary';
-                    $statusText = $available > 0 ? "ว่าง $available" : 'หมด';
+                    // 🔥 Logic PDF (เพิ่มใหม่)
+                    $pdf = $book['sample_pdf'];
+                    $pdfUrl = '';
+                    if(!empty($pdf)){
+                        // ถ้าเป็น URL อยู่แล้ว (http) ใช้เลย, ถ้าไม่ใช่ให้เติม path
+                        $pdfUrl = (strpos($pdf, 'http') === 0) ? $pdf : "uploads/pdfs/" . $pdf;
+                    }
+
+                    // กำหนดสถานะ Badge
+                    if ($available > 0) {
+                        $statusClass = 'bg-success';
+                        $statusText = "ว่าง $available เล่ม";
+                    } else {
+                        $statusClass = 'bg-danger';
+                        $statusText = "ของหมด";
+                    }
                 ?>
                     <div class="col-6 col-md-4 col-lg-3 col-xl-2" data-aos="fade-up">
                         <div class="card book-card h-100" data-id="<?php echo $book['id']; ?>">
@@ -200,16 +215,30 @@ $books = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
                             <div class="card-body p-3 d-flex flex-column">
                                 <h6 class="fw-bold text-truncate mb-1" title="<?php echo $book['title']; ?>"><?php echo $book['title']; ?></h6>
-                                <small class="text-muted mb-3 d-block text-truncate"><i class="fa-solid fa-pen-nib me-1"></i> <?php echo $book['author']; ?></small>
+                                <small class="text-muted mb-2 d-block text-truncate"><i class="fa-solid fa-pen-nib me-1"></i> <?php echo $book['author']; ?></small>
                                 
+                                <?php if ($pdfUrl): ?>
+                                    <div class="mb-2">
+                                        <a href="<?php echo $pdfUrl; ?>" target="_blank" class="btn-pdf text-decoration-none" onclick="event.stopPropagation();">
+                                            <i class="fa-regular fa-file-pdf"></i> ตัวอย่าง
+                                        </a>
+                                    </div>
+                                <?php endif; ?>
+
                                 <div class="mt-auto">
+                                    <a href="book_detail.php?id=<?php echo $book['id']; ?>" class="btn btn-sm btn-outline-primary w-100 rounded-pill mb-2">
+                                        <i class="fa-solid fa-circle-info"></i> รายละเอียด
+                                    </a>
 
                                     <?php if ($is_blocked): ?>
                                         <button class="btn btn-sm btn-secondary w-100 rounded-pill border" disabled>
                                             <i class="fa-solid fa-ban me-1"></i> ระงับสิทธิ์
                                         </button>
-                                    <?php else: ?>
-                                        <button class="btn btn-sm btn-light text-muted w-100 rounded-pill border" disabled>ของหมด</button>
+                                    <?php elseif ($available > 0): ?>
+                                        <button class="btn btn-sm btn-primary w-100 rounded-pill shadow-sm btn-borrow" 
+                                            onclick="event.stopPropagation(); confirmBorrow('<?php echo $book['id']; ?>', '<?php echo addslashes($book['title']); ?>')">
+                                            ยืม
+                                        </button>
                                     <?php endif; ?>
                                 </div>
                             </div>
@@ -235,11 +264,8 @@ $books = $stmt->fetchAll(PDO::FETCH_ASSOC);
         $(document).ready(function() {
             AOS.init({ duration: 800, once: true });
 
-            // 🔥 คลิกที่การ์ด -> ไปหน้า Detail
             $('.book-card').on('click', function(e) {
-                // ถ้าคลิกโดนปุ่มยืมหรือลิงก์รายละเอียด ไม่ต้องทำซ้ำ
                 if ($(e.target).closest('.btn-borrow, a').length) return;
-
                 const id = $(this).data('id');
                 if(id) window.location.href = 'book_detail.php?id=' + id;
             });

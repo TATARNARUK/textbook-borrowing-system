@@ -25,7 +25,101 @@ if (!$bookMaster) {
     exit();
 }
 
-// --- 4. บันทึกเพิ่มเล่ม ---
+// ==========================================
+// 🌍 ZONE: Global Actions (จัดการทุกเล่มในระบบ)
+// ==========================================
+
+// --- 4. 🔥 เพิ่มสต็อกให้หนังสือ "ทุกเล่ม" (Global Add) ---
+if (isset($_POST['global_add_amount'])) {
+    $g_amount = (int)$_POST['global_add_amount'];
+    
+    if ($g_amount > 0) {
+        try {
+            $pdo->beginTransaction();
+            
+            // ดึง ID และ ISBN ของหนังสือทุกเล่มออกมา
+            $allBooks = $pdo->query("SELECT id, isbn FROM book_masters")->fetchAll();
+            $total_added_books = 0;
+
+            foreach ($allBooks as $b) {
+                $m_id = $b['id'];
+                $m_isbn = trim($b['isbn']);
+                
+                if (empty($m_isbn) || $m_isbn == '-') {
+                    $m_isbn = "BK" . str_pad($m_id, 4, '0', STR_PAD_LEFT);
+                }
+
+                // หาเลขรันล่าสุดของเล่มนั้นๆ
+                $stmtSeq = $pdo->prepare("SELECT book_code FROM book_items WHERE book_master_id = ? AND book_code LIKE ? ORDER BY length(book_code) DESC, book_code DESC LIMIT 1");
+                $stmtSeq->execute([$m_id, $m_isbn . '%']);
+                $lastItem = $stmtSeq->fetch();
+
+                $nextNum = 1;
+                if ($lastItem) {
+                    $numberPart = substr($lastItem['book_code'], strlen($m_isbn));
+                    if (is_numeric($numberPart)) {
+                        $nextNum = (int)$numberPart + 1;
+                    }
+                }
+
+                // Loop Insert ตามจำนวนที่ระบุ
+                for ($i = 0; $i < $g_amount; $i++) {
+                    $runningCode = str_pad($nextNum, 4, '0', STR_PAD_LEFT);
+                    $barcode = $m_isbn . $runningCode;
+
+                    $ins = $pdo->prepare("INSERT INTO book_items (book_master_id, book_code, status) VALUES (?, ?, 'available')");
+                    $ins->execute([$m_id, $barcode]);
+                    
+                    $nextNum++;
+                    $total_added_books++;
+                }
+            }
+
+            $pdo->commit();
+            $success_msg = "เพิ่มสต็อกให้หนังสือทุกเล่มในระบบ (เล่มละ $g_amount ชิ้น) รวม $total_added_books เล่ม เรียบร้อยแล้ว!";
+            
+        } catch (Exception $e) {
+            $pdo->rollBack();
+            $error_msg = "เกิดข้อผิดพลาด: " . $e->getMessage();
+        }
+    }
+}
+
+// --- 5. 🔥 ล้างสต็อก "ทุกเล่ม" (Global Clear) ---
+if (isset($_GET['global_clear'])) {
+    try {
+        // เช็คว่ามีเล่มไหนถูกยืมอยู่ไหม (ทั้งระบบ)
+        $stmtCheck = $pdo->query("SELECT COUNT(*) FROM book_items WHERE status = 'borrowed'");
+        $borrowedCount = $stmtCheck->fetchColumn();
+
+        if ($borrowedCount > 0) {
+            $error_msg = "ไม่สามารถล้างสต็อกทั้งระบบได้! มีหนังสือถูกยืมอยู่ $borrowedCount เล่ม (ต้องคืนให้ครบก่อน)";
+        } else {
+            $pdo->beginTransaction();
+            
+            // 1. ลบ Transactions ทั้งหมด (เฉพาะที่เกี่ยวกับ book_items)
+            $pdo->exec("DELETE FROM transactions WHERE book_item_id IS NOT NULL");
+            
+            // 2. ลบ Book Items ทั้งหมด (ใช้ DELETE แทน TRUNCATE เพื่อแก้ปัญหา Foreign Key Error)
+            $pdo->exec("DELETE FROM book_items"); 
+            
+            // (Optional) รีเซ็ต Auto Increment ถ้าต้องการ (อาจจะไม่ทำงานในบาง Hosting แต่ลองใส่ไว้ได้)
+            // $pdo->exec("ALTER TABLE book_items AUTO_INCREMENT = 1");
+
+            $pdo->commit();
+            $success_msg = "ล้างสต็อกหนังสือทั้งระบบเรียบร้อยแล้ว!";
+        }
+    } catch (Exception $e) {
+        $pdo->rollBack();
+        $error_msg = "เกิดข้อผิดพลาด: " . $e->getMessage();
+    }
+}
+
+// ==========================================
+// 📦 ZONE: Local Actions (จัดการเฉพาะเล่มปัจจุบัน)
+// ==========================================
+
+// --- 6. บันทึกเพิ่มเล่ม (เฉพาะเล่มนี้) ---
 if (isset($_POST['add_stock'])) {
     $amount = (int)$_POST['amount'];
     $isbn = trim($bookMaster['isbn']);
@@ -34,7 +128,6 @@ if (isset($_POST['add_stock'])) {
         $isbn = "BK" . str_pad($master_id, 4, '0', STR_PAD_LEFT);
     }
 
-    // หาเลขรันล่าสุด
     $stmtSeq = $pdo->prepare("SELECT book_code FROM book_items WHERE book_master_id = ? AND book_code LIKE ? ORDER BY length(book_code) DESC, book_code DESC LIMIT 1");
     $stmtSeq->execute([$master_id, $isbn . '%']);
     $lastItem = $stmtSeq->fetch();
@@ -60,7 +153,7 @@ if (isset($_POST['add_stock'])) {
     $success_msg = "เพิ่มหนังสือจำนวน $amount เล่ม เรียบร้อยแล้ว!";
 }
 
-// --- 5. ลบเล่มทีละเล่ม ---
+// --- 7. ลบเล่มทีละเล่ม ---
 if (isset($_GET['delete_item'])) {
     $del_id = $_GET['delete_item'];
 
@@ -85,29 +178,21 @@ if (isset($_GET['delete_item'])) {
     }
 }
 
-// --- 🔥 6. ลบเล่มทั้งหมด (Clear All Stock) ---
+// --- 8. ลบเล่มทั้งหมดของเล่มนี้ (Clear All Local) ---
 if (isset($_GET['clear_all'])) {
     try {
-        // เช็คก่อนว่ามีเล่มไหนถูกยืมอยู่ไหม
         $stmtCheckBorrow = $pdo->prepare("SELECT COUNT(*) FROM book_items WHERE book_master_id = ? AND status = 'borrowed'");
         $stmtCheckBorrow->execute([$master_id]);
         $borrowedCount = $stmtCheckBorrow->fetchColumn();
 
         if ($borrowedCount > 0) {
-            $error_msg = "ไม่สามารถลบทั้งหมดได้! มีหนังสือถูกยืมอยู่ $borrowedCount เล่ม (ต้องคืนให้ครบก่อน)";
+            $error_msg = "ไม่สามารถล้างสต็อกได้! มีหนังสือถูกยืมอยู่ $borrowedCount เล่ม";
         } else {
-            // ถ้าไม่มีใครยืม -> ลบโลด!
             $pdo->beginTransaction();
-
-            // ลบ Transactions ที่เกี่ยวข้องกับหนังสือ Master ID นี้ทั้งหมด (ผ่านการ JOIN หรือ ลบทีละเล่ม)
-            // วิธีที่ปลอดภัย: ลบ Transactions ของ Item ที่อยู่ใน Master นี้
             $pdo->prepare("DELETE FROM transactions WHERE book_item_id IN (SELECT id FROM book_items WHERE book_master_id = ?)")->execute([$master_id]);
-
-            // ลบ Items ทั้งหมด
             $pdo->prepare("DELETE FROM book_items WHERE book_master_id = ?")->execute([$master_id]);
-
             $pdo->commit();
-            $success_msg = "ล้างสต็อกหนังสือทั้งหมดเรียบร้อยแล้ว!";
+            $success_msg = "ล้างสต็อกหนังสือเล่มนี้ทั้งหมดเรียบร้อยแล้ว!";
         }
     } catch (Exception $e) {
         $pdo->rollBack();
@@ -122,6 +207,8 @@ if (isset($_GET['clear_all'])) {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="referrer" content="no-referrer">
+    
     <title>จัดการสต็อก - <?php echo $bookMaster['title']; ?></title>
     <link rel="icon" type="image/png" href="images/books.png">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -130,191 +217,37 @@ if (isset($_GET['clear_all'])) {
     <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
 
     <style>
-        /* CSS เดิม */
-        body {
-            font-family: 'Noto Sans Thai', sans-serif;
-            background-color: #f0f4f8;
-            background-image: radial-gradient(#dbeafe 1px, transparent 1px);
-            background-size: 20px 20px;
-            color: #333;
-            overflow-x: hidden;
-        }
+        body { font-family: 'Noto Sans Thai', sans-serif; background-color: #f0f4f8; overflow-x: hidden; }
+        #particles-js { position: fixed; width: 100%; height: 100%; top: 0; left: 0; z-index: -1; pointer-events: none; }
+        .glass-card { background: #ffffff; border: none; border-radius: 20px; box-shadow: 0 10px 40px rgba(13, 110, 253, 0.1); padding: 30px; margin-bottom: 30px; position: relative; z-index: 1; }
+        
+        .table-custom { width: 100%; border-collapse: separate; border-spacing: 0 8px; }
+        .table-custom thead th { background-color: #e7f1ff; color: #0d6efd; font-size: 0.85rem; font-weight: 700; text-transform: uppercase; padding: 15px; border: none; }
+        .table-custom thead th:first-child { border-top-left-radius: 10px; border-bottom-left-radius: 10px; }
+        .table-custom thead th:last-child { border-top-right-radius: 10px; border-bottom-right-radius: 10px; }
+        .table-custom tbody tr { background-color: #fff; transition: all 0.2s; box-shadow: 0 2px 5px rgba(0, 0, 0, 0.02); }
+        .table-custom tbody tr:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(13, 110, 253, 0.1); }
+        .table-custom td { padding: 15px; vertical-align: middle; color: #555; border-top: 1px solid #f0f0f0; border-bottom: 1px solid #f0f0f0; }
+        .table-custom td:first-child { border-left: 1px solid #f0f0f0; border-top-left-radius: 10px; border-bottom-left-radius: 10px; }
+        .table-custom td:last-child { border-right: 1px solid #f0f0f0; border-top-right-radius: 10px; border-bottom-right-radius: 10px; }
+        
+        .btn-custom-primary { background: linear-gradient(45deg, #0d6efd, #0dcaf0); color: #fff; border: none; font-weight: 600; border-radius: 10px; padding: 8px 20px; }
+        .btn-del { color: #dc3545; background: #fff; border: 1px solid #f5c2c7; border-radius: 8px; padding: 6px 12px; }
+        .btn-del:hover { background: #dc3545; color: #fff; }
+        
+        /* ปุ่มล้างสต็อก (Local & Global) */
+        .btn-clear-all { color: #fff; background: #dc3545; border: none; border-radius: 10px; padding: 8px 20px; font-weight: bold; transition: all 0.3s; }
+        .btn-clear-all:hover { background: #bb2d3b; transform: translateY(-2px); box-shadow: 0 4px 10px rgba(220, 53, 69, 0.3); color: white;}
+        
+        /* ปุ่ม Add Global */
+        .btn-add-global { background: linear-gradient(45deg, #198754, #20c997); color: #fff; border: none; border-radius: 10px; padding: 8px 20px; font-weight: 600; transition: 0.3s; box-shadow: 0 4px 10px rgba(25, 135, 84, 0.2); }
+        .btn-add-global:hover { transform: translateY(-2px); box-shadow: 0 6px 15px rgba(25, 135, 84, 0.3); color: #fff; }
 
-        #particles-js {
-            position: fixed;
-            width: 100%;
-            height: 100%;
-            top: 0;
-            left: 0;
-            z-index: -1;
-            pointer-events: none;
-        }
-
-        .glass-card {
-            background: #ffffff;
-            border: none;
-            border-radius: 20px;
-            box-shadow: 0 10px 40px rgba(13, 110, 253, 0.1);
-            padding: 30px;
-            margin-bottom: 30px;
-            position: relative;
-            z-index: 1;
-        }
-
-        .table-custom {
-            width: 100%;
-            border-collapse: separate;
-            border-spacing: 0 8px;
-        }
-
-        .table-custom thead th {
-            background-color: #e7f1ff;
-            color: #0d6efd;
-            font-size: 0.85rem;
-            font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            border: none;
-            padding: 15px;
-        }
-
-        .table-custom thead th:first-child {
-            border-top-left-radius: 10px;
-            border-bottom-left-radius: 10px;
-        }
-
-        .table-custom thead th:last-child {
-            border-top-right-radius: 10px;
-            border-bottom-right-radius: 10px;
-        }
-
-        .table-custom tbody tr {
-            background-color: #fff;
-            transition: all 0.2s;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.02);
-        }
-
-        .table-custom tbody tr:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(13, 110, 253, 0.1);
-            background-color: #f8f9fa;
-        }
-
-        .table-custom td {
-            border: 1px solid #f0f0f0;
-            border-width: 1px 0;
-            padding: 15px;
-            vertical-align: middle;
-            color: #555;
-        }
-
-        .table-custom td:first-child {
-            border-left: 1px solid #f0f0f0;
-            border-top-left-radius: 10px;
-            border-bottom-left-radius: 10px;
-        }
-
-        .table-custom td:last-child {
-            border-right: 1px solid #f0f0f0;
-            border-top-right-radius: 10px;
-            border-bottom-right-radius: 10px;
-        }
-
-        .btn-custom-primary {
-            background: linear-gradient(45deg, #0d6efd, #0dcaf0);
-            color: #fff;
-            border: none;
-            font-weight: 600;
-            border-radius: 10px;
-            padding: 8px 20px;
-            transition: all 0.3s;
-            box-shadow: 0 4px 6px rgba(13, 110, 253, 0.2);
-        }
-
-        .btn-custom-primary:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 12px rgba(13, 110, 253, 0.3);
-            color: #fff;
-        }
-
-        .btn-outline-custom {
-            background: transparent;
-            color: #0d6efd;
-            border: 1px solid #0d6efd;
-            border-radius: 10px;
-            font-weight: 600;
-            padding: 8px 20px;
-            transition: all 0.3s;
-        }
-
-        .btn-outline-custom:hover {
-            background: #0d6efd;
-            color: #fff;
-        }
-
-        .btn-del {
-            color: #dc3545;
-            background: #fff;
-            border: 1px solid #f5c2c7;
-            border-radius: 8px;
-            padding: 6px 12px;
-            transition: all 0.3s;
-        }
-
-        .btn-del:hover {
-            background: #dc3545;
-            color: #fff;
-            border-color: #dc3545;
-        }
-
-        .btn-clear-all {
-            color: #fff;
-            background: #dc3545;
-            border: none;
-            border-radius: 10px;
-            padding: 8px 20px;
-            font-weight: 600;
-            transition: all 0.3s;
-        }
-
-        .btn-clear-all:hover {
-            background: #bb2d3b;
-            transform: translateY(-2px);
-            box-shadow: 0 4px 10px rgba(220, 53, 69, 0.3);
-        }
-
-        .status-pill {
-            padding: 5px 12px;
-            border-radius: 50px;
-            font-size: 0.75rem;
-            font-weight: 600;
-        }
-
-        .st-ok {
-            background: #d1e7dd;
-            color: #0f5132;
-        }
-
-        .st-borrow {
-            background: #fff3cd;
-            color: #856404;
-        }
-
-        .book-thumb-lg {
-            width: 100%;
-            max-width: 140px;
-            border-radius: 10px;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-            border: 1px solid #eee;
-        }
-
-        .stats-box {
-            background: #f8f9fa;
-            border: 1px solid #dee2e6;
-            border-radius: 15px;
-            padding: 20px;
-            text-align: center;
-        }
+        .status-pill { padding: 5px 12px; border-radius: 50px; font-size: 0.75rem; font-weight: 600; }
+        .st-ok { background: #d1e7dd; color: #0f5132; }
+        .st-borrow { background: #fff3cd; color: #856404; }
+        .book-thumb-lg { width: 100%; max-width: 140px; border-radius: 10px; box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1); }
+        .stats-box { background: #f8f9fa; border-radius: 15px; padding: 20px; text-align: center; }
     </style>
 </head>
 
@@ -335,9 +268,19 @@ if (isset($_GET['clear_all'])) {
                     <small class="text-secondary">บริหารจัดการจำนวนเล่มหนังสือ</small>
                 </div>
             </div>
-            <div>
-                <a href="index.php" class="btn btn-outline-custom">
-                    <i class="fa-solid fa-arrow-left me-2"></i> กลับหน้าหลัก
+            <div class="d-flex gap-2">
+                <button type="button" class="btn btn-add-global" onclick="openAddAllModal()">
+                    <i class="fa-solid fa-layer-group me-2"></i> เพิ่มสต็อก (ทุกเล่ม)
+                </button>
+                
+                <a href="book_stock.php?id=<?php echo $master_id; ?>&global_clear=1" 
+                   class="btn btn-clear-all"
+                   onclick="return confirm('⚠️⚠️ อันตราย! ⚠️⚠️\n\nคุณกำลังจะลบสต็อกหนังสือ \'ทุกเล่ม\' ในระบบ!!\nข้อมูลจะไม่สามารถกู้คืนได้\n\nยืนยันหรือไม่?');">
+                    <i class="fa-solid fa-dumpster-fire me-2"></i> ล้างสต็อก (ทุกเล่ม)
+                </a>
+                
+                <a href="index.php" class="btn btn-outline-secondary rounded-pill fw-bold border-2 px-3 pt-2">
+                    <i class="fa-solid fa-arrow-left me-2"></i> กลับ
                 </a>
             </div>
         </div>
@@ -345,13 +288,12 @@ if (isset($_GET['clear_all'])) {
         <div class="glass-card" data-aos="fade-up">
             <div class="row align-items-center">
                 <div class="col-md-2 text-center text-md-start mb-4 mb-md-0">
-                    <?php if ($bookMaster['cover_image']): ?>
-                        <img src="uploads/<?php echo $bookMaster['cover_image']; ?>" class="book-thumb-lg">
-                    <?php else: ?>
-                        <div class="book-thumb-lg d-flex align-items-center justify-content-center bg-light text-muted" style="height: 180px;">
-                            <i class="fa-regular fa-image fs-1"></i>
-                        </div>
-                    <?php endif; ?>
+                    <?php 
+                        $cover = $bookMaster['cover_image'];
+                        $cover = str_replace(' ', '%20', $cover);
+                        $showImg = (strpos($cover, 'http') === 0) ? $cover : "uploads/" . $cover;
+                    ?>
+                    <img src="<?php echo $showImg; ?>" class="book-thumb-lg" onerror="this.src='https://via.placeholder.com/150?text=No+Image'">
                 </div>
 
                 <div class="col-md-7 mb-4 mb-md-0">
@@ -363,30 +305,23 @@ if (isset($_GET['clear_all'])) {
                     </div>
 
                     <div class="bg-light p-3 rounded-4 border d-flex flex-wrap align-items-center gap-3">
-
                         <label class="text-dark fw-bold small text-uppercase m-0 text-nowrap">
-                            <i class="fa-solid fa-plus-circle me-1 text-primary"></i> เพิ่มสต็อก:
+                            <i class="fa-solid fa-plus-circle me-1 text-primary"></i> เพิ่มสต็อก (เล่มนี้):
                         </label>
-
                         <form method="post" class="d-flex gap-2 align-items-center">
                             <input type="number" name="amount" class="form-control text-center fw-bold border-primary shadow-sm" style="width: 80px;" value="1" min="1" max="50">
                             <button type="submit" name="add_stock" class="btn btn-custom-primary text-nowrap shadow-sm">
                                 <i class="fa-solid fa-check me-1"></i> ยืนยัน
                             </button>
                         </form>
-
-                        <small class="text-muted d-none d-md-block text-nowrap">
-                            (รหัส: <?php echo $bookMaster['isbn']; ?>xxxx)
-                        </small>
-
+                        
                         <div class="ms-auto">
-                            <a href="book_stock.php?id=<?php echo $master_id; ?>&clear_all=1"
-                                class="btn btn-clear-all btn-sm text-nowrap shadow-sm"
-                                onclick="return confirm('⚠️ คำเตือน! คุณต้องการลบหนังสือทุกเล่มในสต็อกนี้ใช่หรือไม่?\n\nการกระทำนี้ไม่สามารถย้อนกลับได้!');">
-                                <i class="fa-solid fa-trash-can me-1"></i> ล้างสต็อก
+                            <a href="book_stock.php?id=<?php echo $master_id; ?>&clear_all=1" 
+                               class="btn btn-outline-danger btn-sm text-nowrap shadow-sm border-danger"
+                               onclick="return confirm('⚠️ คำเตือน! คุณต้องการลบสต็อกหนังสือเล่มนี้ทั้งหมดหรือไม่?\n\n(การกระทำนี้ไม่สามารถย้อนกลับได้)');">
+                                <i class="fa-solid fa-trash-can me-1"></i> ล้างสต็อก (เล่มนี้)
                             </a>
                         </div>
-
                     </div>
                 </div>
 
@@ -462,83 +397,68 @@ if (isset($_GET['clear_all'])) {
 
     </div>
 
+    <form id="formGlobalAdd" method="POST" style="display:none;">
+        <input type="hidden" name="global_add_amount" id="inputGlobalAmount">
+    </form>
+
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/particles.js@2.0.0/particles.min.js"></script>
 
     <script>
-        AOS.init({
-            duration: 800,
-            once: true
-        });
+        AOS.init({ duration: 800, once: true });
 
         particlesJS("particles-js", {
             "particles": {
-                "number": {
-                    "value": 160,
-                    "density": {
-                        "enable": true,
-                        "value_area": 800
-                    }
-                },
-                "color": {
-                    "value": "#0d6efd"
-                },
-                "shape": {
-                    "type": "circle"
-                },
-                "opacity": {
-                    "value": 0.5,
-                    "random": true
-                },
-                "size": {
-                    "value": 3,
-                    "random": true
-                },
-                "line_linked": {
-                    "enable": true,
-                    "distance": 150,
-                    "color": "#0d6efd",
-                    "opacity": 0.2,
-                    "width": 1
-                },
-                "move": {
-                    "enable": true,
-                    "speed": 2
-                }
+                "number": { "value": 160, "density": { "enable": true, "value_area": 800 } },
+                "color": { "value": "#0d6efd" },
+                "shape": { "type": "circle" },
+                "opacity": { "value": 0.5, "random": true },
+                "size": { "value": 3, "random": true },
+                "line_linked": { "enable": true, "distance": 150, "color": "#0d6efd", "opacity": 0.2, "width": 1 },
+                "move": { "enable": true, "speed": 2 }
             },
             "interactivity": {
                 "detect_on": "canvas",
-                "events": {
-                    "onhover": {
-                        "enable": true,
-                        "mode": "grab"
-                    }
-                }
+                "events": { "onhover": { "enable": true, "mode": "grab" } },
+                "onclick": { "enable": true, "mode": "push" }
             },
             "retina_detect": true
         });
 
-        <?php if (isset($success_msg)) : ?>
+        // 🔥 ฟังก์ชันเปิด Modal สำหรับเพิ่มสต็อกทุกเล่ม (Global)
+        function openAddAllModal() {
             Swal.fire({
-                title: 'สำเร็จ!',
-                text: '<?php echo $success_msg; ?>',
-                icon: 'success',
-                confirmButtonColor: '#0d6efd',
-                confirmButtonText: 'ตกลง'
-            });
+                title: '⚡ เพิ่มสต็อกให้หนังสือทุกเล่ม',
+                html: '<p class="text-muted">ระบบจะเพิ่มจำนวนสต็อกให้กับหนังสือ <b>ทุกเล่มในฐานข้อมูล</b><br>โปรดระบุจำนวนที่ต้องการเพิ่มต่อเล่ม</p>',
+                input: 'number',
+                inputAttributes: { min: 1, max: 100, step: 1 },
+                inputValue: 1,
+                showCancelButton: true,
+                confirmButtonText: 'ยืนยันการเพิ่ม',
+                cancelButtonText: 'ยกเลิก',
+                confirmButtonColor: '#198754',
+                preConfirm: (amount) => {
+                    if (!amount || amount <= 0) {
+                        Swal.showValidationMessage('กรุณาระบุจำนวนที่ถูกต้อง')
+                    }
+                    return amount;
+                }
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    document.getElementById('inputGlobalAmount').value = result.value;
+                    document.getElementById('formGlobalAdd').submit();
+                }
+            })
+        }
+
+        <?php if (isset($success_msg)) : ?>
+            Swal.fire({ title: 'สำเร็จ!', text: '<?php echo $success_msg; ?>', icon: 'success', confirmButtonColor: '#0d6efd', confirmButtonText: 'ตกลง' });
         <?php endif; ?>
 
         <?php if (isset($error_msg)) : ?>
-            Swal.fire({
-                title: 'ข้อผิดพลาด!',
-                text: '<?php echo $error_msg; ?>',
-                icon: 'error',
-                confirmButtonColor: '#dc3545',
-                confirmButtonText: 'ตกลง'
-            });
+            Swal.fire({ title: 'ข้อผิดพลาด!', text: '<?php echo $error_msg; ?>', icon: 'error', confirmButtonColor: '#dc3545', confirmButtonText: 'ตกลง' });
         <?php endif; ?>
     </script>
 </body>
-
 </html>

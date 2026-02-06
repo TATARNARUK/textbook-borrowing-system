@@ -219,16 +219,19 @@ $is_blocked = ($overdue_count > 0);
                                     <h6 class="dropdown-header text-uppercase small text-muted">รายงาน & สถิติ</h6>
                                 </li>
                                 <li><a class="dropdown-item" href="report.php"><i class="fa-solid fa-chart-pie me-2 text-warning"></i> รายงานสรุป</a></li>
+
                                 <li>
                                     <hr class="dropdown-divider">
                                 </li>
+
                                 <li>
                                     <h6 class="dropdown-header text-uppercase small text-muted">จัดการข้อมูล</h6>
                                 </li>
                                 <li><a class="dropdown-item" href="add_book.php"><i class="fa-solid fa-book-medical me-2 text-success"></i> เพิ่มหนังสือใหม่</a></li>
+                                <li><a class="dropdown-item" href="book_stock_list.php"><i class="fa-solid fa-boxes-stacked me-2 text-primary"></i> จัดการสต็อกหนังสือ</a></li>
                                 <li><a class="dropdown-item" href="manage_categories.php"><i class="fa-solid fa-layer-group me-2 text-info"></i> จัดการหมวดหมู่</a></li>
                                 <li><a class="dropdown-item" href="admin_users.php"><i class="fa-solid fa-users-gear me-2 text-danger"></i> จัดการผู้ใช้</a></li>
-                                <li><a class="dropdown-item" href="import_api.php"><i class="fa-solid fa-cloud-arrow-down me-2 text-primary"></i> นำเข้าหนังสือจาก API</a></li>
+                                <li><a class="dropdown-item" href="import_api.php"><i class="fa-solid fa-cloud-arrow-down me-2 text-secondary"></i> นำเข้าหนังสือจาก API</a></li>
                             </ul>
                         </li>
                     <?php } ?>
@@ -439,12 +442,6 @@ $is_blocked = ($overdue_count > 0);
                                             <?php endif; ?>
                                         </td>
                                         <td>
-                                            <?php if ($user_role == 'admin') { ?>
-                                                <a href="book_stock.php?id=<?php echo $book['id']; ?>" class="btn btn-sm btn-warning w-100 mb-1 btn-action" onclick="event.stopPropagation();">
-                                                    <i class="fa-solid fa-layer-group"></i> จัดการสต็อก
-                                                </a>
-                                            <?php } ?>
-
                                             <a href="book_detail.php?id=<?php echo $book['id']; ?>" class="btn btn-sm btn-primary w-100 mb-1 btn-action" onclick="event.stopPropagation();">
                                                 <i class="fa-solid fa-circle-info"></i> รายละเอียด
                                             </a>

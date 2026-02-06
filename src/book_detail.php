@@ -305,8 +305,13 @@ $available_items = $stock['available'] ?? 0;
                                             <span><i class="fa-regular fa-building me-1 text-primary"></i> <?php echo $book['publisher']; ?></span>
                                         </div>
 
-                                        <?php if (!empty($book['sample_pdf'])): ?>
-                                            <a href="uploads/pdfs/<?php echo $book['sample_pdf']; ?>" target="_blank"
+                                        <?php
+                                        $pdf = $book['sample_pdf'];
+                                        if (!empty($pdf)):
+                                            // เช็คว่าถ้าเป็นลิงก์ http (จาก API) ให้ใช้เลย, ถ้าไม่ใช่ให้เติม path ในเครื่อง
+                                            $pdfUrl = (strpos($pdf, 'http') === 0) ? $pdf : "uploads/pdfs/" . $pdf;
+                                        ?>
+                                            <a href="<?php echo $pdfUrl; ?>" target="_blank"
                                                 class="btn btn-sm btn-outline-danger rounded-pill px-3 pdf-btn">
                                                 <i class="fa-regular fa-file-pdf me-1"></i> ทดลองอ่านตัวอย่าง
                                             </a>
