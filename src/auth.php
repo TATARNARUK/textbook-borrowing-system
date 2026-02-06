@@ -1,13 +1,20 @@
 <?php
-// 1. ตั้งค่า Header และปิด Error กวนใจ
+// 1. ตั้งค่า Header และ Session
+session_start(); // เริ่ม Session ตั้งแต่บรรทัดแรกเลย
 error_reporting(0);
 ini_set('display_errors', 0);
 header('Content-Type: application/json; charset=utf-8');
+
 require_once 'config.php';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $student_id = trim($_POST['student_id'] ?? '');
     $password = trim($_POST['password'] ?? '');
+
+    if (empty($student_id) || empty($password)) {
+        echo json_encode(['status' => 'error', 'message' => 'กรุณากรอกข้อมูลให้ครบถ้วน']);
+        exit;
+    }
 
     // ----------------------------------------------------------------------
     // ส่วนที่ 1: เช็ค ADMIN (Admin ต้องเช็คจากฐานข้อมูลเราเสมอ)
@@ -18,11 +25,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $admin = $stmt->fetch(PDO::FETCH_ASSOC);
 
         if ($admin && password_verify($password, $admin['password'])) {
-            session_start();
+            // Regenerate ID เพื่อความปลอดภัย (ป้องกัน Session Fixation)
+            session_regenerate_id(true);
+            
             $_SESSION['user_id'] = $admin['id'];
             $_SESSION['fullname'] = $admin['fullname'];
             $_SESSION['role'] = $admin['role'];
             $_SESSION['student_id'] = $student_id;
+            
             echo json_encode(['status' => 'success', 'message' => 'เข้าสู่ระบบ Admin สำเร็จ']);
             exit;
         }
@@ -40,11 +50,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     curl_setopt_array($curl, [
         CURLOPT_URL => "https://rms.bncc.ac.th/api/pornchai/api.php",
         CURLOPT_RETURNTRANSFER => true,
-        CURLOPT_TIMEOUT => 30,
+        CURLOPT_TIMEOUT => 30, // เพิ่มเวลาเผื่อเว็บวิลัยช้า
         CURLOPT_CUSTOMREQUEST => "GET",
         CURLOPT_HTTPHEADER => [
             "Accept: */*",
-            "X-Application-Key: 7f2dabbc4721bb7229846555123b42fc", // Key ปัจจุบัน
+            "X-Application-Key: 7f2dabbc4721bb7229846555123b42fc",
             "X-Application-Name: check_auth_rms",
             "X-Application-Parameter: " . $apiParameter,
             "X-Application-Request: pornchai"
@@ -56,8 +66,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     curl_close($curl);
 
     if ($err) {
-        // กรณีเน็ตวิทยาลัยล่ม ให้ลองเช็ค Local DB เป็น Backup (Optional)
-        echo json_encode(['status' => 'error', 'message' => 'เชื่อมต่อระบบ RMS ไม่ได้']);
+        echo json_encode(['status' => 'error', 'message' => 'ไม่สามารถติดต่อ RMS ได้ (Connection Error)']);
         exit;
     }
 
@@ -66,65 +75,62 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     // ตรวจสอบว่า API ตอบกลับมาว่า Login สำเร็จไหม
     if (!empty($data['result']) && count($data['result']) > 0) {
         
-        // --- ✅ Login RMS ผ่านแล้ว! ---
         $userData = $data['result'][0];
         
-        // เตรียมข้อมูลสำหรับบันทึกลง DB
-        $std_code = trim($userData['username']); // หรือ $userData['std_code'] แล้วแต่ API ส่ง
-        $prefix = $userData['std_prefix'] ?? ''; // บางที API login ไม่ส่ง prefix มา อาจต้องข้าม
-        $fname = $userData['first_name'];
-        $lname = $userData['last_name'];
+        // เตรียมข้อมูล (ใช้ ?? ป้องกัน Error กรณี API ส่งมาไม่ครบ)
+        $std_code = trim($userData['username'] ?? $student_id);
+        $prefix   = trim($userData['std_prefix'] ?? '');
+        $fname    = trim($userData['first_name'] ?? '');
+        $lname    = trim($userData['last_name'] ?? '');
+        
+        // รวมชื่อ (ตัดช่องว่างส่วนเกินออก)
         $full_name = trim("$prefix$fname $lname");
-        $dept = $userData['department'] ?? 'นักเรียน';
+        if (empty($full_name)) $full_name = "นักเรียน (ไม่มีชื่อจากระบบ)";
 
         // ------------------------------------------------------------------
-        // 🔥 AUTO SYNC: บันทึกหรืออัปเดตข้อมูลลงฐานข้อมูลเราทันที
+        // 🔥 AUTO SYNC
         // ------------------------------------------------------------------
         try {
-            // เช็คว่ามีคนนี้ใน DB เราหรือยัง
             $stmt = $pdo->prepare("SELECT id FROM users WHERE student_id = :id");
             $stmt->execute([':id' => $std_code]);
             $local_user = $stmt->fetch(PDO::FETCH_ASSOC);
 
             if ($local_user) {
-                // กรณี A: มีอยู่แล้ว -> อัปเดตชื่อให้เป็นปัจจุบัน (เผื่อเปลี่ยนชื่อ)
-                $updateSql = "UPDATE users SET fullname = :fullname WHERE id = :id";
-                $updateStmt = $pdo->prepare($updateSql);
+                // UPDATE: อัปเดตชื่อ
+                $updateStmt = $pdo->prepare("UPDATE users SET fullname = :fullname WHERE id = :id");
                 $updateStmt->execute([
                     ':fullname' => $full_name,
                     ':id' => $local_user['id']
                 ]);
                 $user_db_id = $local_user['id'];
             } else {
-                // กรณี B: ยังไม่มี (เด็กใหม่) -> เพิ่มลง DB เลย!
-                $insertSql = "INSERT INTO users (student_id, password, fullname, role) VALUES (:student_id, :password, :fullname, 'student')";
-                $insertStmt = $pdo->prepare($insertSql);
+                // INSERT: เพิ่มเด็กใหม่ (ใส่รหัสผ่านหลอกๆ ไว้ เพราะเช็คผ่าน API)
+                $insertStmt = $pdo->prepare("INSERT INTO users (student_id, password, fullname, role) VALUES (:student_id, :password, :fullname, 'student')");
                 $insertStmt->execute([
                     ':student_id' => $std_code,
-                    ':password' => password_hash('RMS_LOGIN', PASSWORD_DEFAULT), // รหัสหลอก
+                    ':password' => password_hash('RMS_LOGIN_USER', PASSWORD_DEFAULT), 
                     ':fullname' => $full_name
                 ]);
-                $user_db_id = $pdo->lastInsertId(); // รับ ID ที่เพิ่งสร้าง
+                $user_db_id = $pdo->lastInsertId();
             }
 
-            // ------------------------------------------------------------------
-            // สร้าง Session เพื่อเข้าสู่ระบบ
-            // ------------------------------------------------------------------
-            session_start();
+            // ตั้งค่า Session
+            session_regenerate_id(true);
             $_SESSION['user_id'] = $user_db_id;
             $_SESSION['fullname'] = $full_name;
             $_SESSION['role'] = 'student';
             $_SESSION['student_id'] = $std_code;
-            $_SESSION['department'] = $dept;
 
-            echo json_encode(['status' => 'success', 'message' => 'เข้าสู่ระบบสำเร็จ (ข้อมูลอัปเดตแล้ว)']);
+            echo json_encode(['status' => 'success', 'message' => 'เข้าสู่ระบบสำเร็จ']);
 
         } catch (Exception $e) {
-            echo json_encode(['status' => 'error', 'message' => 'Login RMS ผ่าน แต่บันทึกข้อมูลลงระบบไม่ได้: ' . $e->getMessage()]);
+            // ถ้าบันทึก DB ไม่ได้ ให้ Login ได้อยู่ดี (แต่ไม่มี Session ID ของ DB)
+            // หรือจะเลือกให้ Error เลยก็ได้
+            echo json_encode(['status' => 'error', 'message' => 'ระบบฐานข้อมูลมีปัญหา: ' . $e->getMessage()]);
         }
 
     } else {
-        // --- ❌ RMS บอกว่ารหัสผิด ---
+        // --- RMS บอกว่ารหัสผิด ---
         echo json_encode(['status' => 'error', 'message' => 'รหัสนักเรียน หรือ รหัสผ่าน ไม่ถูกต้อง']);
     }
     exit;

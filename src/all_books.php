@@ -235,10 +235,6 @@ $books = $stmt->fetchAll(PDO::FETCH_ASSOC);
                                             <i class="fa-solid fa-ban me-1"></i> ระงับสิทธิ์
                                         </button>
                                     <?php elseif ($available > 0): ?>
-                                        <button class="btn btn-sm btn-primary w-100 rounded-pill shadow-sm btn-borrow" 
-                                            onclick="event.stopPropagation(); confirmBorrow('<?php echo $book['id']; ?>', '<?php echo addslashes($book['title']); ?>')">
-                                            ยืม
-                                        </button>
                                     <?php endif; ?>
                                 </div>
                             </div>

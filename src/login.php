@@ -112,18 +112,6 @@ if (isset($_SESSION['user_id'])) {
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
 
-    <?php if (isset($error_msg)) : ?>
-        <script>
-            Swal.fire({
-                icon: 'error',
-                title: 'เข้าสู่ระบบไม่สำเร็จ',
-                text: '<?php echo $error_msg; ?>',
-                confirmButtonColor: '#0d6efd',
-                confirmButtonText: 'ลองใหม่อีกครั้ง'
-            });
-        </script>
-    <?php endif; ?>
-
     <script>
         // เริ่มต้น AOS Animation
         AOS.init();
@@ -159,10 +147,7 @@ if (isset($_SESSION['user_id'])) {
                 // สั่งให้หายไปเมื่อครบ 5 วิ
                 setTimeout(() => {
                     if (welcomeScreen) {
-                        // 🔥 ใช้ Class .fade-out จาก CSS ใหม่ (สวยกว่า)
                         welcomeScreen.classList.add('fade-out');
-
-                        // รอ Animation จบ 1.5 วิ ค่อยซ่อน
                         setTimeout(() => {
                             welcomeScreen.style.display = 'none';
                         }, 3500);
@@ -172,76 +157,95 @@ if (isset($_SESSION['user_id'])) {
         });
 
         // ---------------------------------------------------------------
-        // 2. ระบบ Login แบบ AJAX (แบบ Robust ป้องกันหน้าค้าง)
+        // 2. ระบบ Login แบบ AJAX (แก้ปัญหา Popup ค้าง/ซ้อนกัน + เช็คปิด Browser)
         // ---------------------------------------------------------------
         document.getElementById('loginForm').addEventListener('submit', function(e) {
             e.preventDefault(); // ห้ามรีเฟรชหน้า
 
-            // 1. ล็อกปุ่มและหมุนติ้วๆ
+            // 1. เคลียร์ Popup เก่าที่อาจจะค้างอยู่ (สำคัญมาก)
+            Swal.close();
+
+            // 2. ล็อกปุ่มและหมุนติ้วๆ ที่ปุ่มแทน
             const btn = this.querySelector('button[type="submit"]');
-            const originalText = btn.innerHTML;
+            const originalContent = '<i class="fas fa-sign-in-alt me-2"></i> เข้าสู่ระบบ';
+
             btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> กำลังตรวจสอบ...';
             btn.disabled = true;
 
             const formData = new FormData(this);
 
-            // 2. ส่งข้อมูลไป auth.php
+            // 3. ส่งข้อมูลไป auth.php
             fetch('auth.php', {
                     method: 'POST',
                     body: formData
                 })
-                .then(response => response.text()) // 🔥 อ่านเป็นข้อความก่อน (กันพัง)
+                .then(response => response.text())
                 .then(text => {
                     try {
-                        const data = JSON.parse(text); // 🔥 แปลงเป็น JSON เอง
+                        const data = JSON.parse(text);
 
                         if (data.status === 'success') {
-                            // ✅ สำเร็จ
+                            // ✅ กรณีสำเร็จ
                             Swal.fire({
                                 icon: 'success',
-                                title: 'สำเร็จ!',
-                                text: 'กำลังเข้าสู่ระบบ...',
+                                title: 'เข้าสู่ระบบสำเร็จ',
+                                text: 'กำลังพาท่านไปหน้าแรก...',
                                 timer: 1500,
-                                showConfirmButton: false
+                                showConfirmButton: false,
+                                allowOutsideClick: false,
+                                allowEscapeKey: false
                             }).then(() => {
+                                // 🔥 [สำคัญ] ฝังตัวแปรยืนยันการล็อกอินลงใน Browser
+                                // ตัวแปรนี้จะหายไปทันทีเมื่อปิด Browser
+                                sessionStorage.setItem('is_logged_in', 'true');
+
                                 window.location.href = 'index.php';
                             });
+
                         } else {
-                            // ❌ ไม่สำเร็จ (รหัสผิด)
+                            // ❌ กรณีรหัสผิด
+                            throw new Error(data.message || 'รหัสผ่านไม่ถูกต้อง');
+                        }
+
+                    } catch (err) {
+                        let errorText = err.message;
+                        if (err instanceof SyntaxError) {
+                            errorText = 'เกิดข้อผิดพลาดจากเซิร์ฟเวอร์ (Invalid JSON)';
+                        }
+
+                        Swal.close();
+                        setTimeout(() => {
                             Swal.fire({
                                 icon: 'error',
                                 title: 'เข้าสู่ระบบไม่สำเร็จ',
-                                text: data.message,
-                                confirmButtonColor: '#0d6efd'
+                                text: errorText,
+                                confirmButtonColor: '#0d6efd',
+                                confirmButtonText: 'ตกลง'
                             });
-                            btn.innerHTML = originalText;
-                            btn.disabled = false;
-                        }
-                    } catch (err) {
-                        // ☠️ Error ร้ายแรง (เช่น PHP พัง)
-                        console.error('Server Error:', text);
-                        Swal.fire({
-                            icon: 'error',
-                            title: 'เกิดข้อผิดพลาด',
-                            text: 'เซิร์ฟเวอร์ตอบกลับผิดพลาด (ดู Console)',
-                        });
-                        btn.innerHTML = originalText;
-                        btn.disabled = false;
+                        }, 100);
                     }
                 })
                 .catch(error => {
-                    // ☠️ เน็ตหลุด
-                    console.error('Network Error:', error);
+                    Swal.close();
                     Swal.fire({
                         icon: 'error',
                         title: 'การเชื่อมต่อขัดข้อง',
                         text: 'ไม่สามารถติดต่อเซิร์ฟเวอร์ได้',
+                        confirmButtonText: 'ตกลง'
                     });
-                    btn.innerHTML = originalText;
-                    btn.disabled = false;
+                })
+                .finally(() => {
+                    // คืนค่าปุ่มเสมอ (ถ้าไม่ได้กำลังจะเปลี่ยนหน้า)
+                    if (!window.location.href.includes('index.php')) {
+                        setTimeout(() => {
+                            btn.innerHTML = originalContent;
+                            btn.disabled = false;
+                        }, 300);
+                    }
                 });
         });
     </script>
 
 </body>
+
 </html>

@@ -6,16 +6,14 @@ services:
     image: php:8.2-apache
     container_name: lib_web
     ports:
-      - "8099:80" 
+      - "8099:80"
     volumes:
       - ./src:/var/www/html
       - ./uploads:/var/www/html/uploads
-      # ✅ เพิ่มบรรทัดนี้เข้าไปครับ
       - ./php.ini:/usr/local/etc/php/conf.d/custom.ini
-      
     networks:
       - lib-network
-    # ติดตั้ง Extension ที่จำเป็นสำหรับเชื่อมต่อ MySQL และจัดการรูปภาพ
+    # ติดตั้ง Extension ที่จำเป็น
     command: >
       bash -c "docker-php-ext-install mysqli pdo pdo_mysql && docker-php-entrypoint apache2-foreground"
 
@@ -25,9 +23,10 @@ services:
     container_name: lib_db
     environment:
       MYSQL_ROOT_PASSWORD: rootpassword
-      MYSQL_DATABASE: library_db
-      MYSQL_USER: user
-      MYSQL_PASSWORD: password
+      # 🔥 แก้ตรงนี้ให้ตรงกับ config.php
+      MYSQL_DATABASE: vbrs
+      MYSQL_USER: vbrs
+      MYSQL_PASSWORD: bnccvbrs2026
     volumes:
       - db_data:/var/lib/mysql
     networks:
