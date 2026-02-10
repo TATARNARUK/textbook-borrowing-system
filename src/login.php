@@ -29,22 +29,6 @@ if (isset($_SESSION['user_id'])) {
 
     <?php require_once 'loader.php'; ?>
 
-    <div id="welcome-screen">
-        <div class="intro-content text-center">
-            <div class="intro-icons mb-3 text-white">
-                <i class="fas fa-code"></i>
-                <i class="fas fa-user-graduate"></i>
-                <i class="fas fa-book"></i>
-            </div>
-            <h1 class="fade-in-text fw-bold text-dark">Welcome To Website</h1>
-            <h2 class="gradient-text">Textbook Borrowing System</h2>
-
-            <p class="text-black mt-2 fw-bold" style="min-height: 30px; font-size: 1.1rem;">
-                <span id="typewriter-text"></span><span class="cursor" style="color: black;">|</span>
-            </p>
-        </div>
-    </div>
-
     <nav class="navbar navbar-expand-lg navbar-custom fixed-top py-3" data-aos="fade-down" data-aos-duration="1500">
         <div class="container">
             <a class="navbar-brand d-flex align-items-center gap-3" href="index.php">
@@ -117,47 +101,7 @@ if (isset($_SESSION['user_id'])) {
         AOS.init();
 
         // ---------------------------------------------------------------
-        // 1. จัดการ Intro Screen (แบบ Smooth Fade Out)
-        // ---------------------------------------------------------------
-        document.addEventListener("DOMContentLoaded", function() {
-            const welcomeScreen = document.getElementById('welcome-screen');
-            const typewriterText = document.getElementById('typewriter-text');
-
-            // เช็ค Session ว่าเคยแสดงหรือยัง
-            if (sessionStorage.getItem('introShown')) {
-                if (welcomeScreen) welcomeScreen.style.display = 'none';
-            } else {
-                sessionStorage.setItem('introShown', 'true');
-
-                // เอฟเฟกต์พิมพ์ข้อความ
-                const textToType = "ระบบยืม-คืนหนังสือเรียน";
-                let charIndex = 0;
-
-                function type() {
-                    if (charIndex < textToType.length) {
-                        typewriterText.innerHTML += textToType.charAt(charIndex);
-                        charIndex++;
-                        setTimeout(type, 80);
-                    }
-                }
-
-                // เริ่มพิมพ์หลังจากโหลด 0.5 วิ
-                setTimeout(type, 3000);
-
-                // สั่งให้หายไปเมื่อครบ 5 วิ
-                setTimeout(() => {
-                    if (welcomeScreen) {
-                        welcomeScreen.classList.add('fade-out');
-                        setTimeout(() => {
-                            welcomeScreen.style.display = 'none';
-                        }, 3500);
-                    }
-                }, 5000);
-            }
-        });
-
-        // ---------------------------------------------------------------
-        // 2. ระบบ Login แบบ AJAX (แก้ปัญหา Popup ค้าง/ซ้อนกัน + เช็คปิด Browser)
+        // ระบบ Login แบบ AJAX (แก้ปัญหา Popup ค้าง/ซ้อนกัน + เช็คปิด Browser)
         // ---------------------------------------------------------------
         document.getElementById('loginForm').addEventListener('submit', function(e) {
             e.preventDefault(); // ห้ามรีเฟรชหน้า

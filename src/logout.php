@@ -4,13 +4,17 @@ session_destroy(); // ทำลาย Session PHP
 ?>
 <!DOCTYPE html>
 <html>
+
 <head>
     <script>
-        // ทำลายตัวเช็คฝั่ง Browser ด้วย
+// 2. ทำลาย Session ฝั่ง Browser (ตัวแปรกันเหนียว)
         sessionStorage.removeItem('is_logged_in');
-        // ดีดกลับไปหน้า Login
-        window.location.href = 'login.php';
+        
+        // 3. ดีดกลับไปหน้า Landing
+        window.location.href = 'landing.php';
     </script>
 </head>
+
 <body></body>
+
 </html>

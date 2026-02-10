@@ -2,9 +2,9 @@
 session_start();
 require_once 'config.php';
 
-// 1. ตรวจสอบว่า Login หรือยัง?
+// 1. เช็คว่าล็อกอินหรือยัง?
 if (!isset($_SESSION['user_id'])) {
-    header("Location: login.php");
+    header("Location: landing.php");
     exit();
 }
 
@@ -37,7 +37,13 @@ $is_blocked = ($overdue_count > 0);
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css" rel="stylesheet">
-
+    <script>
+        // 2. เช็คฝั่ง Browser (RAM)
+        // ถ้าเปิดมาแล้วไม่เจอค่านี้ แสดงว่าปิด Browser ไปแล้ว -> ดีดออกทันที
+        if (!sessionStorage.getItem('is_logged_in')) {
+            window.location.href = 'logout.php';
+        }
+    </script>
     <style>
         body {
             font-family: 'Noto Sans Thai', sans-serif;
@@ -67,6 +73,7 @@ $is_blocked = ($overdue_count > 0);
             border-radius: 5px;
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
             transition: transform 0.3s ease;
+            cursor: zoom-in; /* เปลี่ยน Cursor ให้รู้ว่าซูมได้ */
         }
 
         .navbar-custom {
@@ -518,23 +525,24 @@ $is_blocked = ($overdue_count > 0);
                     confirmBorrow(id, title);
                 });
 
-                // Hover รูปใหญ่
+                // 🔥 [แก้ไขใหม่] Hover รูปใหญ่ เฉพาะตอนชี้ที่รูป (.book-cover) เท่านั้น
                 let hoverTimeout;
                 const overlay = $('#img-overlay');
                 const largeImg = $('#large-book-img');
 
-                $('#bookTable tbody').on('mouseenter', 'tr.book-row', function() {
-                    const imgSrc = $(this).data('img');
+                $('#bookTable tbody').on('mouseenter', '.book-cover', function() {
+                    const imgSrc = $(this).attr('src'); // ดึง src จากตัวรูปโดยตรง
                     if (imgSrc) {
                         hoverTimeout = setTimeout(() => {
                             largeImg.attr('src', imgSrc);
                             overlay.css('display', 'flex').addClass('show');
-                        }, 2000);
+                        }, 500); // ตั้งเวลาหน่วง 0.5 วินาที
                     }
-                }).on('mouseleave', 'tr.book-row', function() {
+                }).on('mouseleave', '.book-cover', function() {
                     clearTimeout(hoverTimeout);
                     overlay.removeClass('show').hide();
                 });
+                
                 overlay.on('click', function() {
                     $(this).removeClass('show').hide();
                 });
