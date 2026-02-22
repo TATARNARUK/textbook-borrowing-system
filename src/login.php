@@ -27,8 +27,6 @@ if (isset($_SESSION['user_id'])) {
 
 <body>
 
-    <?php require_once 'loader.php'; ?>
-
     <nav class="navbar navbar-expand-lg navbar-custom fixed-top py-3" data-aos="fade-down" data-aos-duration="1500">
         <div class="container">
             <a class="navbar-brand d-flex align-items-center gap-3" href="index.php">
