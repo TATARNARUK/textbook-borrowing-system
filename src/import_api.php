@@ -8,6 +8,22 @@ if (!isset($_SESSION['user_id']) || $_SESSION['role'] != 'admin') {
     exit();
 }
 
+// -------------------------------------------------------------
+// ฟังก์ชันสำหรับแปลงลิงก์ Google Drive ให้เป็นแบบ Embed/Preview
+// -------------------------------------------------------------
+function convertGoogleDriveLink($url) {
+    if (empty($url)) return '';
+
+    if (strpos($url, 'drive.google.com/file/d/') !== false) {
+        preg_match('/d\/(.*?)\//', $url, $matches);
+        if (isset($matches[1])) {
+            $fileId = $matches[1];
+            return "https://drive.google.com/file/d/{$fileId}/preview";
+        }
+    }
+    return $url;
+}
+
 // 2. ฟังก์ชันดึงข้อมูล API
 function getBooksFromApi()
 {
@@ -53,8 +69,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $cover = 'https://itdev.bncc.ac.th/vbss/Education_system/other/img/uploads/' . $cover;
         }
 
-        // 🔥 PDF (จุดสำคัญ)
-        $pdf = $data['linkExp'] ?? '';
+        // 🔥 PDF (จุดสำคัญ) : แปลงลิงก์ก่อนบันทึกลง Database
+        $raw_pdf = $data['linkExp'] ?? '';
+        $pdf = convertGoogleDriveLink($raw_pdf);
 
         $desc = $data['detail'] ?? '';
         $pages = $data['countPage'] ?? 0;
@@ -226,8 +243,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         $b_img = 'https://itdev.bncc.ac.th/vbss/Education_system/other/img/uploads/' . $b_img;
                     }
 
-                    // 🔥 PDF Link
-                    $b_pdf = $book['linkExp'] ?? '';
+                    // 🔥 PDF Link (แปลงลิงก์ก่อนส่งไปโชว์หน้าเว็บ)
+                    $raw_b_pdf = $book['linkExp'] ?? '';
+                    $b_pdf = convertGoogleDriveLink($raw_b_pdf);
 
                     $b_desc = $book['detail'] ?? '';
                     $b_pages = $book['countPage'] ?? 0;
@@ -259,13 +277,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
                                 <?php if ($b_pdf): ?>
                                     <div class="mb-3">
-                                        <a href="<?php echo $b_pdf; ?>" target="_blank" class="badge bg-danger text-white text-decoration-none">
-                                            <i class="fa-regular fa-file-pdf"></i> มีไฟล์ E-Book
-                                        </a>
+                                        <button type="button" class="btn btn-sm btn-danger w-100 text-white shadow-sm" 
+                                                onclick="viewPDF('<?php echo htmlspecialchars($b_pdf); ?>', '<?php echo htmlspecialchars($b_title, ENT_QUOTES); ?>')">
+                                            <i class="fa-regular fa-file-pdf"></i> อ่าน E-Book
+                                        </button>
                                     </div>
                                 <?php else: ?>
                                     <div class="mb-3">
-                                        <span class="badge bg-light text-muted border">ไม่มีไฟล์ E-Book</span>
+                                        <button class="btn btn-sm btn-light border w-100 text-muted" disabled>ไม่มีไฟล์ E-Book</button>
                                     </div>
                                 <?php endif; ?>
 
@@ -276,8 +295,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                         <input type="hidden" name="isbn" value="<?php echo htmlspecialchars($b_isbn); ?>">
                                         <input type="hidden" name="price" value="<?php echo htmlspecialchars($b_price); ?>">
                                         <input type="hidden" name="cover" value="<?php echo htmlspecialchars($b_img); ?>">
-                                        <input type="hidden" name="pdf" value="<?php echo htmlspecialchars($b_pdf); ?>">
-                                        <input type="hidden" name="description" value="<?php echo htmlspecialchars($b_desc); ?>">
+                                        <input type="hidden" name="pdf" value="<?php echo htmlspecialchars($raw_b_pdf); ?>"> <input type="hidden" name="description" value="<?php echo htmlspecialchars($b_desc); ?>">
                                         <input type="hidden" name="pages" value="<?php echo htmlspecialchars($b_pages); ?>">
                                         <input type="hidden" name="paper" value="<?php echo htmlspecialchars($b_paper); ?>">
                                         <input type="hidden" name="print" value="<?php echo htmlspecialchars($b_print); ?>">
@@ -309,6 +327,24 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <?php endif; ?>
     </div>
 
+    <div class="modal fade" id="pdfPreviewModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-xl modal-dialog-centered">
+            <div class="modal-content shadow-lg" style="height: 90vh; border-radius: 15px; overflow: hidden;">
+                <div class="modal-header bg-dark text-white border-0">
+                    <h5 class="modal-title fw-bold" id="pdfModalTitle"><i class="fa-solid fa-book-open me-2"></i> อ่านหนังสือ</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close" onclick="closePDF()"></button>
+                </div>
+                <div class="modal-body p-0 bg-light position-relative">
+                    <div id="pdfLoader" class="position-absolute top-50 start-50 translate-middle text-center text-muted">
+                        <div class="spinner-border mb-2" role="status"></div>
+                        <p>กำลังโหลดเอกสาร...</p>
+                    </div>
+                    <iframe id="pdfIframe" src="" width="100%" height="100%" style="border:none; position: relative; z-index: 2;" allow="autoplay"></iframe>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/particles.js@2.0.0/particles.min.js"></script>
@@ -319,53 +355,43 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             once: true
         });
 
+        // 🔥 ฟังก์ชันสำหรับเปิดหน้าต่าง PDF
+        function viewPDF(pdfUrl, title) {
+            document.getElementById('pdfModalTitle').innerText = title;
+            document.getElementById('pdfIframe').style.opacity = '0'; // ซ่อน Iframe ไว้แปปนึงตอนโหลด
+            document.getElementById('pdfIframe').src = pdfUrl; // ใส่ URL ที่แปลงแล้ว
+
+            // แสดง Modal
+            var myModal = new bootstrap.Modal(document.getElementById('pdfPreviewModal'));
+            myModal.show();
+
+            // เมื่อ iframe โหลดเสร็จ ค่อยโชว์
+            document.getElementById('pdfIframe').onload = function() {
+                document.getElementById('pdfIframe').style.opacity = '1';
+                document.getElementById('pdfLoader').style.display = 'none';
+            };
+        }
+
+        // ฟังก์ชันล้างค่าตอนปิด เพื่อไม่ให้กินเน็ต/ค้าง
+        function closePDF() {
+            document.getElementById('pdfIframe').src = "";
+            document.getElementById('pdfLoader').style.display = 'block';
+        }
+
         particlesJS("particles-js", {
             "particles": {
-                "number": {
-                    "value": 160,
-                    "density": {
-                        "enable": true,
-                        "value_area": 800
-                    }
-                },
-                "color": {
-                    "value": "#0d6efd"
-                },
-                "shape": {
-                    "type": "circle"
-                },
-                "opacity": {
-                    "value": 0.5,
-                    "random": true
-                },
-                "size": {
-                    "value": 3,
-                    "random": true
-                },
-                "line_linked": {
-                    "enable": true,
-                    "distance": 150,
-                    "color": "#0d6efd",
-                    "opacity": 0.2,
-                    "width": 1
-                },
-                "move": {
-                    "enable": true,
-                    "speed": 2
-                }
+                "number": { "value": 160, "density": { "enable": true, "value_area": 800 } },
+                "color": { "value": "#0d6efd" },
+                "shape": { "type": "circle" },
+                "opacity": { "value": 0.5, "random": true },
+                "size": { "value": 3, "random": true },
+                "line_linked": { "enable": true, "distance": 150, "color": "#0d6efd", "opacity": 0.2, "width": 1 },
+                "move": { "enable": true, "speed": 2 }
             },
             "interactivity": {
                 "detect_on": "canvas",
-                "events": {
-                    "onhover": {
-                        "enable": true,
-                        "mode": "grab"
-                    }
-                },
-                "onclick": {
-                    "enable": true,
-                    "mode": "push"
-                }
+                "events": { "onhover": { "enable": true, "mode": "grab" } },
+                "onclick": { "enable": true, "mode": "push" }
             },
             "retina_detect": true
         });

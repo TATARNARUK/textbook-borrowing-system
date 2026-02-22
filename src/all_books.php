@@ -188,12 +188,23 @@ $books = $stmt->fetchAll(PDO::FETCH_ASSOC);
                         $img = "https://via.placeholder.com/300x450?text=No+Cover";
                     }
 
-                    // 🔥 Logic PDF (เพิ่มใหม่)
+                    // 🔥 Logic PDF (แก้ไข: เปลี่ยน Google Drive ให้เป็นไฟล์ PDF โดยตรง)
                     $pdf = $book['sample_pdf'];
                     $pdfUrl = '';
                     if(!empty($pdf)){
-                        // ถ้าเป็น URL อยู่แล้ว (http) ใช้เลย, ถ้าไม่ใช่ให้เติม path
-                        $pdfUrl = (strpos($pdf, 'http') === 0) ? $pdf : "uploads/pdfs/" . $pdf;
+                        if (strpos($pdf, 'drive.google.com/file/d/') !== false) {
+                            // แปลงจากลิงก์เว็บ Google Drive เป็นลิงก์สำหรับเปิดดูไฟล์ตรงๆ
+                            preg_match('/d\/(.*?)\//', $pdf, $matches);
+                            if (isset($matches[1])) {
+                                $pdfUrl = "https://drive.google.com/uc?export=view&id=" . $matches[1];
+                            } else {
+                                $pdfUrl = $pdf;
+                            }
+                        } elseif (strpos($pdf, 'http') === 0) {
+                            $pdfUrl = $pdf;
+                        } else {
+                            $pdfUrl = "uploads/pdfs/" . $pdf;
+                        }
                     }
 
                     // กำหนดสถานะ Badge
