@@ -24,6 +24,16 @@ if (isset($_SESSION['user_id'])) {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ยินดีต้อนรับ - ระบบยืมคืนหนังสือเรียน</title>
+
+    <script>
+        // ถ้าเคยเห็นหน้า Landing แล้วในรอบที่เปิด Browser นี้ ให้ข้ามไปหน้า Login ทันที
+        if (sessionStorage.getItem('has_seen_landing')) {
+            window.location.replace('login.php');
+        } else {
+            // ถ้าเพิ่งเปิดเว็บเข้ามาครั้งแรก ให้บันทึกค่าไว้ว่า "เห็นแล้วนะ"
+            sessionStorage.setItem('has_seen_landing', 'true');
+        }
+    </script>
     <link rel="icon" type="image/png" href="images/books.png">
 
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">

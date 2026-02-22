@@ -183,7 +183,6 @@ $is_blocked = ($overdue_count > 0);
 </head>
 
 <body>
-    <?php require_once 'loader.php'; ?>
     <div id="particles-js"></div>
 
     <div id="img-overlay">
