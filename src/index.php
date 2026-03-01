@@ -73,7 +73,8 @@ $is_blocked = ($overdue_count > 0);
             border-radius: 5px;
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
             transition: transform 0.3s ease;
-            cursor: zoom-in; /* เปลี่ยน Cursor ให้รู้ว่าซูมได้ */
+            cursor: zoom-in;
+            /* เปลี่ยน Cursor ให้รู้ว่าซูมได้ */
         }
 
         .navbar-custom {
@@ -338,6 +339,34 @@ $is_blocked = ($overdue_count > 0);
                         </div>
                     </div>
                 </div>
+                <div class="card border-0 shadow-sm rounded-4 overflow-hidden mb-4" data-aos="fade-up">
+                    <div class="row g-0 align-items-center">
+                        <div class="col-md-3 bg-success bg-opacity-10 d-flex justify-content-center align-items-center p-4" style="min-height: 200px;">
+                            <div class="bg-white p-2 rounded-3 shadow-sm border border-success border-opacity-25">
+                                <img src="images/bot_qrcode.png" style="width: 130px; height: 130px; object-fit: contain;" alt="LINE QR Code">
+                            </div>
+                        </div>
+
+                        <div class="col-md-9 p-4 p-md-5">
+                            <div class="d-flex align-items-center gap-2 mb-2">
+                                <i class="fab fa-line text-success fa-2x"></i>
+                                <h4 class="fw-bold mb-0">เชื่อมต่อระบบแจ้งเตือนผ่าน LINE</h4>
+                            </div>
+                            <p class="text-muted fs-5 mb-4">
+                                รับการแจ้งเตือนทันทีเมื่อมีการ <span class="text-primary fw-bold">ยืม-คืนหนังสือ</span>
+                                พร้อมระบบเตือนวันกำหนดส่งคืนอัตโนมัติ เพื่อป้องกันการค้างส่งหนังสือครับ
+                            </p>
+                            <div class="d-flex flex-wrap gap-2">
+                                <div class="badge bg-success bg-opacity-10 text-success border border-success border-opacity-25 rounded-pill px-4 py-2 fw-bold">
+                                    LINE ID: @695pbvul
+                                </div>
+                                <div class="badge bg-primary bg-opacity-10 text-primary border border-primary border-opacity-25 rounded-pill px-4 py-2 fw-bold">
+                                    <i class="fas fa-bell me-1"></i> แจ้งเตือนแบบ Real-time
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
             <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
             <script>
@@ -393,6 +422,7 @@ $is_blocked = ($overdue_count > 0);
                     </div>
                 </div>
             </div>
+
 
             <div class="d-flex flex-column flex-md-row text-dark justify-content-between align-items-center mb-4 gap-3" data-aos="fade-up" data-aos-delay="100">
                 <h3>📚 รายชื่อหนังสือเรียนทั้งหมด</h3>
@@ -474,6 +504,13 @@ $is_blocked = ($overdue_count > 0);
                 </div>
             </div>
         </div>
+        <div id="qr-overlay" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); backdrop-filter: blur(8px); z-index: 9999; display: none; justify-content: center; align-items: center; opacity: 0; transition: opacity 0.4s ease;">
+            <div style="text-align: center;">
+                <img id="qr-large-img" src="images/bot_qrcode.png" style="width: 350px; height: 350px; border-radius: 30px; border: 10px solid white; box-shadow: 0 0 50px rgba(0,0,0,0.5); transform: scale(0.8); transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);">
+                <p class="text-white mt-4 fw-bold fs-4">สแกนเพื่อเชื่อมต่อระบบแจ้งเตือน</p>
+                <button onclick="closeQR()" class="btn btn-outline-light rounded-pill px-4 mt-2">ปิดหน้าต่าง (Esc)</button>
+            </div>
+        </div>
 
         <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
         <script src="https://cdn.datatables.net/1.13.4/js/jquery.dataTables.min.js"></script>
@@ -490,19 +527,25 @@ $is_blocked = ($overdue_count > 0);
                     once: true
                 });
 
-                const table = $('#bookTable').DataTable({
-                    language: {
-                        search: "ค้นหา:",
-                        lengthMenu: "แสดง _MENU_ รายการ",
-                        info: "แสดง _START_ ถึง _END_ จาก _TOTAL_ รายการ",
-                        paginate: {
-                            first: "หน้าแรก",
-                            last: "หน้าสุดท้าย",
-                            next: "ถัดไป",
-                            previous: "ก่อนหน้า"
-                        },
-                        zeroRecords: "ไม่พบข้อมูลหนังสือ"
-                    }
+                $(document).ready(function() {
+                    // รวมการตั้งค่าภาษาและการทำลายของเก่าทิ้งถ้ามีการเรียกซ้ำ
+                    const table = $('#bookTable').DataTable({
+                        destroy: true, // 🔥 เพิ่มบรรทัดนี้เพื่อล้างค่าเก่าทิ้งก่อนเริ่มใหม่
+                        language: {
+                            search: "ค้นหา:",
+                            lengthMenu: "แสดง _MENU_ รายการ",
+                            info: "แสดง _START_ ถึง _END_ จาก _TOTAL_ รายการ",
+                            paginate: {
+                                first: "หน้าแรก",
+                                last: "หน้าสุดท้าย",
+                                next: "ถัดไป",
+                                previous: "ก่อนหน้า"
+                            },
+                            zeroRecords: "ไม่พบข้อมูลหนังสือ"
+                        }
+                    });
+
+                    // ... ส่วนโค้ด Click Row หรือ Hover QR Code ของคุณ ...
                 });
 
                 // 🔥 คลิกที่แถว -> ไปหน้า Detail
@@ -541,7 +584,7 @@ $is_blocked = ($overdue_count > 0);
                     clearTimeout(hoverTimeout);
                     overlay.removeClass('show').hide();
                 });
-                
+
                 overlay.on('click', function() {
                     $(this).removeClass('show').hide();
                 });
@@ -641,7 +684,71 @@ $is_blocked = ($overdue_count > 0);
                 icon: 'error',
                 confirmButtonText: 'ปิด'
             });
+            // ย้ายตัวแปรมาไว้ในนี้เพื่อให้เรียกใช้ได้ทั่วถึง
+            let qrTimer;
+            const overlay = document.getElementById('qr-overlay');
+            const largeImg = document.getElementById('qr-large-img');
+
+            // ฟังก์ชันเปิดรูปใหญ่
+            function openQR() {
+                overlay.style.display = 'flex';
+                setTimeout(() => {
+                    overlay.style.opacity = '1';
+                    largeImg.style.transform = 'scale(1)';
+                }, 10);
+            }
+
+            // ฟังก์ชันปิดรูป
+            function closeQR() {
+                if (!overlay) return;
+                overlay.style.opacity = '0';
+                largeImg.style.transform = 'scale(0.8)';
+                setTimeout(() => {
+                    overlay.style.display = 'none';
+                }, 400);
+            }
+
+            $(document).ready(function() {
+                // AOS & DataTable (โค้ดเดิมของคุณ)
+                AOS.init({
+                    duration: 800,
+                    once: true
+                });
+                $('#bookTable').DataTable({
+                    language: {
+                        search: "ค้นหา:",
+                        lengthMenu: "แสดง _MENU_ รายการ"
+                    }
+                });
+
+                // --- 🖱️ ระบบตรวจจับการชี้เมาส์ที่ QR Code ---
+                // ค้นหารูปที่มีชื่อไฟล์เกี่ยวข้องกับ qrcode หรือ gainfriends
+                document.querySelectorAll('img[src*="qrcode"], img[src*="gainfriends"]').forEach(img => {
+                    img.style.cursor = 'zoom-in';
+
+                    img.addEventListener('mouseenter', () => {
+                        // เริ่มนับถอยหลัง 2 วินาที
+                        qrTimer = setTimeout(openQR, 2000);
+                    });
+
+                    img.addEventListener('mouseleave', () => {
+                        // ถ้าเอาเมาส์ออกก่อน 2 วิ ให้ยกเลิก
+                        clearTimeout(qrTimer);
+                    });
+                });
+
+                // ปิดด้วยปุ่ม Esc
+                document.addEventListener('keydown', (e) => {
+                    if (e.key === "Escape") closeQR();
+                });
+
+                // คลิกฉากหลังเพื่อปิด
+                overlay.addEventListener('click', (e) => {
+                    if (e.target === overlay) closeQR();
+                });
+            });
         </script>
+
 </body>
 
 </html>

@@ -357,26 +357,36 @@ if (isset($_SESSION['user_id'])) {
         </div>
     </div>
 
-    <div class="info-modal-overlay" id="infoModal">
-        <div class="info-modal-content">
-            <div class="modal-icon-top">
-                <i class="fas fa-book-reader"></i>
-            </div>
-            <h3 class="fw-bold text-dark mb-2">เกี่ยวกับระบบ</h3>
-            <p class="text-muted mb-4">ระบบยืม-คืนหนังสือเรียนฟรี แผนกวิชาเทคโนโลยีสารสนเทศ วิทยาลัยพณิชยการบางนา</p>
-
-            <ul class="feature-list ps-3">
-                <li><i class="fas fa-check-circle"></i> ระบบยืมหนังสือเรียนฟรี</li>
-                <li><i class="fas fa-check-circle"></i> ระบบบริการยืม-คืน ค้นหาและตรวจสอบสถานะหนังสือแบบ Real-time (ว่าง/ถูกยืม)</li>
-                <li><i class="fas fa-check-circle"></i> เช็คประวัติการยืม-คืนหนังสือย้อนหลังทั้งหมด
-                    ตรวจสอบรายการหนังสือที่กำลังยืมและวันกำหนดส่งคืน
-                    แจ้งเตือนสถานะหนังสือ (ปกติ / เกินกำหนด / คืนแล้ว)</li>
-                <li><i class="fas fa-check-circle"></i> เข้าสู่ระบบด้วยรหัสนักเรียน (เชื่อมต่อฐานข้อมูลวิทยาลัย/RMS)</li>
-            </ul>
-
-            <button class="btn-close-modal" onclick="closeModal()">ปิดหน้าต่าง</button>
+<div class="info-modal-overlay" id="infoModal">
+    <div class="info-modal-content">
+        <div class="modal-icon-top">
+            <i class="fas fa-book-reader"></i>
         </div>
+        <h3 class="fw-bold text-dark mb-2">เกี่ยวกับระบบ</h3>
+        <p class="text-muted mb-4">ระบบยืม-คืนหนังสือเรียนฟรี แผนกวิชาเทคโนโลยีสารสนเทศ วิทยาลัยพณิชยการบางนา</p>
+
+        <div class="bg-light rounded-4 p-3 mb-4 border border-primary border-opacity-10">
+            <div class="row align-items-center">
+                <div class="col-4">
+                    <img src="images/bot_qrcode.png" class="img-fluid rounded-3 shadow-sm" alt="LINE QR Code">
+                </div>
+                <div class="col-8 text-start">
+                    <h6 class="fw-bold text-primary mb-1"><i class="fab fa-line text-success"></i> ระบบแจ้งเตือนอัตโนมัติ</h6>
+                    <p class="small text-muted mb-0">สแกนเพื่อรับแจ้งเตือนเมื่อยืมหนังสือสำเร็จ หรือแจ้งเตือนเมื่อใกล้ครบกำหนดส่งคืนผ่าน LINE</p>
+                </div>
+            </div>
+        </div>
+
+        <ul class="feature-list ps-3">
+            <li><i class="fas fa-check-circle"></i> ระบบบริการยืม-คืน ตรวจสอบสถานะแบบ Real-time</li>
+            <li><i class="fas fa-check-circle"></i> เช็คประวัติย้อนหลังและวันกำหนดส่งคืนได้ทุกที่</li>
+            <li><i class="fas fa-check-circle"></i> แจ้งเตือนสถานะหนังสือผ่าน LINE (ปกติ / เกินกำหนด)</li>
+            <li><i class="fas fa-check-circle"></i> ล็อกอินด้วยรหัสนักเรียน (เชื่อมต่อระบบ RMS)</li>
+        </ul>
+
+        <button class="btn-close-modal" onclick="closeModal()">ปิดหน้าต่าง</button>
     </div>
+</div>
 
     <script>
         // --- 1. Typewriter Effect ---

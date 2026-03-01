@@ -52,44 +52,58 @@ if (isset($_SESSION['user_id'])) {
         </div>
     </nav>
 
-    <div class="container d-flex justify-content-center align-items-center" style="min-height: 80vh;">
-        <div class="login-card" data-aos="fade-up">
-            <div class="text-center mb-4">
+<div class="container d-flex justify-content-center align-items-start pt-5" style="min-height: 100vh;">
+    <div class="login-wrapper row g-0 shadow-lg" data-aos="zoom-in" style="border-radius: 25px; overflow: hidden; max-width: 900px; width: 100%; background: white;">
+        
+        <div class="col-md-6 login-side p-5">
+            <div class="mb-4 text-center text-md-start">
                 <div class="bg-primary bg-opacity-10 rounded-circle d-inline-flex p-3 mb-3">
                     <i class="fas fa-user-lock fa-2x text-primary"></i>
                 </div>
                 <h3 class="fw-bold text-dark">เข้าสู่ระบบ</h3>
-                <p class="text-muted small">กรุณากรอกข้อมูลเพื่อยืนยันตัวตน</p>
+                <p class="text-muted small">กรุณากรอกข้อมูลเพื่อยืนยันตัวตนเข้าระบบยืม-คืน</p>
             </div>
 
             <form id="loginForm">
                 <div class="mb-3">
-                    <label class="form-label text-secondary fw-medium">รหัสนักเรียน / ชื่อผู้ใช้</label>
+                    <label class="form-label text-secondary fw-medium small">รหัสนักเรียน / ชื่อผู้ใช้</label>
                     <div class="input-group">
-                        <span class="input-group-text bg-white border-end-0 text-primary"><i class="fas fa-user"></i></span>
-                        <input type="text" name="student_id" class="form-control border-start-0 ps-0" placeholder="กรอกรหัสนักเรียน" required>
+                        <span class="input-group-text bg-light border-0 text-primary"><i class="fas fa-user"></i></span>
+                        <input type="text" name="student_id" class="form-control bg-light border-0 ps-2" placeholder="กรอกรหัสนักเรียน" required>
                     </div>
                 </div>
-
                 <div class="mb-4">
-                    <label class="form-label text-secondary fw-medium">รหัสผ่าน</label>
+                    <label class="form-label text-secondary fw-medium small">รหัสผ่าน</label>
                     <div class="input-group">
-                        <span class="input-group-text bg-white border-end-0 text-primary"><i class="fas fa-key"></i></span>
-                        <input type="password" name="password" class="form-control border-start-0 ps-0" placeholder="กรอกรหัสผ่าน RMS" required>
+                        <span class="input-group-text bg-light border-0 text-primary"><i class="fas fa-key"></i></span>
+                        <input type="password" name="password" class="form-control bg-light border-0 ps-2" placeholder="กรอกรหัสผ่าน RMS" required>
                     </div>
                 </div>
-
-                <button type="submit" class="btg w-100 mb-3 rounded-pill">
+                <button type="submit" class="btn-login w-100 mb-3 shadow-sm py-2 rounded-pill fw-bold text-white border-0" style="background: linear-gradient(45deg, #0d6efd, #0dcaf0);">
                     <i class="fas fa-sign-in-alt me-2"></i> เข้าสู่ระบบ
                 </button>
                 <div class="text-center">
-                    <a href="forgot_password.php" class="text-decoration-none text-primary small fw-medium">
-                        ลืมรหัสผ่านใช่หรือไม่?
-                    </a>
+                    <a href="forgot_password.php" class="text-decoration-none text-primary small fw-medium">ลืมรหัสผ่านใช่หรือไม่?</a>
                 </div>
             </form>
         </div>
+
+        <div class="col-md-6 line-side p-5 d-flex flex-column justify-content-center align-items-center text-center" style="background: #f8fafc; border-left: 1px solid #edf2f7;">
+            <div class="qr-frame mb-3 p-3 bg-white shadow-sm" style="border-radius: 20px; border: 1px solid #e2e8f0;">
+                <img src="images/bot_qrcode.png" alt="LINE QR Code" style="width: 160px; height: 160px; object-fit: contain;">
+            </div>
+            <h6 class="fw-bold text-dark mb-2">
+                <i class="fab fa-line text-success fs-5 me-1"></i> บริการแจ้งเตือนผ่าน LINE
+            </h6>
+            <p class="text-muted mb-3 px-2" style="font-size: 0.8rem;">
+                สแกนแอดบอทเพื่อรับการแจ้งเตือนเมื่อยืมหนังสือสำเร็จ และรับการแจ้งเตือนเมื่อใกล้ถึงกำหนดส่งคืนอัตโนมัติ
+            </p>
+            <div class="badge bg-success bg-opacity-10 text-success border border-success border-opacity-25 rounded-pill px-3 py-2 fw-bold" style="font-size: 0.75rem;">
+                LINE ID: @695pbvul
+            </div>
+        </div>
     </div>
+</div>
 
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
