@@ -8,6 +8,43 @@ if (!isset($_SESSION['user_id'])) {
     exit();
 }
 
+// 🔥 ระบบแปลงลิงก์ Google Drive ให้เป็นไฟล์ PDF ดิบ (เปิดอ่านอย่างเดียว ไม่โหลด ไม่ใช้หน้าเว็บ GDrive)
+if (isset($_GET['read_pdf'])) {
+    $id = $_GET['read_pdf'];
+    $stmt = $pdo->prepare("SELECT sample_pdf FROM book_masters WHERE id = ?");
+    $stmt->execute([$id]);
+    $pdf = $stmt->fetchColumn();
+
+    if (!empty($pdf)) {
+        $fileId = '';
+        // ตรวจสอบว่าเป็นลิงก์ Google Drive หรือไม่
+        if (strpos($pdf, 'drive.google.com') !== false) {
+            if (preg_match('/d\/(.*?)\//', $pdf, $matches)) {
+                $fileId = $matches[1];
+            } elseif (preg_match('/id=([^&]+)/', $pdf, $matches)) {
+                $fileId = $matches[1];
+            }
+        }
+
+        // บังคับให้เบราว์เซอร์เปิดอ่านเป็นไฟล์ PDF (inline) แทนการดาวน์โหลด
+        header('Content-type: application/pdf');
+        header('Content-Disposition: inline; filename="book_preview_' . $id . '.pdf"');
+        header('Content-Transfer-Encoding: binary');
+        header('Accept-Ranges: bytes');
+
+        if ($fileId) {
+            // โหลดข้อมูลจาก Google Drive มาสตรีมเป็น PDF แท้ๆ 
+            $url = "https://drive.google.com/uc?export=download&id=" . $fileId;
+            @readfile($url);
+        } else {
+            // กรณีเป็นไฟล์ที่อยู่ในเครื่องเซิร์ฟเวอร์
+            $path = (strpos($pdf, 'http') === 0) ? $pdf : "uploads/pdfs/" . $pdf;
+            @readfile($path);
+        }
+        exit(); // จบการทำงาน เพื่อไม่ให้โค้ด HTML ด้านล่างปนเข้าไปในไฟล์ PDF
+    }
+}
+
 // ดึงข้อมูล User
 $user_id = $_SESSION['user_id'];
 
@@ -188,24 +225,7 @@ $books = $stmt->fetchAll(PDO::FETCH_ASSOC);
                         $img = "https://via.placeholder.com/300x450?text=No+Cover";
                     }
 
-                    // 🔥 Logic PDF (แก้ไข: เปลี่ยน Google Drive ให้เป็นไฟล์ PDF โดยตรง)
                     $pdf = $book['sample_pdf'];
-                    $pdfUrl = '';
-                    if(!empty($pdf)){
-                        if (strpos($pdf, 'drive.google.com/file/d/') !== false) {
-                            // แปลงจากลิงก์เว็บ Google Drive เป็นลิงก์สำหรับเปิดดูไฟล์ตรงๆ
-                            preg_match('/d\/(.*?)\//', $pdf, $matches);
-                            if (isset($matches[1])) {
-                                $pdfUrl = "https://drive.google.com/uc?export=view&id=" . $matches[1];
-                            } else {
-                                $pdfUrl = $pdf;
-                            }
-                        } elseif (strpos($pdf, 'http') === 0) {
-                            $pdfUrl = $pdf;
-                        } else {
-                            $pdfUrl = "uploads/pdfs/" . $pdf;
-                        }
-                    }
 
                     // กำหนดสถานะ Badge
                     if ($available > 0) {
@@ -225,12 +245,12 @@ $books = $stmt->fetchAll(PDO::FETCH_ASSOC);
                             </div>
 
                             <div class="card-body p-3 d-flex flex-column">
-                                <h6 class="fw-bold text-truncate mb-1" title="<?php echo $book['title']; ?>"><?php echo $book['title']; ?></h6>
+                                <h6 class="fw-bold text-truncate mb-1" title="<?php echo htmlspecialchars($book['title']); ?>"><?php echo $book['title']; ?></h6>
                                 <small class="text-muted mb-2 d-block text-truncate"><i class="fa-solid fa-pen-nib me-1"></i> <?php echo $book['author']; ?></small>
                                 
-                                <?php if ($pdfUrl): ?>
+                                <?php if (!empty($pdf)): ?>
                                     <div class="mb-2">
-                                        <a href="<?php echo $pdfUrl; ?>" target="_blank" class="btn-pdf text-decoration-none" onclick="event.stopPropagation();">
+                                        <a href="all_books.php?read_pdf=<?php echo $book['id']; ?>#toolbar=0&navpanes=0" target="_blank" class="btn-pdf text-decoration-none" onclick="event.stopPropagation();">
                                             <i class="fa-regular fa-file-pdf"></i> ตัวอย่าง
                                         </a>
                                     </div>

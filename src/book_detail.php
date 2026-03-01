@@ -2,6 +2,43 @@
 session_start();
 require_once 'config.php';
 
+// 🔥 ระบบแปลงลิงก์ Google Drive ให้เป็นไฟล์ PDF ดิบ (เปิดอ่านอย่างเดียว ไม่โหลด ไม่ใช้หน้าเว็บ GDrive)
+if (isset($_GET['read_pdf'])) {
+    $id = $_GET['read_pdf'];
+    $stmt = $pdo->prepare("SELECT sample_pdf FROM book_masters WHERE id = ?");
+    $stmt->execute([$id]);
+    $pdf = $stmt->fetchColumn();
+
+    if (!empty($pdf)) {
+        $fileId = '';
+        // ตรวจสอบว่าเป็นลิงก์ Google Drive หรือไม่
+        if (strpos($pdf, 'drive.google.com') !== false) {
+            if (preg_match('/d\/(.*?)\//', $pdf, $matches)) {
+                $fileId = $matches[1];
+            } elseif (preg_match('/id=([^&]+)/', $pdf, $matches)) {
+                $fileId = $matches[1];
+            }
+        }
+
+        // บังคับให้เบราว์เซอร์เปิดอ่านเป็นไฟล์ PDF (inline) แทนการดาวน์โหลด
+        header('Content-type: application/pdf');
+        header('Content-Disposition: inline; filename="book_preview_' . $id . '.pdf"');
+        header('Content-Transfer-Encoding: binary');
+        header('Accept-Ranges: bytes');
+
+        if ($fileId) {
+            // โหลดข้อมูลจาก Google Drive มาสตรีมเป็น PDF แท้ๆ 
+            $url = "https://drive.google.com/uc?export=download&id=" . $fileId;
+            @readfile($url);
+        } else {
+            // กรณีเป็นไฟล์ที่อยู่ในเครื่องเซิร์ฟเวอร์
+            $path = (strpos($pdf, 'http') === 0) ? $pdf : "uploads/pdfs/" . $pdf;
+            @readfile($path);
+        }
+        exit(); // จบการทำงาน เพื่อไม่ให้โค้ด HTML ด้านล่างปนเข้าไปในไฟล์ PDF
+    }
+}
+
 // รับค่า ID
 if (!isset($_GET['id'])) {
     echo "<script>window.location='index.php';</script>";
@@ -42,7 +79,7 @@ $available_items = $stock['available'] ?? 0;
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><?php echo $book['title']; ?></title>
+    <title><?php echo htmlspecialchars($book['title']); ?></title>
     <link rel="icon" type="image/png" href="images/books.png">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -298,7 +335,7 @@ $available_items = $stock['available'] ?? 0;
                                 <div class="d-flex justify-content-between align-items-start">
                                     <div>
                                         <span class="isbn-badge mb-2">ISBN: <?php echo $book['isbn']; ?></span>
-                                        <h1 class="fw-bold text-dark mb-2"><?php echo $book['title']; ?></h1>
+                                        <h1 class="fw-bold text-dark mb-2"><?php echo htmlspecialchars($book['title']); ?></h1>
 
                                         <div class="d-flex gap-3 text-secondary small mb-3">
                                             <span><i class="fa-regular fa-user me-1 text-primary"></i> <?php echo $book['author']; ?></span>
@@ -308,10 +345,8 @@ $available_items = $stock['available'] ?? 0;
                                         <?php
                                         $pdf = $book['sample_pdf'];
                                         if (!empty($pdf)):
-                                            // เช็คว่าถ้าเป็นลิงก์ http (จาก API) ให้ใช้เลย, ถ้าไม่ใช่ให้เติม path ในเครื่อง
-                                            $pdfUrl = (strpos($pdf, 'http') === 0) ? $pdf : "uploads/pdfs/" . $pdf;
                                         ?>
-                                            <a href="<?php echo $pdfUrl; ?>" target="_blank"
+                                            <a href="?read_pdf=<?php echo $book['id']; ?>#toolbar=0&navpanes=0" target="_blank"
                                                 class="btn btn-sm btn-outline-danger rounded-pill px-3 pdf-btn">
                                                 <i class="fa-regular fa-file-pdf me-1"></i> ทดลองอ่านตัวอย่าง
                                             </a>
@@ -365,7 +400,7 @@ $available_items = $stock['available'] ?? 0;
 
                             <div class="d-flex flex-wrap gap-3 mt-auto">
                                 <?php if ($available_items > 0): ?>
-                                    <button onclick="confirmBorrowDetail(<?php echo $book['id']; ?>, '<?php echo htmlspecialchars($book['title']); ?>')"
+                                    <button onclick="confirmBorrowDetail(<?php echo $book['id']; ?>, '<?php echo htmlspecialchars($book['title'], ENT_QUOTES); ?>')"
                                         class="btn btn-custom-primary flex-grow-1 shadow-sm">
                                         <i class="fa-solid fa-book-open me-2"></i> ยืมหนังสือ
                                     </button>
