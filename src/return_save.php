@@ -1,26 +1,22 @@
 <?php
 session_start();
 require_once 'config.php';
+include 'line_helper.php'; // เรียกไฟล์ฟังก์ชันเข้ามา
 
-// =========================================================
-// 🟢 ฟังก์ชันส่งการแจ้งเตือนผ่าน LINE Messaging API
-// =========================================================
-function sendLineMessageAPI($message) {
-    // ใช้รหัสเดิมที่คุณตั้งค่าผ่าน LINE Developers
+// เมื่อทำรายการสำเร็จแล้ว ก็เรียกใช้งานฟังก์ชัน
+$uid = $userData['line_user_id']; // ID ไลน์นักเรียนจากฐานข้อมูล
+$message = "ยืนยันการทำรายการสำเร็จ!";
+sendLinePush($uid, $message);
+
+// นำฟังก์ชัน sendLinePush ที่เราทำไว้มาใช้ (แนะนำให้แยกเป็นไฟล์ functions.php แล้ว include เข้ามาจะดีมากครับ)
+function sendLinePush($to, $message) {
     $access_token = '1nKci4ldstfiR5FpGC1r+1HYvNu34Hdl3VZj6ua9QMXeEJq2BG0QaalaoXgsp6y1MjQxB36Xb0yVEnD5wv9i+Ea0U6gWJ32SIrTEMn0nnkYBoQ8ybvYNUmY3lQEgouyT0a1A9Okfs6vD03mij5yARAdB04t89/1O/w1cDnyilFU='; 
-    $admin_user_id = 'Ua019e53e001e2e7288fa2ef981c0921a'; 
-
-    if(empty($access_token) || empty($admin_user_id)) return false;
+    if(empty($access_token) || empty($to)) return false;
 
     $url = 'https://api.line.me/v2/bot/message/push';
     $data = [
-        'to' => $admin_user_id,
-        'messages' => [
-            [
-                'type' => 'text',
-                'text' => $message
-            ]
-        ]
+        'to' => $to,
+        'messages' => [['type' => 'text', 'text' => $message]]
     ];
     $post_body = json_encode($data, JSON_UNESCAPED_UNICODE);
 
@@ -32,71 +28,64 @@ function sendLineMessageAPI($message) {
         'Content-Type: application/json',
         'Authorization: Bearer ' . $access_token
     ]);
-    
-    $result = curl_exec($ch);
+    curl_exec($ch);
     curl_close($ch);
-    return $result;
-}
-// =========================================================
-
-// เฉพาะ Admin เท่านั้นที่กดคืนได้
-if (!isset($_SESSION['user_id']) || $_SESSION['role'] != 'admin') {
-    header("Location: index.php"); exit();
 }
 
-if (isset($_GET['trans_id']) && isset($_GET['item_id'])) {
-    $trans_id = $_GET['trans_id'];
-    $item_id = $_GET['item_id'];
+// รับค่า ID รายการที่ต้องการคืน
+$transaction_id = $_GET['id'] ?? null;
 
-    try {
-        $pdo->beginTransaction();
+if (!$transaction_id) {
+    header("Location: index.php");
+    exit();
+}
 
-        // 1. อัปเดตตาราง transactions (ใส่วันที่คืน)
-        $sqlTrans = "UPDATE transactions SET return_date = NOW(), status = 'returned' WHERE id = ?";
-        $pdo->prepare($sqlTrans)->execute([$trans_id]);
+try {
+    $pdo->beginTransaction();
 
-        // 2. อัปเดตตาราง book_items (เปลี่ยนสถานะกลับเป็นว่าง)
-        $sqlItem = "UPDATE book_items SET status = 'available' WHERE id = ?";
-        $pdo->prepare($sqlItem)->execute([$item_id]);
+    // 1. ดึงข้อมูลการยืมเพื่อดูว่าใครยืม เล่มไหน และ line_user_id คืออะไร
+    $stmtData = $pdo->prepare("SELECT t.user_id, t.book_item_id, u.fullname, u.line_user_id, bm.title 
+                               FROM transactions t
+                               JOIN users u ON t.user_id = u.id
+                               JOIN book_items bi ON t.book_item_id = bi.id
+                               JOIN book_masters bm ON bi.book_master_id = bm.id
+                               WHERE t.id = ? FOR UPDATE");
+    $stmtData->execute([$transaction_id]);
+    $data = $stmtData->fetch();
 
-        // -------------------------------------------------------------
-        // 🟢 ดึงข้อมูลเพื่อส่งแจ้งเตือนเข้า LINE (ทำก่อน Commit เพื่อความชัวร์)
-        // -------------------------------------------------------------
-        $stmtInfo = $pdo->prepare("
-            SELECT b.title, u.fullname 
-            FROM transactions t 
-            JOIN book_items bi ON t.book_item_id = bi.id 
-            JOIN book_masters b ON bi.book_master_id = b.id 
-            JOIN users u ON t.user_id = u.id 
-            WHERE t.id = ?
-        ");
-        $stmtInfo->execute([$trans_id]);
-        $info = $stmtInfo->fetch();
+    if ($data) {
+        // 2. อัปเดตสถานะรายการยืมเป็น 'returned'
+        $updateTrans = $pdo->prepare("UPDATE transactions SET status = 'returned', return_date = NOW() WHERE id = ?");
+        $updateTrans->execute([$transaction_id]);
+
+        // 3. อัปเดตสถานะเล่มหนังสือเป็น 'available'
+        $updateBook = $pdo->prepare("UPDATE book_items SET status = 'available' WHERE id = ?");
+        $updateBook->execute([$data['book_item_id']]);
 
         $pdo->commit();
 
         // -------------------------------------------------------------
-        // 🟢 ส่งข้อความเข้า LINE
+        // 🟢 ส่งแจ้งเตือนการคืนหนังสือสำเร็จ
         // -------------------------------------------------------------
-        if ($info) {
-            $msg = "🟢 คืนหนังสือสำเร็จ!\n";
-            $msg .= "👤 ผู้คืน: " . $info['fullname'] . "\n";
-            $msg .= "📚 หนังสือ: " . $info['title'] . "\n";
-            $msg .= "📅 วันที่คืน: " . date("d/m/Y H:i") . "\n";
-            $msg .= "✅ สถานะ: กลับเข้าสู่ระบบพร้อมยืมต่อ";
+        if ($data['line_user_id']) {
+            $msg = "✅ คืนหนังสือเรียบร้อยแล้วครับ\n";
+            $msg .= "👤 คุณ: " . $data['fullname'] . "\n";
+            $msg .= "📚 หนังสือ: " . $data['title'] . "\n";
+            $msg .= "⏰ วันที่คืน: " . date("d/m/Y H:i") . "\n";
+            $msg .= "ขอบคุณที่ใช้บริการห้องสมุด IT Bangna ครับ";
 
-            sendLineMessageAPI($msg);
+            sendLinePush($data['line_user_id'], $msg);
         }
-        
-        // ส่งกลับไปหน้าประวัติพร้อมแจ้งเตือน
-        header("Location: my_history.php?status=returned");
+        // -------------------------------------------------------------
+
+        header("Location: index.php?status=return_success");
         exit();
-
-    } catch (Exception $e) {
-        if ($pdo->inTransaction()) {
-            $pdo->rollBack();
-        }
-        echo "Error: " . $e->getMessage();
+    } else {
+        $pdo->rollBack();
+        header("Location: index.php?status=error");
     }
+
+} catch (Exception $e) {
+    if ($pdo->inTransaction()) { $pdo->rollBack(); }
+    header("Location: index.php?status=error");
 }
-?>
