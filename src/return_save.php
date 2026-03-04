@@ -1,49 +1,28 @@
 <?php
 session_start();
 require_once 'config.php';
-include 'line_helper.php'; // เรียกไฟล์ฟังก์ชันเข้ามา
+// ดึงฟังก์ชันมาจากไฟล์ Helper แค่ครั้งเดียวพอครับ ไม่ต้องเขียนซ้ำในไฟล์นี้แล้ว
+require_once 'line_helper.php'; 
 
-// เมื่อทำรายการสำเร็จแล้ว ก็เรียกใช้งานฟังก์ชัน
-$uid = $userData['line_user_id']; // ID ไลน์นักเรียนจากฐานข้อมูล
-$message = "ยืนยันการทำรายการสำเร็จ!";
-sendLinePush($uid, $message);
-
-// นำฟังก์ชัน sendLinePush ที่เราทำไว้มาใช้ (แนะนำให้แยกเป็นไฟล์ functions.php แล้ว include เข้ามาจะดีมากครับ)
-function sendLinePush($to, $message) {
-    $access_token = '1nKci4ldstfiR5FpGC1r+1HYvNu34Hdl3VZj6ua9QMXeEJq2BG0QaalaoXgsp6y1MjQxB36Xb0yVEnD5wv9i+Ea0U6gWJ32SIrTEMn0nnkYBoQ8ybvYNUmY3lQEgouyT0a1A9Okfs6vD03mij5yARAdB04t89/1O/w1cDnyilFU='; 
-    if(empty($access_token) || empty($to)) return false;
-
-    $url = 'https://api.line.me/v2/bot/message/push';
-    $data = [
-        'to' => $to,
-        'messages' => [['type' => 'text', 'text' => $message]]
-    ];
-    $post_body = json_encode($data, JSON_UNESCAPED_UNICODE);
-
-    $ch = curl_init($url);
-    curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "POST");
-    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-    curl_setopt($ch, CURLOPT_POSTFIELDS, $post_body);
-    curl_setopt($ch, CURLOPT_HTTPHEADER, [
-        'Content-Type: application/json',
-        'Authorization: Bearer ' . $access_token
-    ]);
-    curl_exec($ch);
-    curl_close($ch);
-}
-
-// รับค่า ID รายการที่ต้องการคืน
-$transaction_id = $_GET['id'] ?? null;
-
-if (!$transaction_id) {
+// 1. เช็คว่าล็อกอินหรือยัง
+if (!isset($_SESSION['user_id'])) {
     header("Location: index.php");
     exit();
 }
 
+// 2. รับค่า ID รายการที่ต้องการคืน (แก้ไขให้ตรงกับ URL ในรูปภาพคือ trans_id)
+$transaction_id = $_GET['trans_id'] ?? null;
+
+if (!$transaction_id) {
+    header("Location: index.php"); // หรือหน้าประวัติการยืม
+    exit();
+}
+
 try {
+    // เริ่มทำงานกับฐานข้อมูล
     $pdo->beginTransaction();
 
-    // 1. ดึงข้อมูลการยืมเพื่อดูว่าใครยืม เล่มไหน และ line_user_id คืออะไร
+    // 3. ดึงข้อมูลการยืมเพื่อดูว่าใครยืม เล่มไหน และ line_user_id คืออะไร
     $stmtData = $pdo->prepare("SELECT t.user_id, t.book_item_id, u.fullname, u.line_user_id, bm.title 
                                FROM transactions t
                                JOIN users u ON t.user_id = u.id
@@ -54,38 +33,57 @@ try {
     $data = $stmtData->fetch();
 
     if ($data) {
-        // 2. อัปเดตสถานะรายการยืมเป็น 'returned'
+        // 4. อัปเดตสถานะรายการยืมเป็น 'returned' (ส่งคืนแล้ว)
         $updateTrans = $pdo->prepare("UPDATE transactions SET status = 'returned', return_date = NOW() WHERE id = ?");
         $updateTrans->execute([$transaction_id]);
 
-        // 3. อัปเดตสถานะเล่มหนังสือเป็น 'available'
+        // 5. อัปเดตสถานะเล่มหนังสือเป็น 'available' (ว่าง)
         $updateBook = $pdo->prepare("UPDATE book_items SET status = 'available' WHERE id = ?");
         $updateBook->execute([$data['book_item_id']]);
 
+        // บันทึกข้อมูลลงฐานข้อมูล
         $pdo->commit();
 
         // -------------------------------------------------------------
-        // 🟢 ส่งแจ้งเตือนการคืนหนังสือสำเร็จ
+        // 🟢 ส่งแจ้งเตือนการคืนหนังสือสำเร็จเข้า LINE
         // -------------------------------------------------------------
-        if ($data['line_user_id']) {
-            $msg = "✅ คืนหนังสือเรียบร้อยแล้วครับ\n";
-            $msg .= "👤 คุณ: " . $data['fullname'] . "\n";
-            $msg .= "📚 หนังสือ: " . $data['title'] . "\n";
-            $msg .= "⏰ วันที่คืน: " . date("d/m/Y H:i") . "\n";
-            $msg .= "ขอบคุณที่ใช้บริการห้องสมุด IT Bangna ครับ";
+        try {
+            // ส่งหานักเรียนคนที่คืน (ถ้าเขาผูก LINE ไว้)
+            if (!empty($data['line_user_id'])) {
+                $msg = "✅ คืนหนังสือเรียบร้อยแล้วครับ\n";
+                $msg .= "👤 คุณ: " . $data['fullname'] . "\n";
+                $msg .= "📚 หนังสือ: " . $data['title'] . "\n";
+                $msg .= "⏰ วันที่คืน: " . date("d/m/Y H:i") . "\n";
+                $msg .= "ขอบคุณที่ใช้บริการห้องสมุด IT ครับ";
 
-            sendLinePush($data['line_user_id'], $msg);
+                sendLinePush($data['line_user_id'], $msg);
+            }
+            
+            // ส่งหา Admin (ให้รู้ว่ามีหนังสือคืนเข้าระบบแล้ว)
+            $admin_user_id = 'Ua019e53e001e2e7288fa2ef981c0921a';
+            $admin_msg = "✅ มีนักเรียนคืนหนังสือเข้าสู่ระบบ\nผู้คืน: " . $data['fullname'] . "\nหนังสือ: " . $data['title'];
+            
+            sendLinePush($admin_user_id, $admin_msg);
+            
+        } catch (Exception $lineError) {
+            // หากส่ง LINE ไม่ได้ ก็ไม่ให้กระทบการคืนหนังสือ
+            error_log("Line Notification Error on Return: " . $lineError->getMessage());
         }
         // -------------------------------------------------------------
 
-        header("Location: index.php?status=return_success");
+        // เด้งกลับไปหน้าที่คุณตั้งไว้ (ส่วนใหญ่มักจะเด้งกลับไปหน้าประวัติของแอดมินหรือหน้าผู้ใช้)
+        // แนะนำให้แก้ตรงนี้ให้เด้งกลับไปหน้าจอที่คุณเคยกดปุ่มคืนมาครับ
+        header("Location: my_history.php?status=success"); 
         exit();
     } else {
         $pdo->rollBack();
-        header("Location: index.php?status=error");
+        header("Location: my_history.php?status=error");
+        exit();
     }
 
 } catch (Exception $e) {
     if ($pdo->inTransaction()) { $pdo->rollBack(); }
-    header("Location: index.php?status=error");
+    header("Location: my_history.php?status=error");
+    exit();
 }
+?>
