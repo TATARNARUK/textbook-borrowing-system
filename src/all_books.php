@@ -87,7 +87,7 @@ $books = $stmt->fetchAll(PDO::FETCH_ASSOC);
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="referrer" content="no-referrer">
-    <title>หนังสือทั้งหมด</title>
+    <title>หนังสือทั้งหมด - Library Hub</title>
     <link rel="icon" type="image/png" href="images/books.png">
     
     <link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600;9..40,700&family=Noto+Sans+Thai:wght@300;400;500;600;700&display=swap" rel="stylesheet">
@@ -97,17 +97,17 @@ $books = $stmt->fetchAll(PDO::FETCH_ASSOC);
     <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
     
     <style>
-        /* === นำ CSS หลักมาใช้ === */
+        /* === นำ CSS หลักมาใช้ (InsightHub Style) === */
         *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
         :root {
-            --sidebar-w: 260px; --sidebar-bg: #ffffff; --body-bg: #f0f4fb;
+            --sidebar-w: 260px; --sidebar-bg: #ffffff; --body-bg: #f8fafc;
             --accent: #2563eb; --accent-light: #dbeafe; --accent-soft: #eff6ff;
             --text-primary: #0f172a; --text-secondary: #64748b; --text-muted: #94a3b8;
-            --border: #e2e8f0; --card-bg: #ffffff; --card-radius: 16px;
+            --border: #f1f5f9; --card-bg: #ffffff; --card-radius: 16px;
             --success: #10b981; --warning: #f59e0b; --danger: #ef4444;
             --font-main: 'DM Sans', 'Noto Sans Thai', sans-serif;
-            --shadow-sm: 0 1px 3px rgba(0,0,0,.06), 0 1px 2px rgba(0,0,0,.04);
-            --shadow-md: 0 4px 16px rgba(0,0,0,.08);
+            --shadow-sm: 0 4px 15px rgba(0, 0, 0, 0.02);
+            --shadow-md: 0 10px 25px rgba(0, 0, 0, 0.06);
         }
         body { font-family: var(--font-main); background: var(--body-bg); color: var(--text-primary); display: flex; min-height: 100vh; overflow-x: hidden; }
 
@@ -164,7 +164,7 @@ $books = $stmt->fetchAll(PDO::FETCH_ASSOC);
         .search-card {
             background: var(--card-bg);
             border-radius: var(--card-radius);
-            padding: 20px;
+            padding: 24px;
             box-shadow: var(--shadow-sm);
             border: 1px solid var(--border);
             margin-bottom: 30px;
@@ -176,7 +176,7 @@ $books = $stmt->fetchAll(PDO::FETCH_ASSOC);
         .search-input-group .btn-clear:hover { color: var(--danger); }
         .search-input-custom {
             width: 100%;
-            padding: 12px 40px 12px 42px;
+            padding: 14px 40px 14px 42px;
             border-radius: 12px;
             border: 1px solid var(--border);
             background: var(--body-bg);
@@ -185,9 +185,9 @@ $books = $stmt->fetchAll(PDO::FETCH_ASSOC);
             transition: 0.2s;
         }
         .search-input-custom:focus { border-color: var(--accent); background: white; outline: none; box-shadow: 0 0 0 3px var(--accent-light); }
-        .search-select-custom { padding: 12px 16px; border-radius: 12px; border: 1px solid var(--border); background: var(--body-bg); font-family: var(--font-main); color: var(--text-primary); cursor: pointer; transition: 0.2s;}
+        .search-select-custom { padding: 14px 16px; border-radius: 12px; border: 1px solid var(--border); background: var(--body-bg); font-family: var(--font-main); color: var(--text-primary); cursor: pointer; transition: 0.2s;}
         .search-select-custom:focus { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-light); outline: none; }
-        .btn-search { background: var(--accent); color: white; border: none; border-radius: 12px; padding: 0 24px; font-weight: 600; transition: 0.2s; box-shadow: 0 4px 12px rgba(37,99,235,0.2); }
+        .btn-search { background: var(--accent); color: white; border: none; border-radius: 12px; padding: 0 30px; font-weight: 600; transition: 0.2s; box-shadow: 0 4px 12px rgba(37,99,235,0.2); }
         .btn-search:hover { background: #1d4ed8; transform: translateY(-2px); color: white; }
 
         /* === Book Cards Grid === */
@@ -244,7 +244,7 @@ $books = $stmt->fetchAll(PDO::FETCH_ASSOC);
     <div class="sidebar-logo">
         <div class="logo-icon"><i class="fa-solid fa-book-open"></i></div>
         <div class="logo-text">
-            <strong>TEXTBOOK BORROWING SYSTEM</strong>
+            <strong>TEXTBOOK BORROWING</strong>
             <small>ระบบยืม-คืนหนังสือเรียนฟรี</small>
         </div>
     </div>
@@ -350,7 +350,7 @@ $books = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
         <div class="row g-4 mb-5">
             <?php if (count($books) > 0): ?>
-                <?php foreach ($books as $book):
+                <?php foreach ($books as $index => $book):
                     $stmtCount = $pdo->prepare("SELECT COUNT(*) FROM book_items WHERE book_master_id = ? AND status = 'available'");
                     $stmtCount->execute([$book['id']]);
                     $available = $stmtCount->fetchColumn();
@@ -365,8 +365,9 @@ $books = $stmt->fetchAll(PDO::FETCH_ASSOC);
                     } else { $img = "https://via.placeholder.com/300x450?text=No+Cover"; }
 
                     $pdf = $book['sample_pdf'];
+                    $delay = ($index % 12) * 50; // ลูกเล่นให้โหลดโชว์ทีละใบสวยๆ
                 ?>
-                    <div class="col-6 col-md-4 col-lg-3 col-xl-2 animate-fadeup">
+                    <div class="col-6 col-md-4 col-lg-3 col-xl-2 animate-fadeup" style="animation-delay: <?php echo $delay; ?>ms;">
                         <div class="book-card" data-id="<?php echo $book['id']; ?>">
                             
                             <div class="book-cover-container">
@@ -375,7 +376,7 @@ $books = $stmt->fetchAll(PDO::FETCH_ASSOC);
                                 <?php else: ?>
                                     <span class="badge-status bg-out">หมด</span>
                                 <?php endif; ?>
-                                <img src="<?php echo $img; ?>" class="book-cover" alt="Cover">
+                                <img src="<?php echo $img; ?>" class="book-cover" alt="Cover" onerror="this.src='https://via.placeholder.com/300x450?text=No+Cover'">
                             </div>
 
                             <div class="book-info">
@@ -387,7 +388,8 @@ $books = $stmt->fetchAll(PDO::FETCH_ASSOC);
                                         <i class="fa-solid fa-file-pdf"></i> ตัวอย่าง
                                     </a>
                                 <?php else: ?>
-                                    <div style="height: 31px; margin-bottom: 12px;"></div> <?php endif; ?>
+                                    <div style="height: 31px; margin-bottom: 12px;"></div> 
+                                <?php endif; ?>
 
                                 <?php if ($is_blocked): ?>
                                     <button class="btn-modern-full btn-disabled" disabled><i class="fa-solid fa-ban"></i> ระงับสิทธิ์</button>
@@ -410,7 +412,7 @@ $books = $stmt->fetchAll(PDO::FETCH_ASSOC);
                     </div>
                     <h5 class="fw-bold" style="color: var(--text-primary);">ไม่พบหนังสือที่คุณค้นหา</h5>
                     <p style="color: var(--text-muted); font-size: 14px;">ลองเปลี่ยนคำค้นหา หรือเลือกหมวดหมู่ใหม่อีกครั้ง</p>
-                    <a href="all_books.php" class="btn btn-primary rounded-pill px-4 mt-2 shadow-sm" style="font-weight: 600;">ดูหนังสือทั้งหมด</a>
+                    <a href="all_books.php" class="btn btn-search rounded-pill px-4 mt-2 shadow-sm" style="font-weight: 600; text-decoration: none; padding: 10px 24px; display: inline-block;">ดูหนังสือทั้งหมด</a>
                 </div>
             <?php endif; ?>
         </div>
