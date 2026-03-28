@@ -1,0 +1,207 @@
+<?php
+session_start();
+require_once 'config.php';
+
+// ถ้าล็อกอินค้างไว้อยู่แล้ว ให้เด้งไปหน้าหลักทันที
+if (isset($_SESSION['user_id'])) {
+    header("Location: index.php");
+    exit();
+}
+?>
+
+<!DOCTYPE html>
+<html lang="th">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>เข้าสู่ระบบ - ระบบยืมหนังสือเรียน</title>
+    <link rel="icon" type="image/png" href="images/books.png">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Thai:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css" rel="stylesheet">
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+    <nav class="navbar navbar-expand-lg navbar-custom fixed-top py-3" data-aos="fade-down" data-aos-duration="1500">
+        <div class="container">
+            <a class="navbar-brand d-flex align-items-center gap-3" href="index.php">
+                <img src="images/books.png" height="45" alt="Logo">
+                <div class="d-none d-md-block text-start">
+                    <h5 class="m-0 fw-bold text-primary" style="font-family: 'Noto Sans Thai', sans-serif;">
+                        TEXTBOOK BORROWING SYSTEM
+                    </h5>
+                    <small>ระบบยืม-คืนหนังสือเรียนฟรี</small>
+                </div>
+            </a>
+
+            <div class="ms-auto d-flex align-items-center gap-3">
+                <a href="manual.php" class="text-decoration-none nav-link-custom small">
+                    <i class="fas fa-book me-1"></i> คู่มือการใช้งาน
+                </a>
+                <div class="vr mx-2 text-secondary"></div>
+                <a href="https://www.facebook.com/kittikun.nookeaw?locale=th_TH" target="_blank"
+                    class="btn btn-sm btn-outline-primary rounded-pill px-3 ms-2">
+                    <i class="fas fa-headset me-1"></i> ติดต่อเจ้าหน้าที่
+                </a>
+            </div>
+        </div>
+    </nav>
+
+<div class="container d-flex justify-content-center align-items-start pt-5" style="min-height: 100vh;">
+    <div class="login-wrapper row g-0 shadow-lg" data-aos="zoom-in" style="border-radius: 25px; overflow: hidden; max-width: 900px; width: 100%; background: white;">
+        
+        <div class="col-md-6 login-side p-5">
+            <div class="mb-4 text-center text-md-start">
+                <div class="bg-primary bg-opacity-10 rounded-circle d-inline-flex p-3 mb-3">
+                    <i class="fas fa-user-lock fa-2x text-primary"></i>
+                </div>
+                <h3 class="fw-bold text-dark">เข้าสู่ระบบ</h3>
+                <p class="text-muted small">กรุณากรอกข้อมูลเพื่อยืนยันตัวตนเข้าระบบยืม-คืน</p>
+            </div>
+
+            <form id="loginForm">
+                <div class="mb-3">
+                    <label class="form-label text-secondary fw-medium small">รหัสนักเรียน / ชื่อผู้ใช้</label>
+                    <div class="input-group">
+                        <span class="input-group-text bg-light border-0 text-primary"><i class="fas fa-user"></i></span>
+                        <input type="text" name="student_id" class="form-control bg-light border-0 ps-2" placeholder="กรอกรหัสนักเรียน" required>
+                    </div>
+                </div>
+                <div class="mb-4">
+                    <label class="form-label text-secondary fw-medium small">รหัสผ่าน</label>
+                    <div class="input-group">
+                        <span class="input-group-text bg-light border-0 text-primary"><i class="fas fa-key"></i></span>
+                        <input type="password" name="password" class="form-control bg-light border-0 ps-2" placeholder="กรอกรหัสผ่าน RMS" required>
+                    </div>
+                </div>
+                <button type="submit" class="btn-login w-100 mb-3 shadow-sm py-2 rounded-pill fw-bold text-white border-0" style="background: linear-gradient(45deg, #0d6efd, #0dcaf0);">
+                    <i class="fas fa-sign-in-alt me-2"></i> เข้าสู่ระบบ
+                </button>
+                <div class="text-center">
+                    <a href="forgot_password.php" class="text-decoration-none text-primary small fw-medium">ลืมรหัสผ่านใช่หรือไม่?</a>
+                </div>
+            </form>
+        </div>
+
+        <div class="col-md-6 line-side p-5 d-flex flex-column justify-content-center align-items-center text-center" style="background: #f8fafc; border-left: 1px solid #edf2f7;">
+            <div class="qr-frame mb-3 p-3 bg-white shadow-sm" style="border-radius: 20px; border: 1px solid #e2e8f0;">
+                <img src="images/bot_qrcode.png" alt="LINE QR Code" style="width: 160px; height: 160px; object-fit: contain;">
+            </div>
+            <h6 class="fw-bold text-dark mb-2">
+                <i class="fab fa-line text-success fs-5 me-1"></i> บริการแจ้งเตือนผ่าน LINE
+            </h6>
+            <p class="text-muted mb-3 px-2" style="font-size: 0.8rem;">
+                สแกนแอดบอทเพื่อรับการแจ้งเตือนเมื่อยืมหนังสือสำเร็จ และรับการแจ้งเตือนเมื่อใกล้ถึงกำหนดส่งคืนอัตโนมัติ
+            </p>
+            <div class="badge bg-success bg-opacity-10 text-success border border-success border-opacity-25 rounded-pill px-3 py-2 fw-bold" style="font-size: 0.75rem;">
+                LINE ID: @695pbvul
+            </div>
+        </div>
+    </div>
+</div>
+<?php include 'footer.php'; ?>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+
+    <script>
+        // เริ่มต้น AOS Animation
+        AOS.init();
+
+        // ---------------------------------------------------------------
+        // ระบบ Login แบบ AJAX (แก้ปัญหา Popup ค้าง/ซ้อนกัน + เช็คปิด Browser)
+        // ---------------------------------------------------------------
+        document.getElementById('loginForm').addEventListener('submit', function(e) {
+            e.preventDefault(); // ห้ามรีเฟรชหน้า
+
+            // 1. เคลียร์ Popup เก่าที่อาจจะค้างอยู่ (สำคัญมาก)
+            Swal.close();
+
+            // 2. ล็อกปุ่มและหมุนติ้วๆ ที่ปุ่มแทน
+            const btn = this.querySelector('button[type="submit"]');
+            const originalContent = '<i class="fas fa-sign-in-alt me-2"></i> เข้าสู่ระบบ';
+
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> กำลังตรวจสอบ...';
+            btn.disabled = true;
+
+            const formData = new FormData(this);
+
+            // 3. ส่งข้อมูลไป auth.php
+            fetch('auth.php', {
+                    method: 'POST',
+                    body: formData
+                })
+                .then(response => response.text())
+                .then(text => {
+                    try {
+                        const data = JSON.parse(text);
+
+                        if (data.status === 'success') {
+                            // ✅ กรณีสำเร็จ
+                            Swal.fire({
+                                icon: 'success',
+                                title: 'เข้าสู่ระบบสำเร็จ',
+                                text: 'กำลังพาท่านไปหน้าแรก...',
+                                timer: 1500,
+                                showConfirmButton: false,
+                                allowOutsideClick: false,
+                                allowEscapeKey: false
+                            }).then(() => {
+                                // 🔥 [สำคัญ] ฝังตัวแปรยืนยันการล็อกอินลงใน Browser
+                                // ตัวแปรนี้จะหายไปทันทีเมื่อปิด Browser
+                                sessionStorage.setItem('is_logged_in', 'true');
+
+                                window.location.href = 'index.php';
+                            });
+
+                        } else {
+                            // ❌ กรณีรหัสผิด
+                            throw new Error(data.message || 'รหัสผ่านไม่ถูกต้อง');
+                        }
+
+                    } catch (err) {
+                        let errorText = err.message;
+                        if (err instanceof SyntaxError) {
+                            errorText = 'เกิดข้อผิดพลาดจากเซิร์ฟเวอร์ (Invalid JSON)';
+                        }
+
+                        Swal.close();
+                        setTimeout(() => {
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'เข้าสู่ระบบไม่สำเร็จ',
+                                text: errorText,
+                                confirmButtonColor: '#0d6efd',
+                                confirmButtonText: 'ตกลง'
+                            });
+                        }, 100);
+                    }
+                })
+                .catch(error => {
+                    Swal.close();
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'การเชื่อมต่อขัดข้อง',
+                        text: 'ไม่สามารถติดต่อเซิร์ฟเวอร์ได้',
+                        confirmButtonText: 'ตกลง'
+                    });
+                })
+                .finally(() => {
+                    // คืนค่าปุ่มเสมอ (ถ้าไม่ได้กำลังจะเปลี่ยนหน้า)
+                    if (!window.location.href.includes('index.php')) {
+                        setTimeout(() => {
+                            btn.innerHTML = originalContent;
+                            btn.disabled = false;
+                        }, 300);
+                    }
+                });
+        });
+    </script>
+
+</body>
+
+</html>
